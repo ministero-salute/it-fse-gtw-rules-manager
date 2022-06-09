@@ -19,14 +19,7 @@ public interface ISchemaRepo extends Serializable {
 	 * @return Schema inserted.
 	 */
 	SchemaETY insert(SchemaETY ety);
-
-	/**
-	 * Return a Schema identified by its {@code pk}.
-	 * 
-	 * @param pk Primary key of the Schema to return.
-	 * @return Schema identified by its {@code pk}.
-	 */
-	SchemaETY findById(String pk);
+ 
 
 	/**
 	 * Inserts all schemas.
@@ -34,15 +27,7 @@ public interface ISchemaRepo extends Serializable {
 	 * @param etys List of schemas to insert.
 	 */
 	void insertAll(List<SchemaETY> etys);
-
-	/**
-	 * Execute upsert on schema.
-	 * 
-	 * @param ety 	  Schema to upsert.
-	 * @param boolean Root schema.
-	 * @return Number of schemas upserted.
-	 */
-	Integer upsertByVersion(SchemaETY ety, Boolean rootSchema);
+ 
 
 	/**
 	 * Return a list of all Schema.
@@ -50,8 +35,9 @@ public interface ISchemaRepo extends Serializable {
 	 * @return List of all Schema.
 	 */
 	List<SchemaETY> findAll();
+	 
 	
-	List<SchemaETY> findAllChildrenSchemaByVersion(String version);
+	boolean existByTypeIdExtension(String typeIdExtension);
 	
-	boolean existByVersion(String version);
+	void dropCollection();
 }

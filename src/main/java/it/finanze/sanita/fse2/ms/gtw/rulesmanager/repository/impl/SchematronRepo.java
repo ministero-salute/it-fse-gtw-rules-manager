@@ -65,5 +65,14 @@ public class SchematronRepo extends AbstractMongoRepo<SchematronETY, String> imp
 		return output;
 	}
 	
+	@Override
+	public void dropCollection() {
+		try {
+			mongoTemplate.dropCollection(SchematronETY.class);
+		} catch(Exception ex) {
+			log.error("Error while execute exists by version query " + getClass() , ex);
+			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
+		}
+	}
 	
 }

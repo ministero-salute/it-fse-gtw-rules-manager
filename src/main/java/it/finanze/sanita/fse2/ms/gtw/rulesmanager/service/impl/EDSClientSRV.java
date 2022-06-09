@@ -9,7 +9,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IEDSClientSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ISchemaSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ISchematronSRV;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IVocabularySRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IXslTransformSRV;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +36,7 @@ public class EDSClientSRV extends AbstractService implements IEDSClientSRV {
 	private ISchematronSRV schematronSRV;
 
 	@Autowired
-	private IVocabularySRV vocabularySRV;
-
-	@Autowired
-	private IXslTransformSRV xslTransformSRV;
+	private ITerminologySRV vocabularySRV;
 
 	@Override
 	public Boolean saveEDSConfigurationItems() {
@@ -63,8 +60,8 @@ public class EDSClientSRV extends AbstractService implements IEDSClientSRV {
 		try {
 			schemaSRV.saveNewVersionSchema(configurationItems.getSchema()); 
 			schematronSRV.saveNewVersionSchematron(configurationItems.getSchematron());
-			xslTransformSRV.saveNewVersionXslTransform(configurationItems.getXslTransform());
 			vocabularySRV.saveNewVocabularySystems(configurationItems.getVocabulary());
+			vocabularySRV.saveDictionaryFiles();
 		} catch (Exception e) {
 			String error = "Error saving on database the configuration items object received from EDS Client";
 			log.error(error);

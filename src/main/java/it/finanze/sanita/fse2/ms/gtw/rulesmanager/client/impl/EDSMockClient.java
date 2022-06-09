@@ -35,6 +35,7 @@ public class EDSMockClient extends AbstractClient implements IEDSClient {
     @Override
     public ConfigItemDTO getConfigurationItems() {
         log.info("Calling Mocked EDS Client to retrieve configuration items...");
+        mockSRV.dropCollections();
         return mockSRV.mockConfigurationItem();
     }
  

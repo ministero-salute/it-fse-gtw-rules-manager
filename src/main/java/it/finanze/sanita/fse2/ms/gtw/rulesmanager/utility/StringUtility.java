@@ -1,5 +1,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;
@@ -99,7 +100,7 @@ public final class StringUtility {
 	 */
 	public static String getFilename(final String completePath) {
 		String output = completePath;
-		int index = completePath.lastIndexOf('\\');
+		int index = completePath.lastIndexOf(File.separator);
 		if(index > 0) {
 			output = completePath.substring(index + 1);
 		}

@@ -16,9 +16,9 @@ import lombok.Data;
 public class SchemaDTO {
     
 	/**
-     * Version.
+     * Type id extension.
      */
-	private String version;
+	private String typeIdExtension;
 
 	/**
      * Schema father.

@@ -23,12 +23,10 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchemaEntryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ISchemaRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ISchematronRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IVocabularyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IXslTransformRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.VocabularyETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.InvokeEDSClientScheduler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +49,7 @@ class FirstUserStory extends AbstractTest {
     private IXslTransformRepo xslTransformRepo;
 
     @Autowired
-    private IVocabularyRepo vocabularyRepo;
+    private ITerminologyRepo vocabularyRepo;
     
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -72,23 +70,18 @@ class FirstUserStory extends AbstractTest {
 
     private void assertItemsArePersisted(ConfigItemDTO configurationItems) {
         List<SchemaETY> schemas = schemaRepo.findAll().stream().filter(e-> !Boolean.TRUE.equals(e.getRootSchema())).collect(Collectors.toList());
-        List<SchematronETY> schematrons = schematronRepo.findAll();
-        List<VocabularyETY> vocabularies = vocabularyRepo.findAll();
-        List<XslTransformETY> xslTransforms = xslTransformRepo.findAll();
+        List<TerminologyETY> vocabularies = vocabularyRepo.findAll();
 
         assertTrue(configurationItems.getSchema().getSchemaChildEntryDTO().size() == schemas.size());
-        assertTrue(configurationItems.getSchematron().get(0).getChildrenSchematronList().size() + 1 == schematrons.size());
         //+8 sono item in più aggiungi per il cda da validare
         assertTrue(configurationItems.getVocabulary().get(0).getEntryDTO().size()+8  == vocabularies.size());
-        assertTrue(configurationItems.getXslTransform().get(0).getEntryListDTO().size() == xslTransforms.size());
 
         List<SchemaETY> toCompare = new ArrayList<>();
         for(SchemaEntryDTO entryDTO : configurationItems.getSchema().getSchemaChildEntryDTO()) {
         	SchemaETY schema = new SchemaETY();
-        	schema.setCdaType(entryDTO.getCdaType());
         	schema.setContentSchema(entryDTO.getContentSchema());
         	schema.setNameSchema(entryDTO.getNameSchema());
-        	schema.setVersion(configurationItems.getSchema().getVersion());
+        	schema.setTypeIdExtension(configurationItems.getSchema().getTypeIdExtension());
         	toCompare.add(schema);
         }
         assertSchemaAreEquals(toCompare , schemas); 

@@ -53,13 +53,9 @@ class EDSClientTest extends AbstractTest {
         assertNotNull(response, "Response should not be null");
         
         assertFalse(CollectionUtils.isEmpty(response.getSchema().getSchemaChildEntryDTO()));
-        assertFalse(CollectionUtils.isEmpty(response.getSchematron().get(0).getChildrenSchematronList()));
-        assertFalse(CollectionUtils.isEmpty(response.getXslTransform().get(0).getEntryListDTO()));
         assertFalse(CollectionUtils.isEmpty(response.getVocabulary().get(0).getEntryDTO()));
 
         assertTrue(configurationItems.getSchema().getSchemaChildEntryDTO().size() == response.getSchema().getSchemaChildEntryDTO().size());
-        assertTrue(configurationItems.getSchematron().get(0).getChildrenSchematronList().size() == response.getSchematron().get(0).getChildrenSchematronList().size());
-        assertTrue(configurationItems.getXslTransform().get(0).getEntryListDTO().size() == response.getXslTransform().get(0).getEntryListDTO().size());
         assertTrue(configurationItems.getVocabulary().get(0).getEntryDTO().size() == response.getVocabulary().get(0).getEntryDTO().size());
      }
     

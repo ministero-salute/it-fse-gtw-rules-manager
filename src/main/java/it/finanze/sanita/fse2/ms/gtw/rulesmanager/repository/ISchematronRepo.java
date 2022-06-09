@@ -44,4 +44,6 @@ public interface ISchematronRepo extends Serializable {
 
 	
 	boolean existByTemplateIdRoot(String templateIdRoot);
+	
+	void dropCollection();
 }

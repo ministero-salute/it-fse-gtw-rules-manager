@@ -25,11 +25,11 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyBuilderTestDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.VocabularyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ISchemaSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ISchematronSRV;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IVocabularySRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IXslTransformSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
@@ -46,7 +46,7 @@ public class PersistenceTest extends AbstractTest {
 	private ISchematronSRV schematronSRV;
 	
 	@Autowired
-	private IVocabularySRV vocabularySRV;
+	private ITerminologySRV vocabularySRV;
 	 
 	@Autowired
 	private IXslTransformSRV xslTtransformSRV;
@@ -84,10 +84,9 @@ public class PersistenceTest extends AbstractTest {
 		byte[] schemaContent = FileUtility.getFileFromInternalResources(fileName);
 		String newFilename = StringUtility.getFilename(fileName);
 		SchemaETY ety = new SchemaETY();
-		ety.setCdaType("CDA TEST");
 		ety.setContentSchema(new Binary(BsonBinarySubType.BINARY, schemaContent));
 		ety.setNameSchema(newFilename);
-		ety.setVersion("1.0.0");
+		ety.setTypeIdExtension("1.0.0");
 		if(rootFile) {
 			ety.setRootSchema(true);	
 		}
@@ -102,11 +101,8 @@ public class PersistenceTest extends AbstractTest {
 		byte[] schematronContent = FileUtility.getFileFromInternalResources("Files" + File.separator + "schematron" + File.separator + schematronFilename);
 		SchematronETY ety = new SchematronETY();
 		ety.setContentSchematron(new Binary(BsonBinarySubType.BINARY, schematronContent));
-		ety.setNameSchematron(schematronFilename);
-		ety.setCdaCode("11502-2");
-		ety.setCdaCodeSystem("2.16.840.1.113883.6.1");
+		ety.setNameSchematron(schematronFilename); 
 		ety.setTemplateIdRoot("1.3");
-		ety.setRootSchematron(true);
 		ety = schematronSRV.insert(ety);
 		
 		SchematronETY out = schematronSRV.findById(ety.getId());
@@ -116,9 +112,7 @@ public class PersistenceTest extends AbstractTest {
 		schematronContent = FileUtility.getFileFromInternalResources("Files" + File.separator + "schematron" + File.separator + schematronFilename);
 		ety = new SchematronETY();
 		ety.setContentSchematron(new Binary(BsonBinarySubType.BINARY, schematronContent));
-		ety.setNameSchematron(schematronFilename);
-		ety.setCdaCode("11502-2");
-		ety.setCdaCodeSystem("2.16.840.1.113883.6.1");
+		ety.setNameSchematron(schematronFilename); 
 		ety.setTemplateIdRoot("1.3");
 		ety = schematronSRV.insert(ety);
 	}
@@ -134,9 +128,9 @@ public class PersistenceTest extends AbstractTest {
 		List<VocabularyBuilderTestDTO> vocabularyListDTO = buildDTOFromCsv(reader);
 		vocabularyListDTO.remove(0);
 
-		List<VocabularyETY> listToSave = new ArrayList<>();
+		List<TerminologyETY> listToSave = new ArrayList<>();
 		for(VocabularyBuilderTestDTO vocabularyDTO : vocabularyListDTO) {
-			VocabularyETY ety = new VocabularyETY();
+			TerminologyETY ety = new TerminologyETY();
 			ety.setCode(vocabularyDTO.getCode());
 			ety.setDescription(vocabularyDTO.getDescription());
 			ety.setSystem("2.16.840.1.113883.6.1");

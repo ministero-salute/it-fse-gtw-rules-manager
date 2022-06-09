@@ -16,24 +16,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
+ * Controller test.
  * 
  * @author vincenzoingenito
- *
- * Controller test.
  */
-@RequestMapping(path = "/v1")
+@RequestMapping(path = "/v1.0.0")
 @Tag(name = "Servizio di test")
 public interface ITestCTL extends Serializable {
-	
-	@PostMapping("/add_schema_schematron_version")
-    @Operation(summary = "Add schema e schematron version", description = "Servizio che consente di aggiungere gli schema e schematron alla base dati.")
-    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class)))
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Duplicazione avvenuta con successo", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class)))})
-    void addSchemaAndSchematronVersion(HttpServletRequest request);
-	
-	@PostMapping("/update_data_ultimo_aggiornamento")
+ 
+    @PostMapping("/update-data-ultimo-aggiornamento")
     @Operation(summary = "Update data ultimo aggiornamento schema e schematron", description = "Update data ultimo aggiornamento schema e schematron.")
-    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class)))
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class)))})
+    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = void.class)))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
     void updateDataUltimoAggiornamento(HttpServletRequest request);
 }

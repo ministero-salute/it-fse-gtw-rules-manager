@@ -2,6 +2,8 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto;
 
 import java.util.List;
 
+import org.bson.types.Binary;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,24 +17,24 @@ import lombok.Data;
 public class SchematronDTO {
     
 	/**
-     * Version.
+     * Cda template id.
      */
 	private String templateIdRoot;
 	
 	/**
-     * Father schematron.
+     * Template id extension.
      */
-	private SchematronEntryDTO fatherSchematron;
+	private String templateIdExtension;
 	
-    
-    /**
-     * List of schematrons child.
+	/**
+     * Content schematron.
      */
-    private List<SchematronEntryDTO> childrenSchematronList;
-    
-    /**
-     * Xsd Version.
+	private Binary contentSchematron;
+
+	/**
+     * Name schematron.
      */
-	private String xsdVersion;
+	private String nameSchematron;
+	
  
 }

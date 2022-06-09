@@ -1,6 +1,5 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchematronDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchematronEntryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ISchematronRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
@@ -76,11 +74,8 @@ public class SchematronSRV implements ISchematronSRV {
 					boolean exist = schematronRepo.existByTemplateIdRoot(schematronDTO.getTemplateIdRoot());
 					Date dataUltimoAggiornamento = new Date();
 					if(Boolean.FALSE.equals(exist)) {
-						SchematronETY schematronFather = buildDtoToEty(schematronDTO.getFatherSchematron(), true, schematronDTO.getTemplateIdRoot(), schematronDTO.getXsdVersion(),dataUltimoAggiornamento);
+						SchematronETY schematronFather = buildDtoToEty(schematronDTO, dataUltimoAggiornamento);
 						schematronRepo.insert(schematronFather);
-						
-						List<SchematronETY> schematronChildren = buildDtoToEty(schematronDTO.getChildrenSchematronList(), false, schematronDTO.getTemplateIdRoot(), schematronDTO.getXsdVersion(),dataUltimoAggiornamento);
-						schematronRepo.insertAll(schematronChildren);
 					}
 				}
  			}
@@ -91,30 +86,15 @@ public class SchematronSRV implements ISchematronSRV {
 		return counter;
 	}
 	
-	private List<SchematronETY> buildDtoToEty(List<SchematronEntryDTO> schematronEntriesDTO, Boolean rootSchema, 
-			String templateIdRoot, String xsdSchemaVersion,Date dataUltimoAggiornamento) {
-		List<SchematronETY> output = new ArrayList<>();
-		
-		for(SchematronEntryDTO schematronEntryDTO : schematronEntriesDTO) {
-			output.add(buildDtoToEty(schematronEntryDTO, rootSchema,templateIdRoot,
-					xsdSchemaVersion,dataUltimoAggiornamento));
-		}
-		
-		return output;
-	}
 	
-	private SchematronETY buildDtoToEty(SchematronEntryDTO schematronEntryDTO, Boolean rootSchema, 
-			String templateIdRoot,String xsdSchemaVersion, final Date dataUltimoAggiornamento) {
+	private SchematronETY buildDtoToEty(SchematronDTO schematronDTO, final Date dataUltimoAggiornamento) {
 		SchematronETY output = new SchematronETY();
 		output.setId(null);
-		output.setCdaCode(schematronEntryDTO.getCdaCode());
-		output.setCdaCodeSystem(schematronEntryDTO.getCdaCodeSystem());
-		output.setContentSchematron(schematronEntryDTO.getContentSchematron());
-		output.setNameSchematron(schematronEntryDTO.getNameSchematron());
-		output.setRootSchematron(rootSchema);
-		output.setTemplateIdRoot(templateIdRoot);
-		output.setTemplateIdExtension(schematronEntryDTO.getTemplateIdExtension());
-		output.setDataUltimoAggiornamento(dataUltimoAggiornamento);
+		output.setContentSchematron(schematronDTO.getContentSchematron());
+		output.setNameSchematron(schematronDTO.getNameSchematron());
+		output.setTemplateIdRoot(schematronDTO.getTemplateIdRoot());
+		output.setTemplateIdExtension(schematronDTO.getTemplateIdExtension());
+		output.setLastUpdateDate(dataUltimoAggiornamento);
 		return output;
 	}
 }

@@ -25,11 +25,6 @@ public class ConfigItemDTO {
 	private List<SchematronDTO> schematron;
 
 	/**
-	 * Xsl transform.
-	 */
-	private List<XslTransformDTO> xslTransform;
-	
-	/**
 	 * Vocabulary.
 	 */
 	private List<VocabularyDTO> vocabulary;

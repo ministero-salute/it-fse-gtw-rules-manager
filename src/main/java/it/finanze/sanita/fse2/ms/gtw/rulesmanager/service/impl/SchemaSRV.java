@@ -60,15 +60,15 @@ public class SchemaSRV implements ISchemaSRV {
 		Integer counter = 0;
 		try {
 			if(schemaDTO!=null) {
-				final String version = schemaDTO.getVersion();
-				boolean exist = schemaRepo.existByVersion(version);
+				final String typeIdExtension = schemaDTO.getTypeIdExtension();
+				boolean exist = schemaRepo.existByTypeIdExtension(typeIdExtension);
 				
 				Date dataUltimoAggiornamento = new Date();
 				if(Boolean.FALSE.equals(exist)) {
-					SchemaETY fatherToSave = buildDtoToETY(schemaDTO.getSchemaFatherEntryDTO(), true, version,dataUltimoAggiornamento);
+					SchemaETY fatherToSave = buildDtoToETY(schemaDTO.getSchemaFatherEntryDTO(), true, typeIdExtension,dataUltimoAggiornamento);
 					schemaRepo.insert(fatherToSave);
 					
-					List<SchemaETY> childrenToSave = buildDtoToETYS(schemaDTO.getSchemaChildEntryDTO(), false, version,dataUltimoAggiornamento);
+					List<SchemaETY> childrenToSave = buildDtoToETYS(schemaDTO.getSchemaChildEntryDTO(), false, typeIdExtension,dataUltimoAggiornamento);
 					schemaRepo.insertAll(childrenToSave);
 				}
 			}
@@ -87,15 +87,14 @@ public class SchemaSRV implements ISchemaSRV {
 		return output;
 	}
 	
-	private SchemaETY buildDtoToETY(final SchemaEntryDTO schemaEntryDTO, final Boolean rootSchema, final String version,final Date dataUltimoAggiornamento) {
+	private SchemaETY buildDtoToETY(final SchemaEntryDTO schemaEntryDTO, final Boolean rootSchema, final String typeIdExtension,final Date dataUltimoAggiornamento) {
 		SchemaETY output = new SchemaETY();
 		output.setId(null);
-		output.setCdaType(schemaEntryDTO.getCdaType());
 		output.setContentSchema(schemaEntryDTO.getContentSchema());
 		output.setNameSchema(schemaEntryDTO.getNameSchema());
-		output.setVersion(version);
+		output.setTypeIdExtension(typeIdExtension);
 		output.setRootSchema(rootSchema);
-		output.setDataUltimoAggiornamento(dataUltimoAggiornamento);
+		output.setLastUpdateDate(dataUltimoAggiornamento);	
 		return output;
 	}
 }

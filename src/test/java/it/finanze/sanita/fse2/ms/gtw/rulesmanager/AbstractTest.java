@@ -21,7 +21,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.properties.EDSClientCFG
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.VocabularyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import lombok.extern.slf4j.Slf4j;
@@ -61,9 +61,8 @@ public abstract class AbstractTest {
     void assertSchemaAreEquals(List<SchemaETY> actual, List<SchemaETY> expected) {
 
         for (int i = 0; i < actual.size(); i++) {
-            assertTrue(actual.get(i).getCdaType().equals(expected.get(i).getCdaType()), String.format("Actual CDA is %s and expected is %s", actual.get(i).getCdaType(), expected.get(i).getCdaType()));
             assertTrue(actual.get(i).getNameSchema().equals(expected.get(i).getNameSchema()), String.format( "Actual Schema name is %s and expected is %s", actual.get(i).getNameSchema(), expected.get(i).getNameSchema()));
-            assertTrue(actual.get(i).getVersion().equals(expected.get(i).getVersion()), String.format( "Actual schema version is %s and expected is %s", actual.get(i).getVersion(), expected.get(i).getVersion()));
+            assertTrue(actual.get(i).getTypeIdExtension().equals(expected.get(i).getTypeIdExtension()), String.format( "Actual schema version is %s and expected is %s", actual.get(i).getTypeIdExtension(), expected.get(i).getTypeIdExtension()));
             assertTrue((actual.get(i).getContentSchema() == null && expected.get(i).getContentSchema() == null)
                     || (actual.get(i).getContentSchema().equals(expected.get(i).getContentSchema())), "Content schema is different");
         }
@@ -71,8 +70,7 @@ public abstract class AbstractTest {
 
     void assertSchematronAreEquals(List<SchematronETY> actual, List<SchematronETY> expected) {
 
-        for (int i = 0; i < actual.size(); i++) {
-            assertTrue(actual.get(i).getCdaCode().equals(expected.get(i).getCdaCode()), String.format("Actual CDA is %s and expected is %s", actual.get(i).getCdaCode(), expected.get(i).getCdaCode()));
+        for (int i = 0; i < actual.size(); i++) { 
             assertTrue(actual.get(i).getNameSchematron().equals(expected.get(i).getNameSchematron()), String.format( "Actual Schematron name is %s and expected is %s", actual.get(i).getNameSchematron(), expected.get(i).getNameSchematron()));
 //            assertTrue(actual.get(i).getXsdSchemaVersion().equals(expected.get(i).getXsdSchemaVersion()), String.format( "Actual schematron version is %s and expected is %s", actual.get(i).getXsdSchemaVersion(), expected.get(i).getXsdSchemaVersion()));
             assertTrue((actual.get(i).getContentSchematron() == null && expected.get(i).getContentSchematron() == null)
@@ -91,7 +89,7 @@ public abstract class AbstractTest {
         }
     }
 
-    void assertVocabulariesAreEquals(List<VocabularyETY> actual, List<VocabularyETY> expected) {
+    void assertVocabulariesAreEquals(List<TerminologyETY> actual, List<TerminologyETY> expected) {
        
         for (int i = 0; i < actual.size(); i++) {
             assertTrue(actual.get(i).getCode().equals(expected.get(i).getCode()), String.format("Actual Code is %s and expected is %s", actual.get(i).getCode(), expected.get(i).getCode()));
@@ -101,7 +99,7 @@ public abstract class AbstractTest {
     }
     
     protected void dropVocabularyCollection() {
-    	mongoTemplate.dropCollection(VocabularyETY.class);
+    	mongoTemplate.dropCollection(TerminologyETY.class);
     }
     
     protected void dropSchematronCollection() {

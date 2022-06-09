@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
-import com.mongodb.client.result.UpdateResult;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ISchemaRepo;
@@ -39,11 +36,6 @@ public class SchemaRepo extends AbstractMongoRepo<SchemaETY, String> implements 
 	}
 
 	@Override
-	public SchemaETY findById(String pk) {
-		return super.findByID(pk);
-	}
-
-	@Override
 	public void insertAll(List<SchemaETY> etys) {
 		super.insertAll(etys);
 	}
@@ -52,54 +44,13 @@ public class SchemaRepo extends AbstractMongoRepo<SchemaETY, String> implements 
 	public List<SchemaETY> findAll() {
 		return super.findAll();
 	}
-	
+	 
 	@Override
-	public Integer upsertByVersion(final SchemaETY ety, final Boolean rootSchema) {
-		Integer output = 0;
-		try {
-			Query query = new Query();
-			query.addCriteria(Criteria.where("version").is(ety.getVersion()).and("cda_type").is(ety.getCdaType()).and("name_schema").is(ety.getNameSchema()));
-			
-			Update update = new Update();
-			update.set("cda_type", ety.getCdaType());
-			update.set("name_schema", ety.getNameSchema());
-			update.set("content_schema", ety.getContentSchema());
-			update.set("version", ety.getVersion());
-			
-			if(Boolean.TRUE.equals(rootSchema)) {
-				update.set("root_schema", true);
-			}
-			
-			UpdateResult uResult = mongoTemplate.upsert(query, update, SchemaETY.class);
-			output = (int)uResult.getModifiedCount();
-		} catch(Exception ex) {
-			log.error("Error upserting ety schema " , ex);
-			throw new BusinessException("Error inserting ety schema ", ex);
-		}
-		return output;
-	
-	}
-	
-	@Override
-	public List<SchemaETY> findAllChildrenSchemaByVersion(final String version) {
-		List<SchemaETY> out = null;
-		try {
-			Query query = new Query();
-			query.addCriteria(Criteria.where("version").is(version).and("root_schema").ne(true));
-			out = mongoTemplate.find(query, SchemaETY.class);
-		} catch(Exception ex) {
-			log.error("Error while find all children schema by version " , ex);
-			throw new BusinessException("Error while find all children schema by version ", ex);
-		}
-		return out;
-	}
-
-	@Override
-	public boolean existByVersion(final String version) {
+	public boolean existByTypeIdExtension(final String typeIdExtension) {
 		boolean output = false;
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("version").is(version));
+			query.addCriteria(Criteria.where("type_id_extension").is(typeIdExtension));
 			output = mongoTemplate.exists(query, SchemaETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute exists by version query " + getClass() , ex);
@@ -108,5 +59,14 @@ public class SchemaRepo extends AbstractMongoRepo<SchemaETY, String> implements 
 		return output;
 	}
 
+	@Override
+	public void dropCollection() {
+		try {
+			mongoTemplate.dropCollection(SchemaETY.class);
+		} catch(Exception ex) {
+			log.error("Error while execute exists by version query " + getClass() , ex);
+			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
+		}
+	}
 }
  		
