@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
@@ -32,7 +33,7 @@ public class DictionaryRepo extends AbstractMongoRepo<DictionaryETY, String> imp
 	@Override
 	public void dropCollection() {
 		try {
-			mongoTemplate.dropCollection(DictionaryETY.class);
+			mongoTemplate.remove(new Query(), DictionaryETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute exists by version query " + getClass() , ex);
 			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);

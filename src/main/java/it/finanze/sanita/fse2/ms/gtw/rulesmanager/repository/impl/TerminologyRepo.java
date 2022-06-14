@@ -104,7 +104,7 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 	@Override
 	public void dropCollection() {
 		try {
-			mongoTemplate.dropCollection(TerminologyETY.class);
+			mongoTemplate.remove(new Query(), TerminologyETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute exists by version query " + getClass() , ex);
 			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);

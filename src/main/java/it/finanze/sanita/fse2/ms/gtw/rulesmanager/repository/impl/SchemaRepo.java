@@ -62,7 +62,7 @@ public class SchemaRepo extends AbstractMongoRepo<SchemaETY, String> implements 
 	@Override
 	public void dropCollection() {
 		try {
-			mongoTemplate.dropCollection(SchemaETY.class);
+			mongoTemplate.remove(new Query(), SchemaETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute exists by version query " + getClass() , ex);
 			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
