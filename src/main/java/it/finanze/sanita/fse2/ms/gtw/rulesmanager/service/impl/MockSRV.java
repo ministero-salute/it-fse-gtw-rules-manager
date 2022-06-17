@@ -466,14 +466,16 @@ public class MockSRV implements IMockSRV {
 
 		Map<String,String> schematronTemplateMap = buildMapSchematronTemplate();
 		try {
-			File directory = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "schematron");
 			
+			ClassLoader classLoader = getClass().getClassLoader();
+			File directory = new File(classLoader.getResource("Files"+ File.separator + "schematron").toURI());
+
 			//only first level files
 			String[] actualFiles = directory.list();
 			
 			if (actualFiles!=null && actualFiles.length>0) {
 				for (String namefile : actualFiles) {
-					File file = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "schematron" + File.separator + namefile);
+					File file = new File(classLoader.getResource("Files" + File.separator + "schematron"+ File.separator + namefile).toURI());
 					byte[] content = Files.readAllBytes(file.toPath());
 					SchematronDTO schematron = SchematronDTO.builder().
 							contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
