@@ -35,6 +35,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.TerminologyRep
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import lombok.extern.slf4j.Slf4j;
+import nonapi.io.github.classgraph.utils.FileUtils;
 
 @Service
 @Slf4j
@@ -466,14 +467,15 @@ public class MockSRV implements IMockSRV {
 
 		Map<String,String> schematronTemplateMap = buildMapSchematronTemplate();
 		try {
-			File directory = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "schematron");
+			ClassLoader classLoader = getClass().getClassLoader();
+			File directory = new File(classLoader.getResource("Files//schematron").getFile());
 			
 			//only first level files
 			String[] actualFiles = directory.list();
 			
 			if (actualFiles!=null && actualFiles.length>0) {
 				for (String namefile : actualFiles) {
-					File file = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "schematron" + File.separator + namefile);
+					File file = new File(classLoader.getResource("Files//schematron//"+namefile).getFile());
 					byte[] content = Files.readAllBytes(file.toPath());
 					SchematronDTO schematron = SchematronDTO.builder().
 							contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
@@ -495,8 +497,8 @@ public class MockSRV implements IMockSRV {
 		Map<String,String> mapSchematronRoot = new HashMap<>();
 		mapSchematronRoot.put("schematron_PSS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
 		mapSchematronRoot.put("schematron_RSA_v3.4.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
-		mapSchematronRoot.put("schematron_VPS_v 2.1.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
-		mapSchematronRoot.put("schematronFSE_LDO_V3.2 .sch" , "2.16.840.1.113883.2.9.10.1.5");
+		mapSchematronRoot.put("schematron_VPS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
+		mapSchematronRoot.put("schematronFSE_LDO_V3.2.sch" , "2.16.840.1.113883.2.9.10.1.5");
 		mapSchematronRoot.put("schematronFSE_RAD_v2.2.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
 		mapSchematronRoot.put("schematronFSEv9.sch" , "2.16.840.1.113883.2.9.10.1.1");
 		return mapSchematronRoot;
