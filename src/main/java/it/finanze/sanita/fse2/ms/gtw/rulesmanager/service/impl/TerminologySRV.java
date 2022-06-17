@@ -132,6 +132,7 @@ public class TerminologySRV implements ITerminologySRV {
 					out.add(dic);
 				}
 				dictionaryRepo.insertAll(out);
+				log.info("Files recovered in " + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "dictionary" +": " + actualFiles.length);
 			}
 			
 			

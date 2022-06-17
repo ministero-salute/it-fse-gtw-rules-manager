@@ -70,12 +70,14 @@ public class SchemaSRV implements ISchemaSRV {
 					
 					List<SchemaETY> childrenToSave = buildDtoToETYS(schemaDTO.getSchemaChildEntryDTO(), false, typeIdExtension,dataUltimoAggiornamento);
 					schemaRepo.insertAll(childrenToSave);
+					counter += childrenToSave.size();
 				}
 			}
 		} catch(Exception ex) {
 			log.error("Error while execute save new version schema :" , ex);
 			throw new BusinessException("Error while execute save new version schema :" , ex);
 		}
+		log.info("VersionSchema saved on db : " + counter);
 		return counter;
 	}
 	

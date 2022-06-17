@@ -483,6 +483,7 @@ public class MockSRV implements IMockSRV {
 							build();
 					out.add(schematron);
 				}
+				log.info("Files recovered in " + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "schematron" +": " + actualFiles.length);
 			}
 		} catch(Exception ex) {
 			log.error("Error while get schematron files : " + ex);
