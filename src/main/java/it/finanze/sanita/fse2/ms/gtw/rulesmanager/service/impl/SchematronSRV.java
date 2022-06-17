@@ -76,6 +76,7 @@ public class SchematronSRV implements ISchematronSRV {
 					if(Boolean.FALSE.equals(exist)) {
 						SchematronETY schematronFather = buildDtoToEty(schematronDTO, dataUltimoAggiornamento);
 						schematronRepo.insert(schematronFather);
+						counter += 1;
 					}
 				}
  			}
@@ -83,6 +84,7 @@ public class SchematronSRV implements ISchematronSRV {
 			log.error("Error while execute save new version schema :" , ex);
 			throw new BusinessException("Error while execute save new version schema :" , ex);
 		}
+		log.info("VersionSchematron saved on db : " + counter);
 		return counter;
 	}
 	
