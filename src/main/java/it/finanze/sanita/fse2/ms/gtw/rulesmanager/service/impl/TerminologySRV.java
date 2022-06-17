@@ -1,7 +1,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +18,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -117,24 +117,16 @@ public class TerminologySRV implements ITerminologySRV {
 		List<DictionaryETY> out = new ArrayList<>();
 		
 		try {
-			ClassLoader classLoader = getClass().getClassLoader();
-			File directory = new File(classLoader.getResource("Files" + File.separator + "dictionary").toURI());
 			
-			//only first level files.
-			String[] actualFiles = directory.list();
-			
-			if (actualFiles!=null && actualFiles.length>0) {
-				for (String namefile : actualFiles) {
-					File file = new File(classLoader.getResource("Files" + File.separator + "dictionary"+File.separator +namefile).toURI());
-					byte[] content = Files.readAllBytes(file.toPath());
+			List<String> dictionaries = getListDictionary();
+				for (String namefile : dictionaries) {
+					byte[] content = FileUtility.getFileFromInternalResources("Files" + File.separator + "dictionary" + File.separator + namefile);
 					DictionaryETY dic = new DictionaryETY();
 					dic.setContentFile(new Binary(BsonBinarySubType.BINARY, content));
 					dic.setFileName(namefile);
 					out.add(dic);
 				}
 				dictionaryRepo.insertAll(out);
-				log.info("Files recovered in " + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "Files" + File.separator + "dictionary" +": " + actualFiles.length);
-			}
 			
 			
 		} catch(Exception ex) {
@@ -142,5 +134,46 @@ public class TerminologySRV implements ITerminologySRV {
 			throw new BusinessException("Error while save dictionary file : " + ex);
 		}
 		return out;
+	}
+	
+	private List<String> getListDictionary(){
+		List<String> list = new ArrayList<>();
+		list.add("2.16.840.1.113883.2.9.1.11.1.2.9.xml");
+		list.add("2.16.840.1.113883.2.9.6.1.5.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.11.xml");
+		list.add("2.16.840.1.113883.5.1052.xml");
+		list.add("2.16.840.1.113883.5.112.xml");
+		list.add("2.16.840.1.113883.2.9.5.2.8.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.4.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.17.xml");
+		list.add("2.16.840.1.113883.11.22.12.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.15.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.10.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.6.xml");
+		list.add("2.16.840.1.113883.6.73.xml");
+		list.add("2.16.840.1.113883.5.111.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.9.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.18.xml");
+		list.add("2.16.840.1.113883.5.1.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.14.xml");
+		list.add("2.16.840.1.113883.11.22.15.xml");
+		list.add("2.16.840.1.113883.1.11.12839.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.7.xml");
+		list.add("2.16.840.1.113883.6.1.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.13.xml");
+		list.add("2.16.840.1.113883.11.22.36.xml");
+		list.add("2.16.840.1.113883.11.22.9.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.2.xml");
+		list.add("2.16.840.1.113883.2.9.6.1.51.xml");
+		list.add("2.16.840.1.113883.5.4.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.8.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.3.xml");
+		list.add("2.16.840.1.113883.1.11.19700.xml");
+		list.add("2.16.840.1.113883.11.22.61.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.12.xml");
+		list.add("2.16.840.1.113883.11.22.17.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.16.xml");
+		list.add("2.16.840.1.113883.1.11.1.xml");
+		return list;
 	}
 }
