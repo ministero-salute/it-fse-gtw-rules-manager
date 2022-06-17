@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -466,26 +465,19 @@ public class MockSRV implements IMockSRV {
 
 		Map<String,String> schematronTemplateMap = buildMapSchematronTemplate();
 		try {
-			
-			ClassLoader classLoader = getClass().getClassLoader();
-			File directory = new File(classLoader.getResource("Files"+ File.separator + "schematron").toURI());
-
-			//only first level files
-			String[] actualFiles = directory.list();
-			
-			if (actualFiles!=null && actualFiles.length>0) {
-				for (String namefile : actualFiles) {
-					File file = new File(classLoader.getResource("Files" + File.separator + "schematron"+ File.separator + namefile).toURI());
-					byte[] content = Files.readAllBytes(file.toPath());
-					SchematronDTO schematron = SchematronDTO.builder().
-							contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
-							nameSchematron(namefile).
-							templateIdExtension("1.0").
-							templateIdRoot(schematronTemplateMap.get(namefile)).
-							build();
-					out.add(schematron);
-				}
+			 
+			for(Entry<String, String> schematron : schematronTemplateMap.entrySet()) {
+				String nameFile = schematron.getKey();
+				byte[] content = FileUtility.getFileFromInternalResources("Files" + File.separator + "schematron" + File.separator + nameFile);
+				SchematronDTO schematronToSave = SchematronDTO.builder().
+						contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
+						nameSchematron(nameFile).
+						templateIdExtension("1.0").
+						templateIdRoot(schematron.getValue()).
+						build();
+				out.add(schematronToSave);
 			}
+			 
 		} catch(Exception ex) {
 			log.error("Error while get schematron files : " + ex);
 			throw new BusinessException("Error while get schematron files : " + ex);
@@ -495,12 +487,17 @@ public class MockSRV implements IMockSRV {
 	
 	private Map<String,String> buildMapSchematronTemplate(){
 		Map<String,String> mapSchematronRoot = new HashMap<>();
-		mapSchematronRoot.put("schematron_PSS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
-		mapSchematronRoot.put("schematron_RSA_v3.4.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
-		mapSchematronRoot.put("schematron_VPS_v 2.1.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
-		mapSchematronRoot.put("schematronFSE_LDO_V3.2 .sch" , "2.16.840.1.113883.2.9.10.1.5");
-		mapSchematronRoot.put("schematronFSE_RAD_v2.2.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
-		mapSchematronRoot.put("schematronFSEv9.sch" , "2.16.840.1.113883.2.9.10.1.1");
+		try {
+			mapSchematronRoot.put("schematron_PSS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
+			mapSchematronRoot.put("schematron_RSA_v3.4.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
+			mapSchematronRoot.put("schematron_VPS_v 2.1.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
+			mapSchematronRoot.put("schematronFSE_LDO_V3.2 .sch" , "2.16.840.1.113883.2.9.10.1.5");
+			mapSchematronRoot.put("schematronFSE_RAD_v2.2.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
+			mapSchematronRoot.put("schematronFSEv9.sch" , "2.16.840.1.113883.2.9.10.1.1");
+		}catch(Exception ex) {
+			log.error("Error while build map : " , ex);
+			throw new BusinessException("Error while build map : " , ex);
+		}
 		return mapSchematronRoot;
 	}
 
