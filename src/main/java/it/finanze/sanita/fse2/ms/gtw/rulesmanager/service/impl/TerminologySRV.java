@@ -118,14 +118,14 @@ public class TerminologySRV implements ITerminologySRV {
 		
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
-			File directory = new File(classLoader.getResource("Files//dictionary").getFile());
+			File directory = new File(classLoader.getResource("Files" + File.separator + "dictionary").toURI());
 			
 			//only first level files.
 			String[] actualFiles = directory.list();
 			
 			if (actualFiles!=null && actualFiles.length>0) {
 				for (String namefile : actualFiles) {
-					File file = new File(classLoader.getResource("Files//dictionary//"+namefile).getFile());
+					File file = new File(classLoader.getResource("Files" + File.separator + "dictionary"+File.separator +namefile).toURI());
 					byte[] content = Files.readAllBytes(file.toPath());
 					DictionaryETY dic = new DictionaryETY();
 					dic.setContentFile(new Binary(BsonBinarySubType.BINARY, content));
