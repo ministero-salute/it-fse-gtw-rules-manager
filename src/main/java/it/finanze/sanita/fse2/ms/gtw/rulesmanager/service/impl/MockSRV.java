@@ -490,12 +490,12 @@ public class MockSRV implements IMockSRV {
 	private Map<String,String> buildMapSchematronTemplate(){
 		Map<String,String> mapSchematronRoot = new HashMap<>();
 		try {
-			mapSchematronRoot.put("schematron_PSS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
-			mapSchematronRoot.put("schematron_RSA_v3.4.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
-			mapSchematronRoot.put("schematron_VPS_v2.1.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
-			mapSchematronRoot.put("schematronFSE_LDO_V3.2.sch" , "2.16.840.1.113883.2.9.10.1.5");
-			mapSchematronRoot.put("schematronFSE_RAD_v2.2.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
-			mapSchematronRoot.put("schematronFSEv9.sch" , "2.16.840.1.113883.2.9.10.1.1");
+			mapSchematronRoot.put("schematron_PSS_v2.3.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
+			mapSchematronRoot.put("schematron_RSA_v5.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
+			mapSchematronRoot.put("schematron_VPS_v 2.3.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
+			mapSchematronRoot.put("schematronFSE_LDO_V3.4.sch" , "2.16.840.1.113883.2.9.10.1.5");
+			mapSchematronRoot.put("schematronFSE_RAD_v2.4.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
+			mapSchematronRoot.put("schematronFSEv14.sch" , "2.16.840.1.113883.2.9.10.1.1");
 		}catch(Exception ex) {
 			log.error("Error while build map : " , ex);
 			throw new BusinessException("Error while build map : " , ex);

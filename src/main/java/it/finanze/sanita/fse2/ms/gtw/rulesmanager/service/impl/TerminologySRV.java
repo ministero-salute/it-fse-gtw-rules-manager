@@ -141,6 +141,7 @@ public class TerminologySRV implements ITerminologySRV {
 		list.add("2.16.840.1.113883.2.9.1.11.1.2.9.xml");
 		list.add("2.16.840.1.113883.2.9.6.1.5.xml");
 		list.add("2.16.840.1.113883.2.9.77.22.11.11.xml");
+		list.add("2.16.840.1.113883.2.9.77.22.11.5.xml");
 		list.add("2.16.840.1.113883.5.1052.xml");
 		list.add("2.16.840.1.113883.5.112.xml");
 		list.add("2.16.840.1.113883.2.9.5.2.8.xml");
@@ -167,6 +168,7 @@ public class TerminologySRV implements ITerminologySRV {
 		list.add("2.16.840.1.113883.2.9.6.1.51.xml");
 		list.add("2.16.840.1.113883.5.4.xml");
 		list.add("2.16.840.1.113883.2.9.77.22.11.8.xml");
+		list.add("2.16.840.1.113883.11.22.12 .xml");
 		list.add("2.16.840.1.113883.2.9.77.22.11.3.xml");
 		list.add("2.16.840.1.113883.1.11.19700.xml");
 		list.add("2.16.840.1.113883.11.22.61.xml");
@@ -174,6 +176,7 @@ public class TerminologySRV implements ITerminologySRV {
 		list.add("2.16.840.1.113883.11.22.17.xml");
 		list.add("2.16.840.1.113883.2.9.77.22.11.16.xml");
 		list.add("2.16.840.1.113883.1.11.1.xml");
+		 
 		return list;
 	}
 }

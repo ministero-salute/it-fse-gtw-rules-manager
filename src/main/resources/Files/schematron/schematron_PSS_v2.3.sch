@@ -28,12 +28,10 @@
 			<!--Controllo code-->	
 			<assert test="count(hl7:code[@code='60591-5'][@codeSystem='2.16.840.1.113883.6.1']) = 1"
 			>ERRORE-4| L'elemento <name/>/code DEVE essere valorizzato con l'attributo @code='60591-5' e il @codeSystem='2.16.840.1.113883.6.1'</assert>
-	
-			<let name="code_codeSystemName" value="hl7:code/@codeSystemName"/>
-			<let name="code_displayName" value="hl7:code/@displayName"/>
 			
-			<report test="($code_codeSystemName !='LOINC') or ($code_displayName!= 'Profilo Sanitario Sintetico')"
-			>W00-| Si raccomanda di valorizzare gli attributi dell'elemento <name/>/code nel seguente modo: @codeSystemName ='LOINC' e @displayName ='Profilo Sanitario Sintetico'</report>
+			<report test="not(count(hl7:code[@codeSystemName='LOINC'])=1) or not(count(hl7:code[@displayName='Profilo Sanitario Sintetico'])=1 or
+			count(hl7:code[@displayName='PROFILO SANITARIO SINTETICO'])=1)"
+			>W001| Si raccomanda di valorizzare gli attributi dell'elemento <name/>/code nel seguente modo: @codeSystemName ='LOINC' e @displayName ='Profilo Sanitario Sintetico'.--> </report>
 			
 			<!--Controllo confidentialityCode-->
 			<assert test="(count(hl7:confidentialityCode[@code='N'][@codeSystem='2.16.840.1.113883.5.25'])= 1) or 
@@ -62,11 +60,11 @@
 			<assert test="count(hl7:recordTarget)=1"
 			>ERRORE-9| L'elemento <name/> DEVE contenere un solo elemento 'recordTarget' </assert>
 			
-			<report test="(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.2']) &gt; 1) or 
-			(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.15'])&gt;1)"
+			<report test="not(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.2'])=1) or 
+			not(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.15'])=1)"
 			>W002| Si consiglia di valorizzare l'elemento <name/>recordTarget/patientRole/id  con una  delle seguenti informazioni:
 			CF:2.16.840.1.113883.2.9.4.3.2
-			ANA: 2.16.840.1.113883.2.9.4.3.15
+			ANA: 2.16.840.1.113883.2.9.4.3.15 .-->
 			</report>
 			
 			<!--Controllo recordTarget/patientRole/addr-->
@@ -561,12 +559,6 @@
 			<assert test="count(@classCode)=1"
 			>ERRORE-45| L'attributo "@classCode" dell'elemento "observation" deve essere presente </assert>
 		</rule>
-
-		<!--controllo code translation-->
-		<rule context="//hl7:code">
-			<report test="count(hl7:translation)=0"
-			>W003| Si consiglia di inserire un elemento translation per codificare le informazioni con un ulteriore sistema di codifica</report> 			
-		</rule>
 		
 		
 		
@@ -826,9 +818,9 @@
 			- @root='2.16.840.1.113883.2.9.10.1.4.3.1.3' per "Presenza allergie e/o intolleranze".</assert>
 			
 			<!--Presenza  di allergie-->
-			<report test="count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3'])=1 and 
-			count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:code[@code='52473-6'][@codesystem='2.16.840.1.113883.6.1'])=0"
-			>W004| Sezione Allergie e Intolleranze: si consiglia di valorizzare l'elemento entry/act/entryRelationship/observation/code con @code='52473-6' derivato da LOINC --> </report>
+			<report test="not(count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3'])=0) and 
+			not(count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:code[@code='52473-6'][@codesystem='2.16.840.1.113883.6.1'])=1)"
+			>W003| Sezione Allergie e Intolleranze: si consiglia di valorizzare l'elemento entry/act/entryRelationship/observation/code con @code='52473-6' derivato da LOINC.--></report>
 			<assert test="count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3'])=0 or
 			count(hl7:act/hl7:entryRelationship/hl7:observation[hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3']]/hl7:effectiveTime/hl7:low)=1"
 			>ERRORE-102| Sezione Allergie e Intolleranze: entry/act/entryRelationship/observation DEVE contenere un elemento 'effectiveTime' il quale deve avere l'elemento 'low' valorizzato.</assert>
@@ -1448,8 +1440,8 @@
 			<assert test="count(hl7:encounter/hl7:text)=0 or count(hl7:encounter/hl7:text/hl7:reference/@value)=1"
 			>ERRORE-241| Sezione Visite o ricoveri: entry/encounter/text DEVE contenere un elemento reference/@value valorizzato con l’URI che punta alla descrizione estesa della visita o ricovero nel narrative block della sezione.</assert>
 		
-			<report test="count(hl7:encounter/hl7:performer)=0"
-			>W005| Sezione Visite o ricoveri: si consiglia di valorizzare, all'interno di entry/encounter, almeno un elemento 'performer' --> </report>
+			<report test="not(count(hl7:encounter/hl7:performer)=1)"
+			>W004| Sezione Visite o ricoveri: si consiglia di valorizzare, all'interno di entry/encounter, almeno un elemento 'performer'.--> </report>
 		
 		</rule>
 
