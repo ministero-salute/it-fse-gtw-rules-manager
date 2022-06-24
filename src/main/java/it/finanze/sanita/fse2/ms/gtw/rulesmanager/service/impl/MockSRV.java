@@ -140,6 +140,8 @@ public class MockSRV implements IMockSRV {
 		VocabularyEntryDTO voc7 = VocabularyEntryDTO.builder().code("LA16666-2").description("LA16666-2").build();
 		VocabularyEntryDTO voc8 = VocabularyEntryDTO.builder().code("LA18821-1").description("LA18821-1").build();
 		VocabularyEntryDTO voc9 = VocabularyEntryDTO.builder().code("LA18632-2").description("LA18632-2").build();
+		VocabularyEntryDTO voc10 = VocabularyEntryDTO.builder().code("LA4270-0").description("LA4270-0").build();
+		
 		vocabulary.add(voc1);
 		vocabulary.add(voc2);
 		vocabulary.add(voc3);
@@ -150,6 +152,8 @@ public class MockSRV implements IMockSRV {
 		vocabulary.add(voc7);
 		vocabulary.add(voc8);
 		vocabulary.add(voc9);
+		vocabulary.add(voc10);
+		
 		mapVocabuary.put("2.16.840.1.113883.6.1", vocabulary);
 		vocabulary = new ArrayList<>();
 		voc = VocabularyEntryDTO.builder().code("UR").description("UR").build(); 
@@ -176,9 +180,13 @@ public class MockSRV implements IMockSRV {
 
 		VocabularyEntryDTO vocIAB = VocabularyEntryDTO.builder().code("IABDINJ").description("IABDINJ").build();
 		VocabularyEntryDTO vocPO = VocabularyEntryDTO.builder().code("PO").description("PO").build();
+		VocabularyEntryDTO vocSQ = VocabularyEntryDTO.builder().code("SQ").description("SQ").build();
+		VocabularyEntryDTO vocIM = VocabularyEntryDTO.builder().code("IM").description("IM").build();
 		vocabulary = new ArrayList<>();
 		vocabulary.add(vocIAB);
 		vocabulary.add(vocPO);
+		vocabulary.add(vocSQ);
+		vocabulary.add(vocIM);
 		mapVocabuary.put("2.16.840.1.113883.5.112", vocabulary);
 		 
 		VocabularyEntryDTO vocQS = VocabularyEntryDTO.builder().code("qs").description("qs").build();
@@ -206,8 +214,10 @@ public class MockSRV implements IMockSRV {
 		mapVocabuary.put("2.16.840.1.113883.5.1063", vocabulary);
 		
 		VocabularyEntryDTO vocLA = VocabularyEntryDTO.builder().code("LA").description("LA").build();
+		VocabularyEntryDTO vocRA = VocabularyEntryDTO.builder().code("RA").description("RA").build();
 		vocabulary = new ArrayList<>();
 		vocabulary.add(vocLA);
+		vocabulary.add(vocRA);
 		mapVocabuary.put("2.16.840.1.113883.5.1052", vocabulary);
 		
 		VocabularyEntryDTO voc30001 = VocabularyEntryDTO.builder().code("30001").description("30001").build();
@@ -225,6 +235,16 @@ public class MockSRV implements IMockSRV {
 		VocabularyEntryDTO voc79021 = VocabularyEntryDTO.builder().code("79021").description("79021").build();
 		VocabularyEntryDTO vocXXXX = VocabularyEntryDTO.builder().code("XXX").description("XXX").build();
 		
+		
+		VocabularyEntryDTO voc493 = VocabularyEntryDTO.builder().code("493.9").description("493.9").build();
+		VocabularyEntryDTO voc787 = VocabularyEntryDTO.builder().code("787.02").description("787.02").build();
+		VocabularyEntryDTO voc369 = VocabularyEntryDTO.builder().code("369.2").description("369.2").build();
+		VocabularyEntryDTO voc8872 = VocabularyEntryDTO.builder().code("8872").description("8872").build();
+		VocabularyEntryDTO voc410 = VocabularyEntryDTO.builder().code("410").description("410").build();
+		VocabularyEntryDTO voc41000 = VocabularyEntryDTO.builder().code("41000").description("41000").build();
+		VocabularyEntryDTO vocCOD_CONSRISK = VocabularyEntryDTO.builder().code("[COD_CONSRISK]").description("[COD_CONSRISK]").build();
+		
+		
 		vocabulary = new ArrayList<>();
 		vocabulary.add(voc30001);
 		vocabulary.add(voc1535);
@@ -240,6 +260,15 @@ public class MockSRV implements IMockSRV {
 		vocabulary.add(voc2512);
 		vocabulary.add(voc9054);
 		vocabulary.add(voc79021);
+		
+		vocabulary.add(voc410);
+		vocabulary.add(voc8872);
+		vocabulary.add(voc493);
+		vocabulary.add(voc787);
+		vocabulary.add(voc369);
+		vocabulary.add(voc41000);
+		vocabulary.add(vocCOD_CONSRISK);
+		
 
 		mapVocabuary.put("2.16.840.1.113883.6.103", vocabulary);
 		
@@ -254,32 +283,44 @@ public class MockSRV implements IMockSRV {
 		VocabularyEntryDTO vocOINT = VocabularyEntryDTO.builder().code("OINT").description("OINT").build();
 		VocabularyEntryDTO vocSEV = VocabularyEntryDTO.builder().code("SEV").description("SEV").build();
 		VocabularyEntryDTO vocALG = VocabularyEntryDTO.builder().code("ALG").description("ALG").build();
+		VocabularyEntryDTO vocIMMUNIZ = VocabularyEntryDTO.builder().code("IMMUNIZ").description("IMMUNIZ").build();
+		VocabularyEntryDTO vocIMP = VocabularyEntryDTO.builder().code("IMP").description("IMP").build();
+		VocabularyEntryDTO vocCARD = VocabularyEntryDTO.builder().code("CARD").description("CARD").build();
+		VocabularyEntryDTO vocASSERTION = VocabularyEntryDTO.builder().code("ASSERTION").description("ASSERTION").build();
 		
 		vocabulary = new ArrayList<>();
+		vocabulary.add(vocASSERTION);
+		vocabulary.add(vocCARD);
 		vocabulary.add(vocOINT);
 		vocabulary.add(vocSEV);
 		vocabulary.add(vocALG);
+		vocabulary.add(vocIMMUNIZ);
+		vocabulary.add(vocIMP);
 		
 		mapVocabuary.put("2.16.840.1.113883.5.4", vocabulary);
 		
 		VocabularyEntryDTO voc035606033 = VocabularyEntryDTO.builder().code("035606033").description("035606033").build();
 		VocabularyEntryDTO voc043348022 = VocabularyEntryDTO.builder().code("043348022").description("043348022").build();
 		VocabularyEntryDTO voc023993013 = VocabularyEntryDTO.builder().code("023993013").description("023993013").build();
+		VocabularyEntryDTO voc035911015 = VocabularyEntryDTO.builder().code("035911015").description("035911015").build();
 		
 		vocabulary = new ArrayList<>();
 		vocabulary.add(voc035606033);
 		vocabulary.add(voc043348022);
 		vocabulary.add(voc023993013);
+		vocabulary.add(voc035911015);
 		mapVocabuary.put("2.16.840.1.113883.2.9.6.1.5", vocabulary);
 		
 		VocabularyEntryDTO vocXX = VocabularyEntryDTO.builder().code("XX").description("XX").build();
 		VocabularyEntryDTO vocXXX = VocabularyEntryDTO.builder().code("XXX").description("XXX").build();
 		VocabularyEntryDTO vocC43168 = VocabularyEntryDTO.builder().code("C43168").description("C43168").build();
+		VocabularyEntryDTO vocRDP_CODE = VocabularyEntryDTO.builder().code("[RDP_CODE]").description("[RDP_CODE]").build();
 		
 		vocabulary = new ArrayList<>();
 		vocabulary.add(vocXX);
 		vocabulary.add(vocXXX);
 		vocabulary.add(vocC43168);
+		vocabulary.add(vocRDP_CODE);
 		
 		mapVocabuary.put("2.16.840.1.113883.9.999", vocabulary);
 		
@@ -287,8 +328,10 @@ public class MockSRV implements IMockSRV {
 		VocabularyEntryDTO vocB01AX05 = VocabularyEntryDTO.builder().code("B01AX05").description("B01AX05").build();
 		VocabularyEntryDTO vocC03CA01 = VocabularyEntryDTO.builder().code("C03CA01").description("C03CA01").build();
 		VocabularyEntryDTO vocC02LA01 = VocabularyEntryDTO.builder().code("C02LA01").description("C02LA01").build();
+		VocabularyEntryDTO vocN01AX10 = VocabularyEntryDTO.builder().code("N01AX10").description("N01AX10").build();
 		
 		vocabulary = new ArrayList<>();
+		vocabulary.add(vocN01AX10);
 		vocabulary.add(vocC08CA01);
 		vocabulary.add(vocB01AX05);
 		vocabulary.add(vocC03CA01);
@@ -296,8 +339,10 @@ public class MockSRV implements IMockSRV {
 		mapVocabuary.put("2.16.840.1.113883.6.73", vocabulary);
 		
 		VocabularyEntryDTO vocMTH = VocabularyEntryDTO.builder().code("MTH").description("MTH").build();
+		VocabularyEntryDTO vocFTH = VocabularyEntryDTO.builder().code("FTH").description("FTH").build();
 		vocabulary = new ArrayList<>();
 		vocabulary.add(vocMTH);
+		vocabulary.add(vocFTH);
 		mapVocabuary.put("2.16.840.1.113883.5.111", vocabulary);
 		
 
@@ -399,6 +444,53 @@ public class MockSRV implements IMockSRV {
 		mapVocabuary.put("2.16.840.1.113883.2.9.1.11.1.2.9", vocabulary);
 		
 		
+		VocabularyEntryDTO vocPss1 = VocabularyEntryDTO.builder().code("257893003").description("257893003").build();
+		VocabularyEntryDTO vocPss2 = VocabularyEntryDTO.builder().code("257893003").description("257893003").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocPss1);
+		vocabulary.add(vocPss2);
+		mapVocabuary.put("2.16.840.1.113883.4.642.3.395", vocabulary);
+		
+		
+		VocabularyEntryDTO vocJ010103 = VocabularyEntryDTO.builder().code("J010103").description("J010103").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocJ010103);
+		mapVocabuary.put("2.16.840.1.113883.2.9.6.1.48", vocabulary);
+		
+		VocabularyEntryDTO vocMg = VocabularyEntryDTO.builder().code("mg{creat}").description("mg{creat}").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocMg);
+		mapVocabuary.put("2.16.840.1.113883.6.8", vocabulary);
+		
+		VocabularyEntryDTO vocQ13 = VocabularyEntryDTO.builder().code("Q13.1").description("Q13.1").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocQ13);
+		mapVocabuary.put("2.16.840.1.113883.2.9.77.22.11.17", vocabulary);
+		
+		VocabularyEntryDTO voc02 = VocabularyEntryDTO.builder().code("02").description("02").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(voc02);
+		mapVocabuary.put("2.16.840.1.113883.2.9.6.1.22", vocabulary);
+		
+		VocabularyEntryDTO vocPSSADI = VocabularyEntryDTO.builder().code("PSSADI").description("PSSADI").build();
+		VocabularyEntryDTO vocPSSIT99 = VocabularyEntryDTO.builder().code("PSSIT99").description("PSSIT99").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocPSSADI);
+		vocabulary.add(vocPSSIT99);
+		mapVocabuary.put("2.16.840.1.113883.2.9.5.2.8", vocabulary);
+		
+		VocabularyEntryDTO vocMMG = VocabularyEntryDTO.builder().code("MMG").description("MMG").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocMMG);
+		mapVocabuary.put("2.16.840.1.113883.2.9.77.22.11.13", vocabulary);
+		
+		VocabularyEntryDTO vocCODRISCHIO = VocabularyEntryDTO.builder().code("[COD_RISCHIO]").description("[COD_RISCHIO]").build();
+		vocabulary = new ArrayList<>();
+		vocabulary.add(vocCODRISCHIO);
+		mapVocabuary.put("2.16.840.1.113883.2.9.6.1.56.2", vocabulary);
+		  
+		
+		
 		List<TerminologyETY> listToAdd = new ArrayList<>();
 		for(Entry<String, List<VocabularyEntryDTO>> map : mapVocabuary.entrySet()) {
 			for(VocabularyEntryDTO dto : map.getValue()) {
@@ -489,13 +581,17 @@ public class MockSRV implements IMockSRV {
 	
 	private Map<String,String> buildMapSchematronTemplate(){
 		Map<String,String> mapSchematronRoot = new HashMap<>();
-		try {
-			mapSchematronRoot.put("schematron_PSS_v2.3.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
-			mapSchematronRoot.put("schematron_RSA_v5.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
-			mapSchematronRoot.put("schematron_VPS_v 2.3.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
-			mapSchematronRoot.put("schematronFSE_LDO_V3.4.sch" , "2.16.840.1.113883.2.9.10.1.5");
-			mapSchematronRoot.put("schematronFSE_RAD_v2.4.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
-			mapSchematronRoot.put("schematronFSEv14.sch" , "2.16.840.1.113883.2.9.10.1.1");
+		try { 
+
+			mapSchematronRoot.put("schematron_certificato_VACC v1.2.sch" , "2.16.840.1.113883.2.9.10.1.11.1.2");
+			mapSchematronRoot.put("schematron_PSS_v2.4.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
+			mapSchematronRoot.put("schematron_RSA_v6.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
+			mapSchematronRoot.put("schematron_singola_VACC v1.9.sch" , "2.16.840.1.113883.2.9.10.1.11.1.1");
+			mapSchematronRoot.put("schematron_VPS_v 2.4.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
+			mapSchematronRoot.put("schematronFSE_LDO_V3.5.sch" , "2.16.840.1.113883.2.9.10.1.5");
+			mapSchematronRoot.put("schematronFSE_RAD_v2.5.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
+			mapSchematronRoot.put("schematronFSEv15.sch" , "2.16.840.1.113883.2.9.10.1.1");
+			
 		}catch(Exception ex) {
 			log.error("Error while build map : " , ex);
 			throw new BusinessException("Error while build map : " , ex);

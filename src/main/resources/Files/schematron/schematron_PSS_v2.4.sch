@@ -30,7 +30,7 @@
 			>ERRORE-4| L'elemento <name/>/code DEVE essere valorizzato con l'attributo @code='60591-5' e il @codeSystem='2.16.840.1.113883.6.1'</assert>
 			
 			<report test="not(count(hl7:code[@codeSystemName='LOINC'])=1) or not(count(hl7:code[@displayName='Profilo Sanitario Sintetico'])=1 or
-			count(hl7:code[@displayName='PROFILO SANITARIO SINTETICO'])=1)"
+			count(hl7:code[@displayName='PROFILO SANITARIO SINTETICO'])=1 or count(hl7:code[@displayName='Profilo sanitario sintetico'])=1)"
 			>W001| Si raccomanda di valorizzare gli attributi dell'elemento <name/>/code nel seguente modo: @codeSystemName ='LOINC' e @displayName ='Profilo Sanitario Sintetico'.--> </report>
 			
 			<!--Controllo confidentialityCode-->
@@ -60,12 +60,12 @@
 			<assert test="count(hl7:recordTarget)=1"
 			>ERRORE-9| L'elemento <name/> DEVE contenere un solo elemento 'recordTarget' </assert>
 			
-			<report test="not(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.2'])=1) or 
+			<!--report test="not(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.2'])=1) and
 			not(count(hl7:recordTarget/hl7:patientRole/hl7:id[@root='2.16.840.1.113883.2.9.4.3.15'])=1)"
 			>W002| Si consiglia di valorizzare l'elemento <name/>recordTarget/patientRole/id  con una  delle seguenti informazioni:
 			CF:2.16.840.1.113883.2.9.4.3.2
-			ANA: 2.16.840.1.113883.2.9.4.3.15 .-->
-			</report>
+			ANA: 2.16.840.1.113883.2.9.4.3.15 .>
+			</report-->
 			
 			<!--Controllo recordTarget/patientRole/addr-->
 			<let name="num_addr" value="count(hl7:recordTarget/hl7:patientRole/hl7:addr)"/>
@@ -819,7 +819,7 @@
 			
 			<!--Presenza  di allergie-->
 			<report test="not(count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3'])=0) and 
-			not(count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:code[@code='52473-6'][@codesystem='2.16.840.1.113883.6.1'])=1)"
+			not(count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:code[@code='52473-6'][@codeSystem='2.16.840.1.113883.6.1'])=1)"
 			>W003| Sezione Allergie e Intolleranze: si consiglia di valorizzare l'elemento entry/act/entryRelationship/observation/code con @code='52473-6' derivato da LOINC.--></report>
 			<assert test="count(hl7:act/hl7:entryRelationship/hl7:observation/hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3'])=0 or
 			count(hl7:act/hl7:entryRelationship/hl7:observation[hl7:templateId[@root='2.16.840.1.113883.2.9.10.1.4.3.1.3']]/hl7:effectiveTime/hl7:low)=1"
