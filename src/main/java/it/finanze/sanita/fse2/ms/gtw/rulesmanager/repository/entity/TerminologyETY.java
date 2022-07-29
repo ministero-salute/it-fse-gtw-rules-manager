@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 /**
  * Model to save terminology.
  */
-@Document(collection = "terminology")
+@Document(collection = "#{@terminologyBean}")
 @Data
 @NoArgsConstructor
 public class TerminologyETY {

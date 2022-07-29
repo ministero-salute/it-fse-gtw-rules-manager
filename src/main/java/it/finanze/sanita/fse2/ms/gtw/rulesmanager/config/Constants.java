@@ -36,13 +36,38 @@ public final class Constants {
 		/**
 		 * Configuration mongo path.
 		 */
-		public static final String CONFIG_MONGO = "it.sanita.rulesmanager.mongo";
+		public static final String CONFIG_MONGO = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.config";
 		
 		/**
 		 * Configuration mongo repository path.
 		 */
-		public static final String REPOSITORY_MONGO = "it.sanita.rulesmanager.repository";
-		 
+		public static final String REPOSITORY = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository";
+
+		public static final String UTILITY = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility";
+
+		public static final String SCHEDULER_QUERIES = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity";
+
+
+		public static final class Collections {
+
+			public static final String SCHEMA = "schema";
+
+			public static final String SCHEMATRON = "schematron";
+
+			public static final String TERMINOLOGY = "terminology";
+
+			public static final String XSL_TRANSFORM = "xsl_transform";
+			
+			public static final String STRUCTURE_DEFINITION = "structure_definition";
+			
+			public static final String STRUCTURE_MAP = "structure_map";
+			
+			public static final String VALUSET = "valueset";
+
+			private Collections() {
+
+			}
+		}
 		
 		private ComponentScan() {
 			//This method is intentionally left blank.
@@ -56,6 +81,10 @@ public final class Constants {
 		 * Test profile.
 		 */
 		public static final String TEST = "test";
+
+		public static final String NOT_TEST = "!" + TEST;
+
+		public static final String TEST_PREFIX = "test_";
 
 		/**
 		 * Dev profile.

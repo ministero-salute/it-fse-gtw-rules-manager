@@ -15,6 +15,8 @@ import com.mongodb.client.result.UpdateResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller.ITestCTL;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.InvokeEDSClientScheduler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -27,9 +29,14 @@ public class TestCTL implements ITestCTL {
 	private static final long serialVersionUID = 3260806709541019186L;
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private transient MongoTemplate mongoTemplate;
 	
+	@Autowired
+	private InvokeEDSClientScheduler edsClientScheduler;
 	    
+	@Autowired
+	private IMockSRV mockSRV;
+	
 	@Override
 	public void updateDataUltimoAggiornamento(HttpServletRequest request) {
 		Query query = new Query();
@@ -40,6 +47,14 @@ public class TestCTL implements ITestCTL {
 		
 		uResult = mongoTemplate.updateMulti(query, update, SchemaETY.class);
 		log.info("Record schema aggiornati : " + uResult.getModifiedCount());
+	}
+
+
+	@Override
+	public void runScheduler(HttpServletRequest request) {
+		mockSRV.dropCollections();
+		mockSRV.saveMockConfigurationItem();
+		edsClientScheduler.action();
 	}
 
 	

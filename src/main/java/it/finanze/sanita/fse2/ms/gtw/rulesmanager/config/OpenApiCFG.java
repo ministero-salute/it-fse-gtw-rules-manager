@@ -1,13 +1,12 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
 
-import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(

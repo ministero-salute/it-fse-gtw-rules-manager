@@ -42,7 +42,8 @@ public interface IXslTransformRepo extends Serializable {
 	 */
 	List<XslTransformETY> findAll();
 	
-	Integer upsertByVersion(XslTransformETY ety);
 	
 	 boolean existByVersion(String version);
+	 
+	 void dropCollection();
 }

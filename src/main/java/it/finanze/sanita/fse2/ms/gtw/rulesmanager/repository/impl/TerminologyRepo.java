@@ -30,9 +30,11 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 	 * Serial version uid.
 	 */
 	private static final long serialVersionUID = 5409183302250695125L;
+	
+	private static final String SYSTEM_STRING = "system";
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private transient MongoTemplate mongoTemplate;
 	
 	@Override
 	public TerminologyETY insert(final TerminologyETY ety) {
@@ -58,10 +60,10 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 		Integer output = 0;
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("code").is(ety.getCode()).and("system").is(ety.getSystem()));
+			query.addCriteria(Criteria.where("code").is(ety.getCode()).and(SYSTEM_STRING).is(ety.getSystem()));
 			
 			Update update = new Update();
-			update.set("system", ety.getSystem());
+			update.set(SYSTEM_STRING, ety.getSystem());
 			update.set("description", ety.getDescription());
 			update.set("code", ety.getCode());
 			UpdateResult uResult = mongoTemplate.upsert(query, update, TerminologyETY.class);
@@ -78,7 +80,7 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 		boolean output = false;
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("system").is(system));
+			query.addCriteria(Criteria.where(SYSTEM_STRING).is(system));
 			output = mongoTemplate.exists(query, TerminologyETY.class);
  		} catch(Exception ex) {
 			log.error("Error while execute exists by system :" , ex);
@@ -92,7 +94,7 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 		List<TerminologyETY> output = null;
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("code").in(codes).and("system").is(system));
+			query.addCriteria(Criteria.where("code").in(codes).and(SYSTEM_STRING).is(system));
 			output = mongoTemplate.find(query, TerminologyETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute find by in code and system :" , ex);
@@ -104,7 +106,7 @@ public class TerminologyRepo extends AbstractMongoRepo<TerminologyETY, String> i
 	@Override
 	public void dropCollection() {
 		try {
-			mongoTemplate.remove(new Query(), TerminologyETY.class);
+			mongoTemplate.dropCollection(TerminologyETY.class);
 		} catch(Exception ex) {
 			log.error("Error while execute exists by version query " + getClass() , ex);
 			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);

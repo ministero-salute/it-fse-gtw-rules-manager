@@ -26,9 +26,11 @@ public class SchematronRepo extends AbstractMongoRepo<SchematronETY, String> imp
 	 * Serial version uid. 
 	 */
 	private static final long serialVersionUID = 8948529146857638945L;
+	
+	private static final String EXECUTION_ERROR = "Error while execute exists by version query ";
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private transient MongoTemplate mongoTemplate;
 	
 	@Override
 	public SchematronETY insert(SchematronETY ety) {
@@ -59,8 +61,8 @@ public class SchematronRepo extends AbstractMongoRepo<SchematronETY, String> imp
 			query.addCriteria(Criteria.where("template_id_root").is(templateIdRoot));
 			output = mongoTemplate.exists(query, SchematronETY.class);
 		} catch(Exception ex) {
-			log.error("Error while execute exists by version query " + getClass() , ex);
-			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
+			log.error(EXECUTION_ERROR + getClass() , ex);
+			throw new BusinessException(EXECUTION_ERROR + getClass(), ex);
 		}
 		return output;
 	}
@@ -68,10 +70,10 @@ public class SchematronRepo extends AbstractMongoRepo<SchematronETY, String> imp
 	@Override
 	public void dropCollection() {
 		try {
-			mongoTemplate.remove(new Query(), SchematronETY.class);
+			mongoTemplate.dropCollection(SchematronETY.class);
 		} catch(Exception ex) {
-			log.error("Error while execute exists by version query " + getClass() , ex);
-			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
+			log.error(EXECUTION_ERROR + getClass() , ex);
+			throw new BusinessException(EXECUTION_ERROR + getClass(), ex);
 		}
 	}
 	

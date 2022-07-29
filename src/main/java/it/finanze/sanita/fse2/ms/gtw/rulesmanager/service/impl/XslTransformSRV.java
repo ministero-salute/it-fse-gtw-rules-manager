@@ -1,13 +1,10 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.XslTransformDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.XslTransformEntryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IXslTransformRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
@@ -65,37 +62,5 @@ public class XslTransformSRV implements IXslTransformSRV {
 		return output;
 	}
 
-	@Override
-	public Integer saveNewVersionXslTransform(final List<XslTransformDTO> xslTranformEntriesDTO) {
-		Integer counter = 0;
-		try {
-			if(xslTranformEntriesDTO!=null && !xslTranformEntriesDTO.isEmpty()) {
-				for(XslTransformDTO xslTranformEntryDTO : xslTranformEntriesDTO) {
-					boolean exist = xslTransformRepo.existByVersion(xslTranformEntryDTO.getVersion());
-					if(Boolean.FALSE.equals(exist)) {
-						List<XslTransformETY> toAdd = buildDtoToETYS(xslTranformEntryDTO.getEntryListDTO(), xslTranformEntryDTO.getVersion());
-						xslTransformRepo.insertAll(toAdd);
-					}
-				}
-			} 
-		} catch(Exception ex) {
-			log.error("Error while execute save new version xsl tranform :" , ex);
-			throw new BusinessException("Error while execute save new version xsl tranform :" , ex);
-		}
-		return counter;
-	}
-	
-	private List<XslTransformETY> buildDtoToETYS(List<XslTransformEntryDTO> xslTrasformEntriesDTO, String version) {
-		List<XslTransformETY> output = new ArrayList<>();
-		for(XslTransformEntryDTO xslTrasformEntryDTO : xslTrasformEntriesDTO) {
-			XslTransformETY entry = new XslTransformETY();
-			entry.setId(null);
-			entry.setCdaType(xslTrasformEntryDTO.getCdaType());
-			entry.setContentXslTransform(xslTrasformEntryDTO.getContentXslTransform());
-			entry.setNameXslTransform(xslTrasformEntryDTO.getNameXslTransform());
-			entry.setVersion(version);
-			output.add(entry);
-		}
-		return output;
-	}
-}
+	 
+ }

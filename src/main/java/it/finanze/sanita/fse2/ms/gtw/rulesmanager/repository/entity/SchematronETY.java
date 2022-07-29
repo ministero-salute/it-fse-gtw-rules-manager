@@ -1,39 +1,61 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import java.util.Date;
-
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
 
 /**
  * Model to save schematron.
  */
-@Document(collection = "schematron")
+@Document(collection = "#{@schematronBean}")
 @Data
 @NoArgsConstructor
 public class SchematronETY {
 
+	public static final String FIELD_ID = "_id";
+    public static final String FIELD_FILENAME = "name_schematron";
+    public static final String FIELD_CONTENT = "content_schematron";
+    public static final String FIELD_TEMPLATE_ID_EXT = "template_id_extension";
+    public static final String FIELD_ROOT = "template_id_root";
+    public static final String FIELD_LAST_UPDATE = "last_update_date";
+    public static final String FIELD_LAST_SYNC = "last_sync";
+
 	@Id
 	private String id;
-	
-	@Field(name = "content_schematron")
+	@Field(name = FIELD_CONTENT)
 	private Binary contentSchematron;
-
-	@Field(name = "name_schematron")
+	@Field(name = FIELD_FILENAME)
 	private String nameSchematron;
-
-	@Field(name = "template_id_root")
+	@Field(name = FIELD_ROOT)
 	private String templateIdRoot;
-	
-	@Field(name = "template_id_extension")
+	@Field(name = FIELD_TEMPLATE_ID_EXT)
 	private String templateIdExtension;
-	
-	@Field(name = "last_update_date")
+	@Field(name = FIELD_LAST_UPDATE)
 	private Date lastUpdateDate;
+	@Field(name = FIELD_LAST_SYNC)
+    private Date lastSync;
+
+	public void setContentSchemaFromPath(Path path) throws IOException {
+        this.contentSchematron = new Binary(Files.readAllBytes(path));
+    }
+
+    public static SchematronETY fromPath(Path path, String extension, String root) throws IOException {
+        SchematronETY entity = new SchematronETY();
+        entity.setNameSchematron(path.getFileName().toString());
+        entity.setContentSchemaFromPath(path);
+        entity.setTemplateIdExtension(extension);
+        entity.setTemplateIdRoot(root);
+        entity.setLastUpdateDate(new Date());
+        entity.setLastSync(new Date());
+        return entity;
+    }
 	 
 }

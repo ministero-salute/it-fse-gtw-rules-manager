@@ -1,5 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.redis;
 
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.redis.spring.RedisLockProvider;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +13,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import net.javacrumbs.shedlock.core.LockProvider;
-import net.javacrumbs.shedlock.provider.redis.spring.RedisLockProvider;
 
 /**
  *  @author vincenzoingenito
@@ -38,7 +37,7 @@ public class RedisCFG {
      *  Password.
      */
 	@Value("${redis.password}")
-	private transient char[] password;
+	private char[] password;
 
 	/** 
      *  Pool max.

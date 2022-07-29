@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
-import com.mongodb.client.result.UpdateResult;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IXslTransformRepo;
@@ -53,26 +50,7 @@ public class XslTransformRepo extends AbstractMongoRepo<XslTransformETY, String>
 		super.insertAll(etys);
 	}
 
-	@Override
-	public Integer upsertByVersion(final XslTransformETY ety) {
-		Integer output = 0;
-		try {
-			Query query = new Query();
-			query.addCriteria(Criteria.where("version").is(ety.getVersion()).and("cda_type").is(ety.getCdaType()));
-			
-			Update update = new Update();
-			update.set("cda_type", ety.getCdaType());
-			update.set("name_xsl_transform", ety.getNameXslTransform());
-			update.set("content_xsl_transform", ety.getContentXslTransform());
-			update.set("version", ety.getVersion());
-			UpdateResult uResult = mongoTemplate.upsert(query, update, XslTransformETY.class);
-			output = (int)uResult.getModifiedCount();
-		} catch(Exception ex) {
-			log.error("Error upserting ety schema " , ex);
-			throw new BusinessException("Error inserting ety schema ", ex);
-		}
-		return output;
-	}
+	 
 	
 	@Override
 	public boolean existByVersion(final String version) {
@@ -86,5 +64,15 @@ public class XslTransformRepo extends AbstractMongoRepo<XslTransformETY, String>
 			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
 		}
 		return output;
+	}
+	
+	@Override
+	public void dropCollection() {
+		try {
+			mongoTemplate.dropCollection(XslTransformETY.class);
+		} catch(Exception ex) {
+			log.error("Error while execute exists by version query " + getClass() , ex);
+			throw new BusinessException("Error while execute exists by version query " + getClass(), ex);
+		}
 	}
 }

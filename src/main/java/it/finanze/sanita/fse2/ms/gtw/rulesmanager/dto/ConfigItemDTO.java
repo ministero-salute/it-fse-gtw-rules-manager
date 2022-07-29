@@ -13,20 +13,11 @@ import lombok.Data;
 @Data
 @Builder
 public class ConfigItemDTO { 
-	
-	/**
-	 * Xsd schemas.
-	 */
-	private SchemaDTO schema;
-
-	/**
-	 * Schematron.
-	 */
-	private List<SchematronDTO> schematron;
-
+	 
 	/**
 	 * Vocabulary.
 	 */
 	private List<VocabularyDTO> vocabulary;
+	 
  
 }

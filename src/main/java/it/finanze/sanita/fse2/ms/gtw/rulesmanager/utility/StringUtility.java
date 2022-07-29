@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.apache.commons.codec.binary.Hex;
 
+import com.google.gson.Gson;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,6 +81,16 @@ public final class StringUtility {
 	}
 
 	/**
+	 * Encode in Base64 the byte array passed as parameter.
+	 *
+	 * @param input	The byte array to encode.
+	 * @return		The encoded byte array to String.
+	 */
+	public static byte[] decodeBase64(final String input) {
+		return Base64.getDecoder().decode(input);
+	}
+
+	/**
 	 * Encodes the byte array passed as parameter in hexadecimal.
 	 * 
 	 * @param input	The byte array to encode.
@@ -105,5 +117,15 @@ public final class StringUtility {
 			output = completePath.substring(index + 1);
 		}
 		return output;
+	}
+	
+	/**
+	 * Transformation from Object to Json.
+	 * 
+	 * @param obj	object to transform
+	 * @return		json
+	 */
+	public static String toJSON(final Object obj) {
+		return new Gson().toJson(obj);
 	}
 }

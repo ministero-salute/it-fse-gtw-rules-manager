@@ -1,5 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
+import java.util.Date;
+
 import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 /**
  * Model to save xsl transform.
  */
-@Document(collection = "xsl_transform")
+@Document(collection = "#{@xslTransformBean}")
 @Data
 @NoArgsConstructor
 public class XslTransformETY {
@@ -20,8 +22,8 @@ public class XslTransformETY {
 	@Id
 	private String id;
 	
-	@Field(name = "cda_type")
-	private String cdaType;
+	@Field(name = "template_id_root")
+	private String templateIdRoot;
 	
 	@Field(name = "name_xsl_transform")
 	private String nameXslTransform;
@@ -29,7 +31,11 @@ public class XslTransformETY {
 	@Field(name = "content_xsl_transform")
 	private Binary contentXslTransform;
 	
-	@Field(name = "version")
-	private String version;
+	@Field(name = "template_id_extension")
+	private String templateIdExtension;
+	
+	@Field(name = "last_update_date")
+    private Date lastUpdateDate;
+	
 	 
 }

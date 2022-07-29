@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 
 /**
@@ -20,6 +19,5 @@ public interface ITerminologySRV extends Serializable {
 	
 	Integer saveNewVocabularySystems(List<VocabularyDTO> vocabulariesDTO);
 	
-	List<DictionaryETY> saveDictionaryFiles();
 
 }

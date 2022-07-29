@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.EDSClientCFG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.properties.EDSClientCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
@@ -55,7 +55,8 @@ public abstract class AbstractTest {
     }
 
     ConfigItemDTO getMockedItems() {
-    	return mockSRV.mockConfigurationItem();
+    	return null;
+//    	return mockSRV.mockConfigurationItem();
     }
     
     void assertSchemaAreEquals(List<SchemaETY> actual, List<SchemaETY> expected) {
@@ -81,9 +82,8 @@ public abstract class AbstractTest {
     void assertXsltAreEquals(List<XslTransformETY> actual, List<XslTransformETY> expected) {
         
         for (int i = 0; i < actual.size(); i++) {
-            assertTrue(actual.get(i).getCdaType().equals(expected.get(i).getCdaType()), String.format("Actual CDA is %s and expected is %s", actual.get(i).getCdaType(), expected.get(i).getCdaType()));
             assertTrue(actual.get(i).getNameXslTransform().equals(expected.get(i).getNameXslTransform()), String.format( "Actual Xsl name is %s and expected is %s", actual.get(i).getNameXslTransform(), expected.get(i).getNameXslTransform()));
-            assertTrue(actual.get(i).getVersion().equals(expected.get(i).getVersion()), String.format( "Actual xsl transform version is %s and expected is %s", actual.get(i).getVersion(), expected.get(i).getVersion()));
+            assertTrue(actual.get(i).getTemplateIdExtension().equals(expected.get(i).getTemplateIdExtension()), String.format( "Actual xsl transform version is %s and expected is %s", actual.get(i).getTemplateIdExtension(), expected.get(i).getTemplateIdExtension()));
             assertTrue((actual.get(i).getContentXslTransform() == null && expected.get(i).getContentXslTransform() == null)
                     || (actual.get(i).getContentXslTransform().equals(expected.get(i).getContentXslTransform())), "Content xsl transform is different");
         }

@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 
  * @author vincenzoingenito
  */
-@RequestMapping(path = "/v1.0.0")
+@RequestMapping(path = "/v1")
 @Tag(name = "Servizio di test")
 public interface ITestCTL extends Serializable {
  
@@ -31,4 +31,15 @@ public interface ITestCTL extends Serializable {
             @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
     void updateDataUltimoAggiornamento(HttpServletRequest request);
+    
+    
+    @PostMapping("/run-scheduler")
+    @Operation(summary = "Run scheduler", description = "Run scheduler.")
+    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = void.class)))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
+    void runScheduler(HttpServletRequest request);
+    
+    
 }

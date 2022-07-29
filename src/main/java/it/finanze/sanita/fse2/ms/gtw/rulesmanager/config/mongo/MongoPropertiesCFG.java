@@ -1,12 +1,11 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.mongo;
 
-import java.io.Serializable;
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.io.Serializable;
 
 
 /**
