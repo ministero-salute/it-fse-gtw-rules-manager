@@ -8,6 +8,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchematronQuery;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorBridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorEDS;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class SchematronExecutor extends ExecutorEDS<SchematronSetDTO> {
     @Autowired
     private SchematronQuery query;
 
-    protected SchematronExecutor(SchematronCFG config) {
-        super(config);
+    protected SchematronExecutor(SchematronCFG config, ExecutorBridgeEDS bridge) {
+        super(config, bridge);
     }
 
     @Override

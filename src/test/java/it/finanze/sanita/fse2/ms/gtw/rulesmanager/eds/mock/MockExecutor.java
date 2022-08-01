@@ -1,10 +1,14 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.mock;
 
+import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorBridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorEDS;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +25,8 @@ public class MockExecutor extends ExecutorEDS<MockData> {
 
     private boolean verify;
 
-    protected MockExecutor(MockConfig cfg) {
-        super(cfg);
+    protected MockExecutor(MockConfig cfg, ExecutorBridgeEDS bridge) {
+        super(cfg, bridge);
     }
 
     @Override
@@ -30,8 +34,19 @@ public class MockExecutor extends ExecutorEDS<MockData> {
         return new ParameterizedTypeReference<ChangeSetDTO<MockData>>() {};
     }
 
-    public ActionRes onChangeset() {
-        return super.onChangeset();
+    public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
+        return super.onChangeset(hnd);
+    }
+
+    public IActionFnEDS<Date> onLastUpdateProd() {
+        return super.onLastUpdateProd();
+    }
+    public IActionFnEDS<Date> onLastUpdateStaging() {
+        return super.onLastUpdateStaging();
+    }
+
+    public ActionRes onChangesetEmpty() {
+        return super.onChangesetEmpty();
     }
 
     public ActionRes onClean() {
@@ -51,8 +66,14 @@ public class MockExecutor extends ExecutorEDS<MockData> {
         return super.onStaging();
     }
 
-    public ActionRes onSwap() {
+    public ActionRes onSwap(MongoCollection<Document> staging) {
+        // Overwrite value only if test is launch alone
+        if(this.getCollection() == null) this.setCollection(staging);
         return super.onSwap();
+    }
+
+    public ActionRes onChangesetAlignment() {
+        return super.onChangesetAlignment();
     }
 
     public ActionRes onSync() {

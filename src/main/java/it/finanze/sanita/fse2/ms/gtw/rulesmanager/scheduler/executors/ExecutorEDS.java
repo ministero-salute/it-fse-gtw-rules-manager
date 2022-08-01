@@ -8,6 +8,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ICollectionsRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionBuilderEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IDocumentHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
@@ -15,9 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Optional;
@@ -26,22 +25,21 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static java.lang.String.format;
 
 @Slf4j
-@Component
 @Getter
 @Setter
 public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionRetryEDS {
 
-    @Autowired
     private ICollectionsRepo repository;
-    @Autowired
     protected IEDSClientV2 client;
     protected ChangeSetSpecCFG config;
     private ChangeSetDTO<T> changeset;
     private MongoCollection<Document> collection;
     private ProcessResult operations;
 
-    protected ExecutorEDS(ChangeSetSpecCFG config) {
+    protected ExecutorEDS(ChangeSetSpecCFG config, ExecutorBridgeEDS bridge) {
         this.config = config;
+        this.repository = bridge.getRepository();
+        this.client = bridge.getClient();
     }
 
     // TO IMPLEMENT BY THE CALLER
@@ -60,7 +58,9 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
             // Clean previous branch
             .step(this::onClean)
             // Acquire changeset
-            .step(this::onChangeset)
+            .step(() -> onChangeset(this.onLastUpdateProd()))
+            // Verify if empty to early quit
+            .step(this::onChangesetEmpty)
             // Create staging collection
             .step(this::onStaging)
             // Start processing documents inside staging
@@ -69,6 +69,10 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
             .step(this::onVerify)
             // Sync
             .step(this::onSync)
+            // Acquire changeset (again)
+            .step(() -> onChangeset(this.onLastUpdateStaging()))
+            // Verify we are aligned with EDS now
+            .step(this::onChangesetAlignment)
             // Swap the database instance
             .step(this::onSwap)
             // Start
@@ -79,16 +83,19 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         return res;
     }
     // === STEPS ===
-    protected Date onLastUpdate() throws EdsDbException {
-        return repository.getLastSync(config.getSchema());
+    protected IActionFnEDS<Date> onLastUpdateProd() {
+        return () -> repository.getLastSync(config.getSchema());
     }
-    protected ActionRes onChangeset() {
+    protected IActionFnEDS<Date> onLastUpdateStaging() {
+        return () -> repository.getLastSync(config.getStaging());
+    }
+    protected ActionRes onChangeset(IActionFnEDS<Date> hnd) {
         // Working var
         Optional<ChangeSetDTO<T>> data;
         // Log me
         log.info("[EDS][{}] Retrieving changeset", config.getTitle());
         // Retrieve HTTP request data
-        data = retryOnException(() -> client.getStatus(config, onLastUpdate(), getType()), config, log);
+        data = retryOnException(() -> client.getStatus(config, hnd.get(), getType()), config, log);
         // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
         // Let's go
@@ -107,13 +114,18 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
                 config.getTitle(),
                 config.getLastUpdateFormatted(changeset.getTimestamp())
             );
-            // Verify return condition
-            if (this.changeset.getTotalNumberOfElements() == 0) {
-                // Set the flag
-                res = RETURN;
-                // Log me
-                log.info("[EDS][{}] Changeset is empty, quitting ...", config.getTitle());
-            }
+        }
+        return res;
+    }
+    protected ActionRes onChangesetEmpty() {
+        // Working var
+        ActionRes res = OK;
+        // Verify return condition
+        if (this.changeset.getTotalNumberOfElements() == 0) {
+            // Set the flag
+            res = RETURN;
+            // Log me
+            log.info("[EDS][{}] Changeset is empty, quitting ...", config.getTitle());
         }
         return res;
     }
@@ -232,6 +244,21 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
             );
         }
         // Bye
+        return res;
+    }
+    protected ActionRes onChangesetAlignment() {
+        // Working var
+        ActionRes res = KO;
+        // Verify return condition
+        if (this.changeset.getTotalNumberOfElements() == 0) {
+            // Set the flag
+            res = OK;
+            // Log me
+            log.info("[EDS][{}] Changeset is empty, data is aligned", config.getTitle());
+        }else {
+            // Log me
+            log.info("[EDS][{}] Changeset is not empty, data is not aligned", config.getTitle());
+        }
         return res;
     }
     protected ActionRes onClean() {

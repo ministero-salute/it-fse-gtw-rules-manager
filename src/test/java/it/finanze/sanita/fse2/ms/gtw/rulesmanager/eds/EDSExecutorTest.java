@@ -52,24 +52,28 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(OK, executor.onClean());
         // Verify
         assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
+        // No collection exists, call executor without collection
+        assertEquals(OK, executor.onClean());
     }
 
     @Test
     void changeset() throws EdsClientException {
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
+        // Changeset should be retrieved correctly
+        assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Changeset is empty, it should quit
-        assertEquals(RETURN, executor.onChangeset());
+        assertEquals(RETURN, executor.onChangesetEmpty());
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0, 0));
         // Changeset is not empty, it should be OK
-        assertEquals(OK, executor.onChangeset());
+        assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenThrow(
             new EdsClientException("Test error", new IOException("Test error"))
         );
         // Get status errored, it should be KO
-        assertEquals(KO, executor.onChangeset());
+        assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
     }
 
     @Test
@@ -131,8 +135,10 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup repositories with documents
         this.setupTestRepository(executor.getConfig().getStaging());
         this.setupTestRepository(executor.getConfig().getSchema());
-        // Call swap
-        assertEquals(executor.onSwap(), OK);
+        // Call swap with staging instance
+        assertEquals(executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ), OK);
         // Staging is removed, schema is kept
         assertTrue(repository.exists(executor.getConfig().getSchema()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
@@ -153,9 +159,25 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Retrieve
         Date lastSync = repository.getLastSync(executor.getConfig().getStaging());
         // Verify it matches
-        assertEquals(changeset.getTimestamp(), lastSync);
+        assertEquals(lastSync, changeset.getTimestamp());
         // Drop it
         this.clearTestRepository(executor.getConfig().getStaging());
+    }
+
+    @Test
+    void onChangesetAlignment() {
+        // Create empty changeset
+        ChangeSetDTO<MockData> changeset = createChangeset(0,0,0);
+        // Set
+        executor.setChangeset(changeset);
+        // Call it
+        assertEquals(executor.onChangesetAlignment(), OK);
+        // Create changeset
+        changeset = createChangeset(10,5,3);
+        // Set
+        executor.setChangeset(changeset);
+        // Call it
+        assertEquals(executor.onChangesetAlignment(), KO);
     }
 
     @AfterEach

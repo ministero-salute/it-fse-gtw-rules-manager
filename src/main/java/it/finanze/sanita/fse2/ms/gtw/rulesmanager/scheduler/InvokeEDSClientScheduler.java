@@ -9,7 +9,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,6 @@ import static java.util.Arrays.stream;
  */
 @Slf4j
 @Component
-@Profile(Constants.Profile.NOT_TEST)
 public class InvokeEDSClientScheduler implements IActionRetryEDS {
 
 	@Autowired
