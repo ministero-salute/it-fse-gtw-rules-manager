@@ -22,15 +22,15 @@ public abstract class ChangeSetSpecCFG {
     public static int RETRY_VALUE = 3;
 
     private final String title;
-    private final String schema;
+    private final String production;
     private final String staging;
     private final String statusURL;
     private final String dataURL;
 
-    protected ChangeSetSpecCFG(String status, String data, String schema) {
-        this.title = schema.substring(0, 1).toUpperCase() + schema.substring(1);
-        this.schema = schema;
-        this.staging = schema + STAGING_QUALIFIER;
+    protected ChangeSetSpecCFG(String status, String data, String production) {
+        this.title = production.substring(0, 1).toUpperCase() + production.substring(1);
+        this.production = production;
+        this.staging = production + STAGING_QUALIFIER;
         this.statusURL = status;
         this.dataURL = data;
     }

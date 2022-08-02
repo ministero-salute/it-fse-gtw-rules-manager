@@ -18,7 +18,7 @@ public abstract class EDSDatabaseHandler extends EDSEntityHandler {
         // Make test collection
         createTestSchema(name);
         // Init entities
-        initTestEntities();
+        if(getEntities().size() == 0) initTestEntities();
         // Add to collection
         addTestEntityToSchema(name);
     }

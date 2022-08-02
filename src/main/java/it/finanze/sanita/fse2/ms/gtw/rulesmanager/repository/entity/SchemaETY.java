@@ -3,6 +3,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.Binary;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -56,6 +57,16 @@ public class SchemaETY {
         entity.setLastUpdateDate(new Date());
         entity.setLastSync(new Date());
         return entity;
+    }
+
+    public static org.bson.Document toDocument(SchemaETY entity) {
+        return new org.bson.Document()
+            .append(FIELD_ID, new ObjectId(entity.id))
+            .append(FIELD_FILENAME, entity.nameSchema)
+            .append(FIELD_CONTENT, entity.contentSchema)
+            .append(FIELD_TYPE_ID_EXT, entity.typeIdExtension)
+            .append(FIELD_ROOT_SCHEMA, entity.rootSchema)
+            .append(FIELD_LAST_UPDATE, entity.lastUpdateDate);
     }
 
 }

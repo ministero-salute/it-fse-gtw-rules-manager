@@ -1,4 +1,4 @@
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.mock;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
@@ -22,7 +22,6 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 @Slf4j
 @Component
 public class MockExecutor extends ExecutorEDS<MockData> {
-
     private boolean verify;
 
     protected MockExecutor(MockConfig cfg, ExecutorBridgeEDS bridge) {
@@ -139,4 +138,5 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             insert + update + delete
         );
     }
+
 }

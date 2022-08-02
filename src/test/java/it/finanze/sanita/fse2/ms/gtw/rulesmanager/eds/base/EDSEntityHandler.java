@@ -1,6 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
+import org.bson.Document;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -67,5 +69,19 @@ public abstract class EDSEntityHandler {
 
     protected List<SchemaETY> getEntities() {
         return new ArrayList<>(entities);
+    }
+
+    protected List<Document> getModifiedEntitiesAsDocuments() {
+        AtomicInteger i = new AtomicInteger(0);
+        return entities.stream().map(entity -> {
+            // Rename
+            entity.setNameSchema(entity.getNameSchema() +  " - " + i.getAndIncrement());
+            // Return it
+            return entity;
+        }).map(SchemaETY::toDocument).collect(Collectors.toList());
+    }
+
+    protected List<Document> getEntitiesAsDocuments() {
+        return new ArrayList<>(entities).stream().map(SchemaETY::toDocument).collect(Collectors.toList());
     }
 }

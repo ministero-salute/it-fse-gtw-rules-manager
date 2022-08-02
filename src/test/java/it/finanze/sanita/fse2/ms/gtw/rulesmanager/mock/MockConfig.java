@@ -1,4 +1,4 @@
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.mock;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangeSetSpecCFG;
 import org.springframework.stereotype.Component;

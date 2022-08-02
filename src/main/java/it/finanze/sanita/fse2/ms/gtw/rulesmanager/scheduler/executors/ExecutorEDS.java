@@ -84,7 +84,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
     }
     // === STEPS ===
     protected IActionFnEDS<Date> onLastUpdateProd() {
-        return () -> repository.getLastSync(config.getSchema());
+        return () -> repository.getLastSync(config.getProduction());
     }
     protected IActionFnEDS<Date> onLastUpdateStaging() {
         return () -> repository.getLastSync(config.getStaging());
@@ -134,7 +134,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         ActionRes res = KO;
         // Verify if database is not empty
         try {
-            if(repository.exists(config.getSchema())) {
+            if(repository.exists(config.getProduction())) {
                 res = cloneStaging();
             } else {
                 res = emptyStaging();
@@ -208,7 +208,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         // Rename
         try {
             // Execute
-            repository.rename(this.collection, config.getSchema());
+            repository.rename(this.collection, config.getProduction());
             // Set flag
             res = OK;
         } catch (EdsDbException ex) {
@@ -315,7 +315,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         // Let's clone
         try {
             // Assign the collection
-            collection = repository.clone(config.getSchema(), config.getStaging());
+            collection = repository.clone(config.getProduction(), config.getStaging());
             // Set flag
             res = OK;
             // Log me

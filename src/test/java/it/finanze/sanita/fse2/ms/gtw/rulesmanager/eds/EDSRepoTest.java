@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -141,12 +142,7 @@ public class EDSRepoTest extends EDSDatabaseHandler {
             // Verify documents
             assertEquals(copy.countDocuments(), SCHEMA_TEST_SIZE);
             // Now compare deeply
-            copy.find().forEach(doc -> {
-                long size = mongo.getCollection(TEST_BASE_COLLECTION).countDocuments(
-                    query.getComparatorQuery(doc)
-                );
-                assertEquals(1, size);
-            });
+            assertTrue(compareDeeply(copy, mongo.getCollection(TEST_BASE_COLLECTION), query));
         });
         // Drop
         mongo.dropCollection(TEST_COLL_A);
