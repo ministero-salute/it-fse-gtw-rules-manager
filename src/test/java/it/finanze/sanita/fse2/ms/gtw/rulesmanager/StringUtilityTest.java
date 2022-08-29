@@ -1,5 +1,28 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ActiveProfiles;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyEntryDTO;
@@ -12,23 +35,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.TerminologySRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -113,16 +119,7 @@ class StringUtilityTest {
 		
 		assertEquals("dGVzdFN0cmluZw==", encodedString); 
 	} 
-	
-	@Test
-	@DisplayName("Get Filename Test") 
-	void getFilenameTest() {
-		String filenameWithExtension = "sample/path/file.xml"; 
-		String filename = StringUtility.getFilename(filenameWithExtension); 
-		
-		assertEquals(String.class, filename.getClass()); 
-		assertEquals("file.xml", filename); 
-	} 
+	 
 	
 	@Test
 	@DisplayName("Generate UUID Test")
@@ -154,7 +151,6 @@ class StringUtilityTest {
     	byte[] bytesReturn = FileUtility.getFileFromFS(fileName);
     	byte[] bytesReturnTestFile = FileUtility.getFileFromFS(testFile); 
 
-    	String test = System. getProperty("user.dir"); 
 
     	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,fileName));
     	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,null));

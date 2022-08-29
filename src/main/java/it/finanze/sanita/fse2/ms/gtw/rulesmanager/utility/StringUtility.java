@@ -104,20 +104,6 @@ public final class StringUtility {
 	    return UUID.randomUUID().toString();
 	}
 
-	/**
-	 * Get filename from complete path.
-	 * 
-	 * @param completePath	path
-	 * @return				filename
-	 */
-	public static String getFilename(final String completePath) {
-		String output = completePath;
-		int index = completePath.lastIndexOf(File.separator);
-		if(index > 0) {
-			output = completePath.substring(index + 1);
-		}
-		return output;
-	}
 	
 	/**
 	 * Transformation from Object to Json.
