@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -102,7 +103,34 @@ class StringUtilityTest {
 		String convertion2 = StringUtility.encodeSHA256Hex(strToConvert2);
 		assertNotNull(convertion2);
 		
-	}
+	} 
+	
+	@Test
+	@DisplayName("Encode Base 64 Test") 
+	void encodeBase64Test() {
+		String stringToEncode = "testString"; 
+		String encodedString = StringUtility.encodeBase64(stringToEncode.getBytes()); 
+		
+		assertEquals("dGVzdFN0cmluZw==", encodedString); 
+	} 
+	
+	@Test
+	@DisplayName("Get Filename Test") 
+	void getFilenameTest() {
+		String filenameWithExtension = "sample/path/file.xml"; 
+		String filename = StringUtility.getFilename(filenameWithExtension); 
+		
+		assertEquals(String.class, filename.getClass()); 
+		assertEquals("file.xml", filename); 
+	} 
+	
+	@Test
+	@DisplayName("Generate UUID Test")
+	void generateUuidTest() {
+		String uuid = StringUtility.generateUUID(); 
+		
+		assertEquals(String.class, uuid.getClass()); 
+	} 
 	
     @Test
 	@DisplayName("enumeration tests")
@@ -122,18 +150,30 @@ class StringUtilityTest {
     void fileUtilityTest() {
     	byte[] bytes = "\u00e0\u004f\u00d0\u0020\u00ea\u003a\u0069\u0010\u00a2\u00d8\u0008\u0000\u002b\u0030\u0030\u009d".getBytes();    
     	String fileName = "string";
+    	String testFile= System.getProperty("user.dir") + "/src/test/resources/Files/schematron/schematronFSE.sch.xsl"; 
     	byte[] bytesReturn = FileUtility.getFileFromFS(fileName);
+    	byte[] bytesReturnTestFile = FileUtility.getFileFromFS(testFile); 
+
+    	String test = System. getProperty("user.dir"); 
 
     	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,fileName));
     	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,null));
-    	assertDoesNotThrow(()->FileUtility.saveToFile(bytesReturn,null));
+    	assertDoesNotThrow(()->FileUtility.saveToFile(bytesReturn,null)); 
+    	
+    	assertNotNull(bytesReturnTestFile); 
+    	
 
 		try {
 			Files.deleteIfExists(Paths.get(fileName));
 		} catch (IOException e) {
 			log.info("Unable to delete {} file", fileName);
 		}
-	}
+	} 
+    
+    @Test
+    void getFileFromInternalResourcesKo() {
+    	assertNull(FileUtility.getFileFromInternalResources("fileKo.example")); 
+    }
 
     @Test
     void vocabularyTest() {

@@ -131,6 +131,33 @@ public class PersistenceTest extends AbstractTest {
 		
 	}
 	
+	@Test
+	@DisplayName("Insert Terminilogy ETY Test")
+	void insertTerminologyTest() {
+		String csvFileName = "LoincTableCore.csv";
+		byte[] csvContent = FileUtility.getFileFromInternalResources("Files" + File.separator + "vocabulary" + File.separator + csvFileName);
+		InputStream targetStream = new ByteArrayInputStream(csvContent);
+		Reader reader = new InputStreamReader(targetStream);
+		List<VocabularyBuilderTestDTO> vocabularyListDTO = buildDTOFromCsv(reader);
+		vocabularyListDTO.remove(0);
+		
+		VocabularyBuilderTestDTO vocabularyDTO = vocabularyListDTO.get(0); 
+		
+		TerminologyETY ety = new TerminologyETY();
+		ety.setCode(vocabularyDTO.getCode());
+		ety.setDescription(vocabularyDTO.getDescription());
+		ety.setSystem("2.16.840.1.113883.6.1"); 
+		
+		TerminologyETY insertedEty = vocabularySRV.insert(ety); 
+		
+		assertNotNull(insertedEty); 
+	}
+	
+	@Test
+	@DisplayName("Insert Schematron ETY Test") 
+	void insertSchematron() {
+		
+	}
 	
 	@Test
 	@DisplayName("Populate and get xsl transform collection")

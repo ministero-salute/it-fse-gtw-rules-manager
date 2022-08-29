@@ -24,6 +24,7 @@ class ElasticLoggerTest {
 
 	@Test
 	void contextLoads() {
+	    elasticLogger.trace("messaggio per elk", OperationLogEnum.CALL_EDS, ResultLogEnum.OK, new Date(), new Date());
 	    elasticLogger.info("messaggio per elk", OperationLogEnum.CALL_EDS, ResultLogEnum.OK, new Date(), new Date());
 	    elasticLogger.debug("messaggio ko", OperationLogEnum.MONGO, ResultLogEnum.KO, new Date(), new Date());
 	    elasticLogger.warn("messaggio ok", OperationLogEnum.REDIS, ResultLogEnum.OK, new Date(), new Date());
