@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.finanze.sanita.fse2</groupId>
 	<artifactId>gtw-rules-manager-ms</artifactId>
 	<name>gtw-rules-manager-ms</name>
-	<version>0.0.6-SNAPSHOT</version> <!-- SPRINT6 -->
+	<version>0.0.6-SNAPSHOT</version>	<!-- SPRINT6 -->
 	<description>Gateway Rules Manager FSE</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.7</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<version>2.7.3</version>
+		<relativePath />
+		<!-- lookup parent from repository -->
 	</parent>
 
 
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.7</version>
+			<version>1.6.11</version>
 		</dependency>
 
 		<!-- LOGBACK JSON -->
@@ -85,16 +85,16 @@
 
 		<!-- LOGSTASH LOGBACK ENCODER -->
 		<dependency>
-		    <groupId>net.logstash.logback</groupId>
-		    <artifactId>logstash-logback-encoder</artifactId>
-		    <version>7.2</version>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>7.2</version>
 		</dependency>
 
 		<dependency>
-            <groupId>org.codehaus.janino</groupId>
-            <artifactId>janino</artifactId>
-            <version>3.0.6</version>
-        </dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.1.7</version>
+		</dependency>
 
 		<!-- DEVTOOL -->
 		<dependency>
@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>org.modelmapper.extensions</groupId>
 			<artifactId>modelmapper-spring</artifactId>
-			<version>2.4.2</version>
+			<version>3.1.0</version>
 		</dependency>
 
 		<!-- TEST -->
@@ -146,20 +146,20 @@
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>
 			<artifactId>shedlock-spring</artifactId>
-			<version>4.34.0</version>
+			<version>4.41.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>
 			<artifactId>shedlock-provider-redis-spring</artifactId>
-			<version>4.34.0</version>
+			<version>4.41.0</version>
 		</dependency>
 
 		<!-- OpenCSV -->
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>5.3</version>
+			<version>5.6</version>
 		</dependency>
 
 		<!-- GSON -->
@@ -219,6 +219,20 @@
 				</executions>
 			</plugin>
 
+			<!-- Security check -->
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>7.1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Build -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -243,27 +257,21 @@
 						</goals>
 						<configuration>
 							<target>
-								<taskdef
-									resource="net/sf/antcontrib/antcontrib.properties" />
+								<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 								<if>
 									<available file="infrastructure" />
 									<then>
 										<!-- copy common resources of server runtime to project build directory -->
-										<copy todir="${container.output.runtime}"
-											overwrite="true" failonerror="false">
+										<copy todir="${container.output.runtime}" overwrite="true" failonerror="false">
 											<fileset dir="${config.infra}/runtime" includes="**" />
 										</copy>
 										<!-- copy common resources of server runtime to project build directory -->
-										<copy todir="${container.output}" overwrite="true"
-											failonerror="false">
-											<fileset dir="${project.basedir}"
-												includes="Dockerfile" />
+										<copy todir="${container.output}" overwrite="true" failonerror="false">
+											<fileset dir="${project.basedir}" includes="Dockerfile" />
 										</copy>
 										<!-- copy common resources of server runtime to project build directory -->
-										<copy todir="${container.output}" overwrite="true"
-											failonerror="false">
-											<fileset dir="${project.basedir}/target"
-												includes="${project.artifactId}.jar" />
+										<copy todir="${container.output}" overwrite="true" failonerror="false">
+											<fileset dir="${project.basedir}/target" includes="${project.artifactId}.jar" />
 										</copy>
 									</then>
 								</if>

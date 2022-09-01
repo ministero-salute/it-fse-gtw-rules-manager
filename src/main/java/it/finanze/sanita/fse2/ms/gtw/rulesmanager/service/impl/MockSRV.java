@@ -32,6 +32,10 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.StructureMap
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.ValuesetETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.SchemaRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.SchematronRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.TerminologyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.XslTransformRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +53,22 @@ public class MockSRV implements IMockSRV {
 
 	@Autowired
 	private ITerminologyRepo vocabularyRepo;
- 
+
 
 	@Autowired
 	private IXslTransformRepo xslTransformRepo;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private SchemaRepo schemaRepo;
+	@Autowired
+	private SchematronRepo schematronRepo;
+	@Autowired
+	private TerminologyRepo terminologyRepo;
+	@Autowired
+	private XslTransformRepo xsltRepo;
 
 
 	@Override
@@ -76,7 +89,7 @@ public class MockSRV implements IMockSRV {
 
 
 	@SuppressWarnings("all")
-	private void saveTerminologyFromExcel() {
+	private Integer saveTerminologyFromExcel() {
 
 		List<TerminologyETY> terminologyList = new ArrayList<>();
 		final String csvFileName = "LoincTableCore.csv";
@@ -99,6 +112,7 @@ public class MockSRV implements IMockSRV {
 			log.error("Error while reading vocabulary file", e);
 			throw new BusinessException(e);
 		}
+		return terminologyList.size();
 
 	} 
 
@@ -321,7 +335,7 @@ public class MockSRV implements IMockSRV {
 		return out;
 	}
 
-	private void saveOtherTerminology() {
+	private Integer saveOtherTerminology() {
 		VocabularyEntryDTO vocXXX = VocabularyEntryDTO.builder().code("XXX").description("XXX").build();
 		VocabularyEntryDTO voc698 = VocabularyEntryDTO.builder().code("698.8").description("698.8").build();
 		VocabularyEntryDTO voc3211 = VocabularyEntryDTO.builder().code("3211").description("3211").build();
@@ -418,9 +432,10 @@ public class MockSRV implements IMockSRV {
 		}
 
 		mongoTemplate.insertAll(terminologyToSave);
+		return terminologyToSave.size();
 	}
 
-	private void saveSchematronFiles() {
+	private Integer saveSchematronFiles() {
 		List<SchematronETY> out = new ArrayList<>();
 		Map<String,String> schematronTemplateMap = buildMapSchematronTemplate();
 		try { 
@@ -435,12 +450,13 @@ public class MockSRV implements IMockSRV {
 				ety.setTemplateIdRoot(schematron.getValue());
 				out.add(ety);
 			}
-			log.info("Schematron inseriti : " + out.size()); 
 			mongoTemplate.insertAll(out);
+			log.info("Schematron inseriti : " + out.size()); 
 		} catch(Exception ex) {
 			log.error("Error while save schematron files : " + ex);
 			throw new BusinessException("Error while save schematron files : " + ex);
 		}
+		return out.size();
 	}
 
 	private Map<String,String> buildMapSchematronTemplate(){
@@ -474,7 +490,7 @@ public class MockSRV implements IMockSRV {
 
 
 
-	private void saveXslFiles() {
+	private Integer saveXslFiles() {
 		List<XslTransformETY> out = new ArrayList<>();
 		Map<String,String> xslTemplateMap = buildXslTrasformTemplate();
 		try {
@@ -496,6 +512,7 @@ public class MockSRV implements IMockSRV {
 			log.error("Error while save xsl files : " + ex);
 			throw new BusinessException("Error while save xsl files : " + ex);
 		}
+		return out.size();
 	}
 
 	private Map<String,String> buildXslTrasformTemplate(){
@@ -510,7 +527,7 @@ public class MockSRV implements IMockSRV {
 		return mapXslRoot;
 	}
 
-	private void saveStructureDefinition() {
+	private Integer saveStructureDefinition() {
 		List<StructureDefinitionETY> list = new ArrayList<>();
 		try {
 			for(String fileName : buildStructureDefinition()) {
@@ -521,12 +538,13 @@ public class MockSRV implements IMockSRV {
 				structureDef.setLastUpdateDate(new Date());
 				list.add(structureDef);
 			}
-			log.info("Structure definition inserite : " + list.size());
 			mongoTemplate.insertAll(list);
+			log.info("Structure definition inserite : " + list.size());
 		} catch(Exception ex) {
 			log.error("Error while save structure definition : " , ex);
 			throw new BusinessException("Error while save structure definition : " , ex);
 		}
+		return list.size();
 	}
 
 	private List<String> buildStructureDefinition(){
@@ -589,7 +607,7 @@ public class MockSRV implements IMockSRV {
 		return out;
 	}
 
-	private void saveStructureMap() {
+	private Integer saveStructureMap() {
 		List<StructureMapETY> list = new ArrayList<>();
 		try {
 			for(String fileName : buildStructureMap()) {
@@ -601,12 +619,13 @@ public class MockSRV implements IMockSRV {
 				structureMap.setTemplateIdRoot("2.16.840.1.113883.2.9.2.30.10.8");
 				list.add(structureMap);
 			}
-			log.info("Structure map inserite : " + list.size());
 			mongoTemplate.insertAll(list);
+			log.info("Structure map inserite : " + list.size());
 		} catch(Exception ex) {
 			log.error("Error while save structure definition : " , ex);
 			throw new BusinessException("Error while save structure definition : " , ex);
 		}
+		return list.size();
 	}
 
 	private List<String> buildStructureMap(){
@@ -618,8 +637,8 @@ public class MockSRV implements IMockSRV {
 		out.add("step01.map");
 		return out;
 	}
-	
-	private void saveValuset() {
+
+	private Integer saveValuset() {
 		List<ValuesetETY> list = new ArrayList<>();
 		try {
 			for(String fileName : buildValueset()) {
@@ -630,17 +649,30 @@ public class MockSRV implements IMockSRV {
 				valueSet.setNameValuset(nameValueset);
 				list.add(valueSet);
 			}
-			log.info("valueset inseriti : " + list.size());
 			mongoTemplate.insertAll(list);
+			log.info("valueset inseriti : " + list.size());
 		} catch(Exception ex) {
 			log.error("Error while save valueset : " , ex);
 			throw new BusinessException("Error while save valueset : " , ex);
 		}
+		return list.size();
 	}
 
 	private List<String> buildValueset(){
 		List<String> out = new ArrayList<>();
 		out.add("DocumentEntry.confidentialityCode.json");
+		return out;
+	}
+
+
+	@Override
+	public Map<String,Integer> countSavedElement() {
+		Map<String,Integer> out = new HashMap<>();
+		out.put("schema", schemaRepo.countElement());
+		out.put("schematron", schematronRepo.countElement());
+		out.put("terminology", terminologyRepo.countElement());
+		out.put("xslt", xsltRepo.countElement());
+		
 		return out;
 	}
 }

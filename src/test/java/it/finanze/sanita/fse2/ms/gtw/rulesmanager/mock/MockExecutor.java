@@ -1,25 +1,25 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.bson.Document;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Component;
+
 import com.mongodb.client.MongoCollection;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorBridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorEDS;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-
-@Slf4j
 @Component
 public class MockExecutor extends ExecutorEDS<MockData> {
     private boolean verify;

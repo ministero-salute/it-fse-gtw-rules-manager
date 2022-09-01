@@ -69,6 +69,7 @@ public class SchemaRepo extends AbstractMongoRepo<SchemaETY, String> implements 
 			log.error(EXECUTION_ERROR + getClass() , ex);
 			throw new BusinessException(EXECUTION_ERROR + getClass(), ex);
 		}
-	}
+	} 
+	 
 }
  		

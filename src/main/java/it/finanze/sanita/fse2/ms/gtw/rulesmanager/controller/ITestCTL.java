@@ -1,6 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,7 +40,6 @@ public interface ITestCTL extends Serializable {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
-    void runScheduler(HttpServletRequest request);
-    
+    Map<String,Integer> runScheduler(HttpServletRequest request);
     
 }

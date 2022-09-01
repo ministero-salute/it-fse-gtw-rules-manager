@@ -6,6 +6,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
@@ -104,6 +105,7 @@ public abstract class AbstractMongoRepo<T, K> {
 		return mongoTemplate.findAll(getCls());
 	}
 
+	@SuppressWarnings("unchecked")
 	private Class<T> getCls() {
 		ParameterizedType pt = (ParameterizedType) getClass().getGenericSuperclass();
 		return ((Class<T>) pt.getActualTypeArguments()[0]);
@@ -118,6 +120,18 @@ public abstract class AbstractMongoRepo<T, K> {
 			throw new BusinessException("Error during construct object id. :" , ex);
 		}
 		return objectId;
+	}
+	
+
+	public Integer countElement() {
+		Integer out = 0;
+		try {
+			out = (int)mongoTemplate.count(new Query(), getCls());
+		} catch(Exception ex) {
+			log.error("Error while perform count : " , ex);
+			throw new BusinessException(ex);
+		}
+		return out;
 	}
  
 }

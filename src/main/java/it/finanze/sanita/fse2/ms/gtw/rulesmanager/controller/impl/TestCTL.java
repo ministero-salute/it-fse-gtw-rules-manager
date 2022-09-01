@@ -1,6 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller.impl;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,10 +52,11 @@ public class TestCTL implements ITestCTL {
 
 
 	@Override
-	public void runScheduler(HttpServletRequest request) {
+	public Map<String,Integer> runScheduler(HttpServletRequest request) {
 		mockSRV.dropCollections();
 		mockSRV.saveMockConfigurationItem();
 		edsClientScheduler.action();
+		return mockSRV.countSavedElement();
 	}
 
 	

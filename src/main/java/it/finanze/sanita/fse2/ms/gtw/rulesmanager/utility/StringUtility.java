@@ -1,6 +1,5 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;

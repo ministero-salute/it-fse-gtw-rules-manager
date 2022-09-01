@@ -1,23 +1,24 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
-import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static java.util.Arrays.stream;
+
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.Optional;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static java.util.Arrays.stream;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
+import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 /**
  * Invoke EDS Client Scheduler, handles the invocations to EDS Client endpoints.
@@ -29,9 +30,6 @@ public class InvokeEDSClientScheduler implements IActionRetryEDS {
 
 	@Autowired
 	private SchemaExecutor schema;
-	
-	@Autowired
-	private SchematronExecutor schematron;
 
 	@Autowired
 	private IMockSRV mockSRV;
