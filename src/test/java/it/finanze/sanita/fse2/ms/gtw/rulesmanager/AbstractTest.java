@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.EDSClientCFG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,9 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractTest {
- 
-    @MockBean
-    EDSClientCFG edsClientCFG;
 
     @MockBean
     RestTemplate restTemplate;
