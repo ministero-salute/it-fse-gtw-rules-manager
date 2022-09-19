@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.TerminologyRep
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import lombok.extern.slf4j.Slf4j;
-import nonapi.io.github.classgraph.utils.FileUtils;
 
 @Service
 @Slf4j
@@ -53,7 +51,7 @@ public class MockSRV implements IMockSRV {
 	private static final String cdaCodeSystem = "2.16.840.1.113883.6.1";
 
 	@Autowired
-	private TerminologyRepo vocabularyRepo;
+	private TerminologyRepo terminologyRepo;
 	
 	@Autowired
 	private SchemaRepo schemaRepo;
@@ -502,7 +500,7 @@ public class MockSRV implements IMockSRV {
 			}
 		}
 
-		vocabularyRepo.insertAll(listToAdd);
+		terminologyRepo.insertAll(listToAdd);
 	}
 	 
 
@@ -601,7 +599,7 @@ public class MockSRV implements IMockSRV {
 
 	@Override
 	public void dropCollections() {
-		vocabularyRepo.dropCollection();
+		terminologyRepo.dropCollection();
 		dictionaryRepo.dropCollection();
 		schemaRepo.dropCollection();
 		schematronRepo.dropCollection();
