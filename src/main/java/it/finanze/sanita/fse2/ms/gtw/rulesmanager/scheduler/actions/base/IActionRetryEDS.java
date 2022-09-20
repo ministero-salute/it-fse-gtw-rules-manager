@@ -23,7 +23,7 @@ public interface IActionRetryEDS {
             } catch (Exception e) {
                 // Log me
                 log.error(
-                    format("[EDS][%s][#%s] Retrying operation due to exception", config.getTitle(), i + 1),
+                    format("[%s][#%s] Retrying operation due to exception", config.getTitle(), i + 1),
                     e
                 );
             }
@@ -44,7 +44,7 @@ public interface IActionRetryEDS {
             res = executor.execute();
             // Log me
             if(res == KO && i != times) {
-                log.error("[EDS][Executor][#{}] Restarting executor due to exception", i + 1);
+                log.error("[Executor][#{}] Restarting executor due to exception", i + 1);
             }
         }
         // Bye

@@ -53,14 +53,14 @@ public class SchemaExecutor extends ExecutorEDS<SchemaSetDTO> {
                     staging.insertOne(query.getUpsertQuery(dto.get()));
                 }catch (MongoException ex) {
                     log.error(
-                        format("[EDS][%s] Unable to insert document", config.getTitle()),
+                        format("[%s] Unable to insert document", config.getTitle()),
                         ex
                     );
                     // Set flag
                     res = KO;
                 }
             }else {
-                log.error("[EDS][{}] Unable to retrieve document for insertion", config.getTitle());
+                log.error("[{}] Unable to retrieve document for insertion", config.getTitle());
             }
             // Bye, have a nice day
             return res;
@@ -83,14 +83,14 @@ public class SchemaExecutor extends ExecutorEDS<SchemaSetDTO> {
                     staging.replaceOne(query.getFilterQuery(info.getId()), query.getUpsertQuery(dto.get()));
                 }catch (MongoException ex) {
                     log.error(
-                        format("[EDS][%s] Unable to modify document", config.getTitle()),
+                        format("[%s] Unable to modify document", config.getTitle()),
                         ex
                     );
                     // Set flag
                     res = KO;
                 }
             }else {
-                log.error("[EDS][{}] Unable to retrieve document for modification", config.getTitle());
+                log.error("[{}] Unable to retrieve document for modification", config.getTitle());
             }
             // Bye, have a nice day
             return res;
@@ -109,7 +109,7 @@ public class SchemaExecutor extends ExecutorEDS<SchemaSetDTO> {
                 res = OK;
             }catch (MongoException ex) {
                 log.error(
-                    format("[EDS][%s] Unable to delete document", config.getTitle()),
+                    format("[%s] Unable to delete document", config.getTitle()),
                     ex
                 );
             }

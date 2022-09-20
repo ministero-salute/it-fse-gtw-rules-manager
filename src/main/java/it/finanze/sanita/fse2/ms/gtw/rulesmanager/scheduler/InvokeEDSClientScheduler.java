@@ -43,7 +43,7 @@ public class InvokeEDSClientScheduler implements IActionRetryEDS {
 			mockSRV.dropCollections();
 			mockSRV.saveMockConfigurationItem();
 			if(!isTestProfile()) {
-				log.info("[EDS] Executing post construct");
+				log.info("Executing post construct");
 				action();
 			}
 		}
@@ -52,22 +52,22 @@ public class InvokeEDSClientScheduler implements IActionRetryEDS {
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() {
-		log.info("[EDS] Starting scheduled updating process");
+		log.info("Starting scheduled updating process");
 		// Verify execution result even after retries
 		ActionRes schemaExec = retryExecutorOnException(schema, log);
 		// Log if went wrong
 		if(schemaExec == KO) {
-			log.error("[EDS] Unable to update the schema collection");
+			log.error("Unable to update the schema collection");
 		}
 
 //		// Verify execution result even after retries
 //		ActionRes schematronExec = retryExecutorOnException(schematron, log);
 //		// Log if went wrong
 //		if(schematronExec == KO) {
-//			log.error("[EDS] Unable to update the schematron collection");
+//			log.error("Unable to update the schematron collection");
 //		}
 
-		log.info("[EDS] Updating process completed");
+		log.info("Updating process completed");
 	}
 
 	private boolean isTestProfile() {

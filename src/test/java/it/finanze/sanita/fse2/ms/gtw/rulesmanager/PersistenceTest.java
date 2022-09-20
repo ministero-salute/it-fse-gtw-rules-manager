@@ -176,6 +176,7 @@ public class PersistenceTest extends AbstractTest {
 		assertEquals(ety.getId(), out.getId());
 	}
  
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private List<VocabularyBuilderTestDTO> buildDTOFromCsv(Reader reader){
 		List<VocabularyBuilderTestDTO> output = null; 
 		output = new CsvToBeanBuilder(reader).withType(VocabularyBuilderTestDTO.class).withSeparator(',').build().parse();

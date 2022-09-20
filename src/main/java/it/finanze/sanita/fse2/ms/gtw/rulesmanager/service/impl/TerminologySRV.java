@@ -67,7 +67,7 @@ public class TerminologySRV implements ITerminologySRV {
 				
 				List<TerminologyETY> vocabularyETYS = buildDtoToETY(entry.getEntryDTO(), entry.getSystem());
 				if(Boolean.TRUE.equals(exist)) {
-					log.info("Save new version vocabulary");
+					log.debug("Save new version vocabulary");
 					List<String> codeList = vocabularyETYS.stream().map(e-> e.getCode()).collect(Collectors.toList());
 					List<TerminologyETY> vocabularyFinded = vocabularyRepo.findByInCodeAndSystem(codeList,entry.getSystem());
 					List<TerminologyETY> vocabularyToSave = minus(vocabularyETYS, vocabularyFinded);
@@ -79,7 +79,7 @@ public class TerminologySRV implements ITerminologySRV {
 				}
 			}
 		}
-		log.info("Vocabulary saved on db : " + recordSaved);
+		log.debug("Vocabulary saved on db : " + recordSaved);
 		return recordSaved;
 	}
 	

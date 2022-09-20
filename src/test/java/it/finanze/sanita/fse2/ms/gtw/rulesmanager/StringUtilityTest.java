@@ -162,7 +162,7 @@ class StringUtilityTest {
 		try {
 			Files.deleteIfExists(Paths.get(fileName));
 		} catch (IOException e) {
-			log.info("Unable to delete {} file", fileName);
+			log.warn("Unable to delete {} file", fileName);
 		}
 	} 
     

@@ -47,8 +47,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
 
     // HANDLER
     public ActionRes execute() {
-        // Log me
-        log.info("[EDS][{}] Starting updating process", config.getTitle());
+        log.debug("[{}] Starting updating process", config.getTitle());
         // Executor process
         ActionRes res = ActionBuilderEDS
             // Create builder
@@ -77,9 +76,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
             .step(this::onSwap)
             // Start
             .execute();
-        // Log me
-        log.info("[EDS][{}] Ending updating process", config.getTitle());
-        // Bye
+        log.debug("[{}] Ending updating process", config.getTitle());
         return res;
     }
     // === STEPS ===
@@ -90,49 +87,30 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         return () -> repository.getLastSync(config.getStaging());
     }
     protected ActionRes onChangeset(IActionFnEDS<Date> hnd) {
-        // Working var
         Optional<ChangeSetDTO<T>> data;
-        // Log me
-        log.info("[EDS][{}] Retrieving changeset", config.getTitle());
-        // Retrieve HTTP request data
+        log.debug("[{}] Retrieving changeset", config.getTitle());
         data = retryOnException(() -> client.getStatus(config, hnd.get(), getType()), config, log);
-        // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
-        // Let's go
         if(data.isPresent()) {
-            // Assign
             this.changeset = data.get();
-            // Log me
-            log.info(
-                "[EDS][{}] Changeset retrieved with last update at: {}",
+            log.debug(
+                "[{}] Changeset retrieved with last update at: {}",
                 config.getTitle(),
                 config.getLastUpdateFormatted(changeset.getLastUpdate())
-            );
-            // Log me
-            log.info(
-                "[EDS][{}] Changeset retrieved with timestamp at: {}",
-                config.getTitle(),
-                config.getLastUpdateFormatted(changeset.getTimestamp())
             );
         }
         return res;
     }
     protected ActionRes onChangesetEmpty() {
-        // Working var
         ActionRes res = OK;
-        // Verify return condition
         if (this.changeset.getTotalNumberOfElements() == 0) {
-            // Set the flag
             res = RETURN;
-            // Log me
-            log.info("[EDS][{}] Changeset is empty, quitting ...", config.getTitle());
+            log.info("[{}] Changeset is empty, quitting ...", config.getTitle());
         }
         return res;
     }
     protected ActionRes onStaging() {
-        // Working var
         ActionRes res = KO;
-        // Verify if database is not empty
         try {
             if(repository.exists(config.getProduction())) {
                 res = cloneStaging();
@@ -141,17 +119,15 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
             }
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to verify if production branch exists", config.getTitle()),
+                format("[%s] Unable to verify if production branch exists", config.getTitle()),
                 ex
             );
         }
         return res;
     }
     protected ActionRes onProcessing() {
-        // Working var
         ActionRes res = KO;
-        // Log me
-        log.info("[EDS][{}] Start processing data on staging", config.getTitle());
+        log.debug("[{}] Start processing data on staging", config.getTitle());
         // Gives handler their data
         try {
             operations = new ProcessResult(
@@ -168,112 +144,83 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
                 // Expected deletions
                 changeset.getDeletions().size()
             );
-            // Set the flag
             res = OK;
-            // Log me
-            log.info("[EDS][{}] Operations have been applied on staging", config.getTitle());
+            log.debug("[{}] Operations have been applied on staging", config.getTitle());
         }catch (Exception ex){
             log.error(
-                format("[EDS][%s] Unable to process collection due to unknown error", config.getTitle()),
+                format("[%s] Unable to process collection due to unknown error", config.getTitle()),
                 ex
             );
         }
-        // Bye
         return res;
     }
     protected ActionRes onVerify() {
-        // Log me
-        log.info("[EDS][{}] Verifying staging matches checksum", config.getTitle());
+        log.debug("[{}] Verifying staging matches checksum", config.getTitle());
         // Verify
         ActionRes res = operations.isValid() ? OK : KO;
-        // Logging
         if(res == OK) {
-            // Log me
-            log.info("[EDS][{}] Verification success", config.getTitle());
-        }else {
-            // Log me
-            log.info("[EDS][{}] Verification failure", config.getTitle());
+            log.debug("[{}] Verification success", config.getTitle());
+        } else {
+            log.warn("[{}] Verification failure", config.getTitle());
         }
-        // Log me
-        log.info("[EDS][{}] Expecting {}", config.getTitle(), operations.getExpectedInfo());
-        log.info("[EDS][{}] Got {}", config.getTitle(), operations.getInfo());
-        // Bye
+        log.debug("[{}] Expecting {}", config.getTitle(), operations.getExpectedInfo());
+        log.debug("[{}] Got {}", config.getTitle(), operations.getInfo());
         return res;
     }
     protected ActionRes onSwap() {
-        // Working var
         ActionRes res = KO;
-        // Log me
-        log.info("[EDS][{}] Setting up the production branch", config.getTitle());
+        log.debug("[{}] Setting up the production branch", config.getTitle());
         // Rename
         try {
-            // Execute
             repository.rename(this.collection, config.getProduction());
-            // Set flag
             res = OK;
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to rename collection", config.getTitle()),
+                format("[%s] Unable to rename collection", config.getTitle()),
                 ex
             );
         }
-        // Log me
-        log.info("[EDS][{}] Finishing production branch setup", config.getTitle());
-        // Bye
+        log.debug("[{}] Finishing production branch setup", config.getTitle());
         return res;
     }
     protected ActionRes onSync() {
-        // Working var
         ActionRes res = KO;
-        // Log me
-        log.info("[EDS][{}] Syncing documents at {}",
+        log.debug("[{}] Syncing documents at {}",
             config.getTitle(),
             config.getLastUpdateFormatted(changeset.getTimestamp())
         );
         try {
             // Sync collection
             repository.sync(config.getStaging(), changeset.getTimestamp());
-            // Set the flag
             res = OK;
-            // Log me
-            log.info("[EDS][{}] Documents synchronised", config.getTitle());
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to sync collection", config.getTitle()),
+                format("[%s] Unable to sync collection", config.getTitle()),
                 ex
             );
         }
-        // Bye
         return res;
     }
     protected ActionRes onChangesetAlignment() {
-        // Working var
         ActionRes res = KO;
         // Verify return condition
         if (this.changeset.getTotalNumberOfElements() == 0) {
-            // Set the flag
             res = OK;
-            // Log me
-            log.info("[EDS][{}] Changeset is empty, data is aligned", config.getTitle());
-        }else {
-            // Log me
-            log.info("[EDS][{}] Changeset is not empty, data is not aligned", config.getTitle());
+            log.info("[{}] Changeset is empty, data is aligned", config.getTitle());
         }
+        
         return res;
     }
     protected ActionRes onClean() {
-        // Working var
         ActionRes res = KO;
         // Drop previous staging collection if exists
-        log.info("[EDS][{}] Dropping previous branch for staging if exists", config.getTitle());
+        log.debug("[{}] Dropping previous branch for staging if exists", config.getTitle());
         try {
-            // Drop it
             repository.drop(config.getStaging());
-            // Set flag
             res = OK;
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to drop previous staging collection", config.getTitle()),
+                format("[%s] Unable to drop previous staging collection", config.getTitle()),
                 ex
             );
         }
@@ -287,20 +234,16 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
     }
     // === ACTIONS ===
     private ActionRes emptyStaging() {
-        // Working var
         ActionRes res = KO;
-        // Log me
-        log.info("[EDS][{}] Database seems empty, using new collection as staging", config.getTitle());
+        log.debug("[{}] Database seems empty, using new collection as staging", config.getTitle());
         try {
-            // Assign the collection
             collection = repository.create(config.getStaging());
-            // Set the flag
             res = OK;
-            // Log me
-            log.info("[EDS][{}] Staging branch ready", config.getTitle());
+            
+            log.debug("[{}] Staging branch ready", config.getTitle());
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to create collection", config.getTitle()),
+                format("[%s] Unable to create collection", config.getTitle()),
                 ex
             );
         }
@@ -308,25 +251,20 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IActionR
         return res;
     }
     private ActionRes cloneStaging() {
-        // Working var
         ActionRes res = KO;
-        // Log me
-        log.info("[EDS][{}] Cloning current branch for staging", config.getTitle());
+        log.debug("[{}] Cloning current branch for staging", config.getTitle());
         // Let's clone
         try {
             // Assign the collection
             collection = repository.clone(config.getProduction(), config.getStaging());
-            // Set flag
             res = OK;
-            // Log me
-            log.info("[EDS][{}] Staging branch ready", config.getTitle());
+            log.debug("[{}] Staging branch ready", config.getTitle());
         } catch (EdsDbException ex) {
             log.error(
-                format("[EDS][%s] Unable to duplicate collection", config.getTitle()),
+                format("[%s] Unable to duplicate collection", config.getTitle()),
                 ex
             );
         }
-        // Bye
         return res;
     }
 }
