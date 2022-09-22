@@ -564,7 +564,7 @@ public class MockSRV implements IMockSRV {
 				SchematronDTO schematronToSave = SchematronDTO.builder().
 						contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
 						nameSchematron(nameFile).
-						templateIdExtension("1.0").
+						templateIdExtension("3.0").
 						templateIdRoot(schematron.getValue()).
 						build();
 				out.add(schematronToSave);
@@ -581,14 +581,14 @@ public class MockSRV implements IMockSRV {
 		Map<String,String> mapSchematronRoot = new HashMap<>();
 		try { 
 
-			mapSchematronRoot.put("schematron_certificato_VACC v1.2.sch" , "2.16.840.1.113883.2.9.10.1.11.1.2");
-			mapSchematronRoot.put("schematron_PSS_v2.4.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
-			mapSchematronRoot.put("schematron_RSA_v6.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
-			mapSchematronRoot.put("schematron_singola_VACC v1.9.sch" , "2.16.840.1.113883.2.9.10.1.11.1.1");
-			mapSchematronRoot.put("schematron_VPS_v 2.4.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
-			mapSchematronRoot.put("schematronFSE_LDO_V3.5.sch" , "2.16.840.1.113883.2.9.10.1.5");
-			mapSchematronRoot.put("schematronFSE_RAD_v2.5.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
-			mapSchematronRoot.put("schematronFSEv15.sch" , "2.16.840.1.113883.2.9.10.1.1");
+			mapSchematronRoot.put("schematron_certificato_VACC v1.3.sch" , "2.16.840.1.113883.2.9.10.1.11.1.2");
+			mapSchematronRoot.put("schematron_PSS_v2.7.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
+			mapSchematronRoot.put("schematron_RSA_v7.2.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
+			mapSchematronRoot.put("schematron_singola_VACC v2.2.sch" , "2.16.840.1.113883.2.9.10.1.11.1.1");
+			mapSchematronRoot.put("schematron_VPS_v 2.7.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
+			mapSchematronRoot.put("schematronFSE_LDO_V4.8.sch" , "2.16.840.1.113883.2.9.10.1.5");
+			mapSchematronRoot.put("schematronFSE_RAD_v3.0.sch" , "2.16.840.1.113883.2.9.10.1.7.1");
+			mapSchematronRoot.put("schematronFSEv17.sch" , "2.16.840.1.113883.2.9.10.1.1");
 			
 		}catch(Exception ex) {
 			log.error("Error while build map : " , ex);
