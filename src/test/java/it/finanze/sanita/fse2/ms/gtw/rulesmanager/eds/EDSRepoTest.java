@@ -5,7 +5,7 @@ import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSDatabaseHandler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ICollectionsRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
@@ -44,7 +44,7 @@ public class EDSRepoTest extends EDSDatabaseHandler {
     @SpyBean
     private MongoTemplate mongo;
     @Autowired
-    private ICollectionsRepo repository;
+    private IExecutorRepo repository;
     @Autowired
     private SchemaQuery query;
 

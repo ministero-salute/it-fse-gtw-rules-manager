@@ -4,11 +4,6 @@ import lombok.Data;
 
 @Data
 public class SchematronSetDTO {
-    String id;
-    Payload description;
-    @Data
-    public static class Payload {
-        String templateIdRoot;
-        String templateIdExtension;
-    }
+    String templateIdRoot;
+    String templateIdExtension;
 }

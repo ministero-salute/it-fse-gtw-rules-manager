@@ -1,7 +1,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,15 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/v1")
 @Tag(name = "Servizio di test")
 public interface ITestCTL extends Serializable {
- 
-    @PostMapping("/update-data-ultimo-aggiornamento")
-    @Operation(summary = "Update data ultimo aggiornamento schema e schematron", description = "Update data ultimo aggiornamento schema e schematron.")
-    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = void.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
-    void updateDataUltimoAggiornamento(HttpServletRequest request);
-    
+  
     
     @PostMapping("/run-scheduler")
     @Operation(summary = "Run scheduler", description = "Run scheduler.")
@@ -40,6 +31,6 @@ public interface ITestCTL extends Serializable {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Update effettuato correttamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = void.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)) })
-    Map<String,Integer> runScheduler(HttpServletRequest request);
+    void runScheduler(HttpServletRequest request);
     
 }

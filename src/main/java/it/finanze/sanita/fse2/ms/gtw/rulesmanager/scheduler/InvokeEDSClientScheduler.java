@@ -1,22 +1,24 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static java.util.Arrays.stream;
-
-import java.util.Optional;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static java.lang.String.format;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TerminologyExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
@@ -26,65 +28,52 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
  */
 @Slf4j
 @Component
-public class InvokeEDSClientScheduler implements IActionRetryEDS {
+public class InvokeEDSClientScheduler {
 
+	@Autowired
+	private ProfileUtility profiles;
 	@Autowired
 	private SchemaExecutor schema;
-
 	@Autowired
-	private IMockSRV mockSRV;
-
+	private SchematronExecutor schematron;
 	@Autowired
-	private Environment environment;
+	private XslExecutor xsl;
+	@Autowired
+	private TerminologyExecutor terminology;
+	@Autowired
+	private StructureExecutor structures;
 
 	@PostConstruct
 	public void postConstruct() {
-		if(!isDevProfile()) {
-			mockSRV.dropCollections();
-			mockSRV.saveMockConfigurationItem();
-			if(!isTestProfile()) {
-				log.info("Executing post construct");
-				action();
-			}
+		if(!profiles.isTestProfile() && !profiles.isDevProfile()) {
+			log.info("[EDS] Executing post construct");
+			action();
 		}
 	}
 	
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() {
-		log.info("Starting scheduled updating process");
-		// Verify execution result even after retries
-		ActionRes schemaExec = retryExecutorOnException(schema, log);
-		// Log if went wrong
-		if(schemaExec == KO) {
-			log.error("Unable to update the schema collection");
+		// Log me
+		log.info("[EDS] Starting scheduled updating process");
+		// Run executors
+		start(schema, schematron, xsl, terminology);
+		// Run multi-layer executor
+		structures.execute();
+		// Log me
+		log.info("[EDS] Updating process completed");
+	}
+
+	private void start(ExecutorEDS<?> ...executor) {
+		for (ExecutorEDS<?> executorEDS : executor) {
+			// Configuration
+			ChangesetCFG config = executorEDS.getConfig();
+			// Verify execution result even after retries
+			ActionRes exec = retryExecutorOnException(executorEDS, log);
+			// Log if went wrong
+			if (exec == KO) {
+				log.error(format("[EDS] Unable to update the %s collection", config.getTitle()));
+			}
 		}
-
-//		// Verify execution result even after retries
-//		ActionRes schematronExec = retryExecutorOnException(schematron, log);
-//		// Log if went wrong
-//		if(schematronExec == KO) {
-//			log.error("Unable to update the schematron collection");
-//		}
-
-		log.info("Updating process completed");
-	}
-
-	private boolean isTestProfile() {
-		// Get profiles
-		String[] profiles = environment.getActiveProfiles();
-		// Verify if exists the test profile
-		Optional<String> exists = stream(profiles).filter(i -> i.equals(Constants.Profile.TEST)).findFirst();
-		// Return
-		return exists.isPresent();
-	}
-	
-	private boolean isDevProfile() {
-		// Get profiles
-		String[] profiles = environment.getActiveProfiles();
-		// Verify if exists the test profile
-		Optional<String> exists = stream(profiles).filter(i -> i.equals(Constants.Profile.DEV)).findFirst();
-		// Return
-		return exists.isPresent();
 	}
 }

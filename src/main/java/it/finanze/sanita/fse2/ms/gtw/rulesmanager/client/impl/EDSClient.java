@@ -1,7 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClientV2;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangeSetSpecCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,13 +18,13 @@ import java.util.Date;
  * @author G. Baittiner
  */
 @Component
-public class EDSClient implements IEDSClientV2 {
+public class EDSClient implements IEDSClient {
 
     @Autowired
     private RestTemplate client;
 
     @Override
-    public <T> T getDocument(ChangeSetSpecCFG spec, String id, Class<T> type) throws EdsClientException {
+    public <T> T getDocument(ChangesetCFG spec, String id, Class<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {
@@ -37,7 +37,7 @@ public class EDSClient implements IEDSClientV2 {
     }
 
     @Override
-    public <T> T getStatus(ChangeSetSpecCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException {
+    public <T> T getStatus(ChangesetCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {

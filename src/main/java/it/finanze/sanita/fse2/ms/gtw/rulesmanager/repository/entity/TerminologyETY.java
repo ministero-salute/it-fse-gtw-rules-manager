@@ -1,11 +1,13 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Model to save terminology.
@@ -15,17 +17,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TerminologyETY {
 
+	public static final String FIELD_ID = "_id";
+    public static final String FIELD_SYSTEM = "system";
+    public static final String FIELD_CODE = "code";
+    public static final String FIELD_DESCRIPTION = "description";
+	public static final String FIELD_LAST_UPDATE = "last_update_date";
+    public static final String FIELD_LAST_SYNC = "last_sync";
+
 	@Id
 	private String id;
-	
-	@Field(name = "system")
+	@Field(name = FIELD_SYSTEM)
 	private String system;
-	
-	@Field(name = "code")
+	@Field(name = FIELD_CODE)
 	private String code;
-	
-	@Field(name = "description")
+	@Field(name = FIELD_DESCRIPTION)
 	private String description;
+	@Field(name = FIELD_LAST_UPDATE)
+    private Date lastUpdateDate;
+    @Field(name = FIELD_LAST_SYNC)
+    private Date lastSync;
 
 	@Override
 	public boolean equals(Object obj) {

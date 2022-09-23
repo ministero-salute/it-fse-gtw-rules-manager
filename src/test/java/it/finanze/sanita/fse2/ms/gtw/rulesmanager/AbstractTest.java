@@ -1,59 +1,27 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.XslTransformETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IMockSRV;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 public abstract class AbstractTest {
 
     @MockBean
     RestTemplate restTemplate;
     
     @Autowired
-    IMockSRV mockSRV;
-    
-    @Autowired
     private MongoTemplate mongoTemplate;
-
-    @SuppressWarnings("unchecked")
-    void mockEDSClient(final HttpStatus status, final ConfigItemDTO bodyResponse, final HttpClientErrorException exception) {
-
-        log.info("Executing mock to eds client to return a status {}", status);
-        if (status.equals(HttpStatus.OK)) {
-            ResponseEntity<ConfigItemDTO> response = new ResponseEntity<>(bodyResponse, status);
-            given(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class))).willReturn(response);
-
-        } else {
-            given(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class))).willThrow(exception);
-        }
-    }
-
-    ConfigItemDTO getMockedItems() {
-    	return null;
-//    	return mockSRV.mockConfigurationItem();
-    }
     
     void assertSchemaAreEquals(List<SchemaETY> actual, List<SchemaETY> expected) {
 

@@ -1,15 +1,13 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility;
 
+import com.google.gson.Gson;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Hex;
+
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;
-
-import org.apache.commons.codec.binary.Hex;
-
-import com.google.gson.Gson;
-
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class StringUtility {

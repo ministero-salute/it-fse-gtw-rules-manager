@@ -1,23 +1,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client;
 
-import org.springframework.web.client.HttpClientErrorException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
+import org.springframework.core.ParameterizedTypeReference;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.EDSClientException;
+import java.util.Date;
 
 /**
- * Interface of EDS Client.
- * 
- * @author Simone Lungarella
+ * EDS Client interface used to retrieve data according
+ * the specific onChangeset subtype
+ * @author G. Baittiner
  */
 public interface IEDSClient {
-
-    /**
-     * Returns configuration items to use as validation data.
-     * 
-     * @return Configuration items.
-     * @throws EDSClientException If the response from EDS Client has {@code null} body.
-     * @throws HttpClientErrorException If an error occurred while calling EDS Client.
-     */
-    ConfigItemDTO getConfigurationItems();
+    <T> T getDocument(ChangesetCFG spec, String id, Class<T> type) throws EdsClientException;
+    <T> T getStatus(ChangesetCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException;
 }

@@ -1,5 +1,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.base.BaseSetDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,11 +34,9 @@ public class ChangeSetDTO<T> {
     private Date lastUpdate;
     private Date timestamp;
 
-    private List<T> insertions;
+    private List<BaseSetDTO<T>> insertions;
 
-    private List<T> deletions;
-
-    private List<T> modifications;
+    private List<BaseSetDTO<T>> deletions;
 
     private int totalNumberOfElements;
 

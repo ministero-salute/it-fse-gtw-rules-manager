@@ -1,8 +1,8 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
-import java.io.Serializable;
-
 import org.springframework.stereotype.Service;
+
+import java.io.Serializable;
 
 /**
  *

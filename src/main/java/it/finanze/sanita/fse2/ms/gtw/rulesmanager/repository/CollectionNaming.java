@@ -1,11 +1,10 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 
 @Configuration
 public class CollectionNaming {
@@ -64,12 +63,18 @@ public class CollectionNaming {
     @Bean("valuesetBean")
     public String getValusetCollection() {
         if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.VALUSET;
+            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURE_VALUESET;
         }
-        return Constants.ComponentScan.Collections.VALUSET;
+        return Constants.ComponentScan.Collections.STRUCTURE_VALUESET;
     }
-    
-    
+
+    @Bean("structuresBean")
+    public String getStructuresCollection() {
+        if (profileUtility.isTestProfile()) {
+            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURES;
+        }
+        return Constants.ComponentScan.Collections.STRUCTURES;
+    }
     
     
 }

@@ -97,13 +97,6 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- MAPPER -->
-		<dependency>
-			<groupId>org.modelmapper.extensions</groupId>
-			<artifactId>modelmapper-spring</artifactId>
-			<version>3.1.0</version>
-		</dependency>
-
 		<!-- TEST -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -208,20 +201,6 @@
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Security check -->
-			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
-				<version>7.1.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>

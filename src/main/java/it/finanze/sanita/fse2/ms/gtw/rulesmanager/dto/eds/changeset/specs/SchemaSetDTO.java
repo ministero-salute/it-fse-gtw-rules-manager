@@ -4,11 +4,6 @@ import lombok.Data;
 
 @Data
 public class SchemaSetDTO {
-    String id;
-    Payload description;
-    @Data
-    public static class Payload {
-        String extension;
-        String filename;
-    }
+    String extension;
+    String filename;
 }

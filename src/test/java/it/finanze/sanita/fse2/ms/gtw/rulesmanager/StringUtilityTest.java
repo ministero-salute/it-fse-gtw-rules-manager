@@ -1,49 +1,31 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.CurrentApplicationLogEnum;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ErrorLogEnum;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.VocabularyEntryDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.CurrentApplicationLogEnum;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ErrorLogEnum;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl.TerminologyRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.TerminologySRV;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ComponentScan(basePackages = {Constants.ComponentScan.BASE})
 @ActiveProfiles(Constants.Profile.TEST)
 class StringUtilityTest {
-	
-	@Autowired
-	TerminologyRepo terminologyRepo;
 	
     @Test
 	void stringCheckTest() {						
@@ -171,46 +153,4 @@ class StringUtilityTest {
     	assertNull(FileUtility.getFileFromInternalResources("fileKo.example")); 
     }
 
-    @Test
-    void vocabularyTest() {
-    	
-    	TerminologySRV terminologySRV = new TerminologySRV();
-    	
-    	List<VocabularyDTO> vocabularyList = new ArrayList<VocabularyDTO>();
-    	List<VocabularyEntryDTO> entryList = new ArrayList<VocabularyEntryDTO>();
-    	
-    	VocabularyEntryDTO entryDTO = VocabularyEntryDTO.builder().
-    			code("code").
-    			description("description").
-    			build();
-    	
-    	entryList.add(entryDTO);
-    	
-    	VocabularyDTO vocabularyDTO = VocabularyDTO.builder().
-    			entryDTO(entryList).
-    			system("systemString").
-				build();
-    	
-    	vocabularyList.add(vocabularyDTO);
-    	
-
-    	
-    	assertThrows(NullPointerException.class, ()->terminologySRV.saveNewVocabularySystems(vocabularyList));
-    }
-    
-	@Test
-	@DisplayName("upsert by code test")
-	void terminologyEtyUpsert() {
-		TerminologyETY terminologyEty = new TerminologyETY();
-		
-		terminologyEty.setCode("someRandomCode123");
-		terminologyEty.setDescription("genericDescription");
-		terminologyEty.setId("10431");
-		terminologyEty.setSystem("system");
-		
-		Integer output = terminologyRepo.upsertByCode(terminologyEty);
-		
-		assertNotNull(output);
-		assertDoesNotThrow(()->terminologyRepo.upsertByCode(terminologyEty));
-	}
 }

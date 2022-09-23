@@ -1,30 +1,35 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.mongodb.client.MongoCollection;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.base.BaseSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import org.bson.Document;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
-import com.mongodb.client.MongoCollection;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorBridgeEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.ExecutorEDS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Component
 public class MockExecutor extends ExecutorEDS<MockData> {
+
+    public static final String EMPTY_STEP = "EMPTY_STEP";
+
     private boolean verify;
 
-    protected MockExecutor(MockConfig cfg, ExecutorBridgeEDS bridge) {
+    protected MockExecutor(MockConfig cfg, BridgeEDS bridge) {
         super(cfg, bridge);
     }
 
@@ -89,11 +94,6 @@ public class MockExecutor extends ExecutorEDS<MockData> {
     }
 
     @Override
-    public IActionHandlerEDS<MockData> onModification() {
-        return (staging, info) -> verify ? OK : KO;
-    }
-
-    @Override
     public IActionHandlerEDS<MockData> onDeletions() {
         return (staging, info) -> verify ? OK : KO;
     }
@@ -106,25 +106,20 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             new Date(),
             new ArrayList<>(),
             new ArrayList<>(),
-            new ArrayList<>(),
             0
         );
     }
 
-    public static ChangeSetDTO<MockData> createChangeset(int insert, int update, int delete) {
+    public static ChangeSetDTO<MockData> createChangeset(int insert, int delete) {
 
-        List<MockData> insertions = new ArrayList<>();
-        List<MockData> modifications = new ArrayList<>();
-        List<MockData> deletions = new ArrayList<>();
+        List<BaseSetDTO<MockData>> insertions = new ArrayList<>();
+        List<BaseSetDTO<MockData>> deletions = new ArrayList<>();
 
         for(int i = 0; i < insert; ++i) {
-            insertions.add(new MockData("insert - " + i));
-        }
-        for(int i = 0; i < update; ++i) {
-            modifications.add(new MockData("update - " + i));
+            insertions.add(new BaseSetDTO<>("testId", new MockData("insert - " + i)));
         }
         for(int i = 0; i < delete; ++i) {
-            deletions.add(new MockData("delete - " + i));
+            deletions.add(new BaseSetDTO<>("testId", new MockData("delete - " + i)));
         }
 
         return new ChangeSetDTO<>(
@@ -134,9 +129,23 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             new Date(),
             insertions,
             deletions,
-            modifications,
-            insert + update + delete
+            insert + delete
         );
     }
 
+    private ActionRes emptyStep() {
+        return ActionRes.OK;
+    }
+
+    @Override
+    public void registerAdditionalHandlers() {
+        super.registerAdditionalHandlers();
+    }
+
+    @Override
+    protected List<Map.Entry<String, IActionStepEDS>> getCustomSteps() {
+        List<Map.Entry<String, IActionStepEDS>> steps = new ArrayList<>();
+        steps.add(new SimpleImmutableEntry<>(EMPTY_STEP, this::emptyStep));
+        return steps;
+    }
 }
