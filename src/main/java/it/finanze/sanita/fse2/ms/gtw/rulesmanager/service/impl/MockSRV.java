@@ -564,7 +564,7 @@ public class MockSRV implements IMockSRV {
 				SchematronDTO schematronToSave = SchematronDTO.builder().
 						contentSchematron(new Binary(BsonBinarySubType.BINARY, content)).
 						nameSchematron(nameFile).
-						templateIdExtension("3.0").
+						templateIdExtension("4.0").
 						templateIdRoot(schematron.getValue()).
 						build();
 				out.add(schematronToSave);
