@@ -23,7 +23,7 @@ public class StartupListener {
 	}
 
 	private void ensureIndexes() { 
-		mongoOps.indexOps(TerminologyETY.class).ensureIndex(new Index().on("system", Direction.ASC).on("code", Direction.ASC).background());
+		mongoOps.indexOps(TerminologyETY.class).ensureIndex(new Index().on("system", Direction.DESC).on("code", Direction.DESC).background());
 	}
 	 
 }
