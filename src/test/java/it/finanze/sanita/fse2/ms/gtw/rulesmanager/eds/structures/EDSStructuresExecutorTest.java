@@ -8,8 +8,11 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.pare
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.structures.base.EDSStructureHandler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockStructures;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IStructureRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.base.impl.ValuesetExecutor;
+
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -43,6 +46,10 @@ class EDSStructuresExecutorTest extends EDSStructureHandler {
     private IStructureRepo repository;
     @SpyBean
     private StructureExecutor executor;
+    @SpyBean
+    private ValuesetExecutor valuesetExecutor; 
+    @SpyBean
+    private MockStructures mock;
 
     @Test
     void decode() {
@@ -121,6 +128,11 @@ class EDSStructuresExecutorTest extends EDSStructureHandler {
             assertEquals(KO, executor.onMerge(codes, doc));
         });
     }
+    
+    @Test
+    void executeKoTest() {
+    	assertDoesNotThrow(() -> executor.execute()); 
+    } 
 
     @Test
     void empty() {
@@ -130,6 +142,21 @@ class EDSStructuresExecutorTest extends EDSStructureHandler {
             when(repository.isEmpty(anyString())).thenThrow(new EdsDbException("Test error"));
             // Execute
             assertEquals(KO, executor.onEmpty());
+        });
+    }
+
+    @Test
+    void clean() {
+        // Check no throw
+        assertDoesNotThrow(() -> {
+            // Provide knowledge for OK path
+            when(mock.clean()).thenReturn(OK);
+            // Execute
+            executor.onClean(mock);
+            // Provide knowledge for KO path
+            when(mock.clean()).thenReturn(KO);
+            // Execute
+            executor.onClean(mock);
         });
     }
 

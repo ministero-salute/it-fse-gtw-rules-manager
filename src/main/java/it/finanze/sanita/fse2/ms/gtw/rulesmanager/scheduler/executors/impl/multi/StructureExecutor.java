@@ -44,7 +44,7 @@ public class StructureExecutor implements IExecutableEDS {
     @Override
     public ActionRes execute() {
         // Log me
-        log.debug("[{}] Starting multi-onUpdate process", TITLE);
+        log.debug("[{}] Starting multi-update process", TITLE);
         // Iterate each executor and onUpdate them
         Map<ChangesetCFG, ActionRes> codes = onUpdate(map, valueset, definition);
         // Decode
@@ -64,7 +64,7 @@ public class StructureExecutor implements IExecutableEDS {
             case KO:
                 // Log me
                 log.debug(
-                    "[{}] One or more executors are unable to onUpdate",
+                    "[{}] One or more executors are unable to update",
                     TITLE
                 );
                 break;
@@ -74,9 +74,9 @@ public class StructureExecutor implements IExecutableEDS {
                 break;
         }
         // Call clean on each executor
-        clean(map, valueset, definition);
+        onClean(map, valueset, definition);
         // Log me
-        log.debug("[{}] Ending multi-onUpdate process", TITLE);
+        log.debug("[{}] Ending multi-update process", TITLE);
         // Bye
         return res;
     }
@@ -246,7 +246,7 @@ public class StructureExecutor implements IExecutableEDS {
         return res;
     }
 
-    private void clean(StructureBase<?>...executors) {
+    public void onClean(StructureBase<?>...executors) {
         for (StructureBase<?> executor : executors) {
             // Remove staging repo
             ActionRes res = executor.clean();

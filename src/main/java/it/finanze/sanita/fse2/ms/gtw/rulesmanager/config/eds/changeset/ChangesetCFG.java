@@ -17,10 +17,10 @@ import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 @Getter
 public abstract class ChangesetCFG {
-    public static String LAST_UPDATE_FIELD = "lastUpdate";
-    public static String STAGING_QUALIFIER = "-staging";
+    public static final String LAST_UPDATE_FIELD = "lastUpdate";
+    public static final String STAGING_QUALIFIER = "-staging";
 
-    public static int RETRY_VALUE = 3;
+    public static final int RETRY_VALUE = 3;
 
     private final String title;
     private final String production;

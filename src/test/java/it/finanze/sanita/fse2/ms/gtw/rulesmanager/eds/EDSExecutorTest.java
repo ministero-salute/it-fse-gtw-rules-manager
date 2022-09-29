@@ -96,7 +96,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Verify exists
         assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
         // Execute
-        assertEquals(executor.onStaging(), OK);
+        assertEquals(OK, executor.onStaging());
         // Now staging and production co-exists
         assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
         assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
@@ -107,7 +107,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Case #2 - Production not exists
         assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
         // Execute
-        assertEquals(executor.onStaging(), OK);
+        assertEquals(OK, executor.onStaging());
         // There is only staging
         assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
         assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
@@ -120,7 +120,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup changeset
         executor.setChangeset(MockExecutor.createChangeset(10, 1));
         // Call processing with verified flag
-        assertEquals(executor.onProcessing(true), OK);
+        assertEquals(OK, executor.onProcessing(true));
         // Now check size
         assertEquals(10, executor.getOperations().getInsertions());
         assertEquals(1, executor.getOperations().getDeletions());
@@ -142,11 +142,11 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup changeset
         executor.setChangeset(MockExecutor.createChangeset(10,1));
         // Call processing with verified flag
-        assertEquals(executor.onProcessing(true), OK);
-        assertEquals(executor.onVerify(), OK);
+        assertEquals(OK, executor.onProcessing(true));
+        assertEquals(OK, executor.onVerify());
         // Call processing with unverified flag
-        assertEquals(executor.onProcessing(false), OK);
-        assertEquals(executor.onVerify(), KO);
+        assertEquals(OK, executor.onProcessing(false));
+        assertEquals(KO, executor.onVerify());
         // Verify production integrity
         verifyProductionIntegrity();
     }
@@ -158,9 +158,9 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup repositories with documents
         this.setupTestRepository(executor.getConfig().getStaging());
         // Call swap with staging instance
-        assertEquals(executor.onSwap(
+        assertEquals(OK, executor.onSwap(
             mongo.getCollection(executor.getConfig().getStaging())
-        ), OK);
+        ));
         // Staging is removed, production is kept
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
@@ -179,7 +179,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup changeset
         executor.setChangeset(changeset);
         // Call it
-        assertEquals(executor.onSync(), OK);
+        assertEquals(OK, executor.onSync());
         // Retrieve
         Date lastSync = repository.getLastSync(executor.getConfig().getStaging());
         // Verify it matches
@@ -197,13 +197,13 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Set
         executor.setChangeset(changeset);
         // Call it
-        assertEquals(executor.onChangesetAlignment(), OK);
+        assertEquals(OK, executor.onChangesetAlignment());
         // Create changeset
         changeset = createChangeset(10,3);
         // Set
         executor.setChangeset(changeset);
         // Call it
-        assertEquals(executor.onChangesetAlignment(), KO);
+        assertEquals(KO, executor.onChangesetAlignment());
         // Verify production integrity
         verifyProductionIntegrity();
     }

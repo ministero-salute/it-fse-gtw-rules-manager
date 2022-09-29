@@ -23,3 +23,4 @@ public enum ResultLogEnum implements ILogEnum {
 	}
 
 }
+
