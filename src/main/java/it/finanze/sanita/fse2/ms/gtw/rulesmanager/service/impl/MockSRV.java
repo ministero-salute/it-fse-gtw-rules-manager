@@ -583,7 +583,7 @@ public class MockSRV implements IMockSRV {
 
 			mapSchematronRoot.put("schematron_certificato_VACC v1.3.sch" , "2.16.840.1.113883.2.9.10.1.11.1.2");
 			mapSchematronRoot.put("schematron_PSS_v2.7.sch" , "2.16.840.1.113883.2.9.10.1.4.1.1");
-			mapSchematronRoot.put("schematron_RSA_v7.2.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
+			mapSchematronRoot.put("schematron_RSA_v7.3.sch" , "2.16.840.1.113883.2.9.10.1.9.1");
 			mapSchematronRoot.put("schematron_singola_VACC v2.2.sch" , "2.16.840.1.113883.2.9.10.1.11.1.1");
 			mapSchematronRoot.put("schematron_VPS_v 2.7.sch" , "2.16.840.1.113883.2.9.10.1.6.1");
 			mapSchematronRoot.put("schematronFSE_LDO_V4.8.sch" , "2.16.840.1.113883.2.9.10.1.5");
