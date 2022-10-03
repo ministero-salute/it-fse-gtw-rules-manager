@@ -1,12 +1,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.CurrentApplicationLogEnum;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ErrorLogEnum;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,12 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -111,20 +115,6 @@ class StringUtilityTest {
 		assertEquals(String.class, uuid.getClass()); 
 	} 
 	
-    @Test
-	@DisplayName("enumeration tests")
-	void logEnumTest() {						
-			for(ErrorLogEnum entry : Arrays.asList(ErrorLogEnum.values())) {
-				assertNotNull(entry.getCode());
-				assertNotNull(entry.getDescription());
-				}
-			
-			for(CurrentApplicationLogEnum entry : Arrays.asList(CurrentApplicationLogEnum.values())) {
-				assertNotNull(entry.getCode());
-				assertNotNull(entry.getDescription());
-				}
-		}
-    
     @Test
     void fileUtilityTest() {
     	byte[] bytes = "\u00e0\u004f\u00d0\u0020\u00ea\u003a\u0069\u0010\u00a2\u00d8\u0008\u0000\u002b\u0030\u0030\u009d".getBytes();    

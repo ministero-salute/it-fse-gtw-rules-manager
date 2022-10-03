@@ -1,10 +1,42 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.EMPTY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.CHANGESET_ALIGNMENT;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.CHANGESET_EMPTY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.CHANGESET_PROD;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.CHANGESET_STAGING;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.CLEAN;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.PROCESSING;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.RESET;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.STAGING;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.SWAP;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.SYNC;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.VERIFY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
+import static java.lang.String.format;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.bson.Document;
+import org.springframework.core.ParameterizedTypeReference;
+
 import com.mongodb.client.MongoCollection;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionBuilderEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
@@ -16,17 +48,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
-import org.springframework.core.ParameterizedTypeReference;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
-import static java.lang.String.format;
 
 @Slf4j
 @Getter
@@ -39,11 +60,13 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     private MongoCollection<Document> collection;
     private ProcessResult operations;
     private Map<String, IActionStepEDS> mappers;
+    private LoggerHelper loggerHelper;
 
-    protected ExecutorEDS(ChangesetCFG config, BridgeEDS bridge) {
+    protected ExecutorEDS(ChangesetCFG config, BridgeEDS bridge, LoggerHelper logger) {
         this.config = config;
         this.bridge = bridge;
         this.mappers = createDefaultMapper();
+        loggerHelper = logger;
     }
 
     // TO IMPLEMENT BY THE CALLER
@@ -55,14 +78,16 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     // HANDLERs
     @Override
     public ActionRes execute() {
-        // Log me
+
+        final Date startingDate = new Date();
         log.debug("[{}] Starting updating process", config.getTitle());
+
         // Register additional handlers if necessary
         if(!getCustomSteps().isEmpty()) registerAdditionalHandlers();
-        // Create builder
+
         ActionBuilderEDS builder = ActionBuilderEDS.builder();
-        // Iterate defaults steps
         String[] steps = getSteps();
+
         // Add to builder
         for(String step: steps) {
             // Verify handler is available
@@ -70,10 +95,19 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
                 throw new IllegalArgumentException("Unregistered handler: " + step);
             }
             // Add
-            builder.step(mappers.get(step));
+            builder.step(step, mappers.get(step));
         }
         // Execute
-        ActionRes res = builder.execute();
+        ActionRes res = builder.execute((name, status) -> {
+            if (status == ActionRes.KO)  {
+                loggerHelper.error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, startingDate);
+            }
+        });
+
+        if (res == ActionRes.OK) {
+            loggerHelper.info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, startingDate);
+        }
+        
         // Log me
         log.debug("[{}] Ending updating process", config.getTitle());
         // Bye
@@ -96,7 +130,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(CHANGESET_STAGING, this::onChangesetStaging);
         mapper.put(CHANGESET_ALIGNMENT, this::onChangesetAlignment);
         mapper.put(SWAP, this::onSwap);
-        // Bye
+
         return mapper;
     }
 

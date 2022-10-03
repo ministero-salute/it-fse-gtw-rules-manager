@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ILogEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +36,12 @@ public class LoggerHelper {
 	/* 
 	 * Implements structured logs, at all logging levels
 	 */
-	public void trace(String message, ILogEnum operation, 
-			   ResultLogEnum result, Date startDateOperation, String issuer) {
+	public void trace(String message, String operation, 
+			   ResultLogEnum result, Date startDateOperation) {
 		
 		LogDTO logDTO = LogDTO.builder().
-				op_issuer(issuer).
 				message(message).
-				operation(operation.getCode()).
+				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
@@ -57,13 +55,12 @@ public class LoggerHelper {
 		}
 	} 
 	
-	public void debug(String message,  ILogEnum operation,  
-			   ResultLogEnum result, Date startDateOperation, String issuer) {
+	public void debug(String message,  String operation,  
+			   ResultLogEnum result, Date startDateOperation) {
 		
 		LogDTO logDTO = LogDTO.builder().
-				op_issuer(issuer).
 				message(message).
-				operation(operation.getCode()).
+				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
@@ -77,13 +74,12 @@ public class LoggerHelper {
 		}
 	} 
 	 
-	public void info(String message, ILogEnum operation,  
-			ResultLogEnum result, Date startDateOperation, String issuer) {
+	public void info(String message, String operation,  
+			ResultLogEnum result, Date startDateOperation) {
 		
 		LogDTO logDTO = LogDTO.builder().
-				op_issuer(issuer).
 				message(message).
-				operation(operation.getCode()).
+				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
@@ -96,13 +92,12 @@ public class LoggerHelper {
 		}
 	} 
 	
-	public void warn(String message, ILogEnum operation,  
-			   ResultLogEnum result, Date startDateOperation, String issuer) {
+	public void warn(String message, String operation,  
+			   ResultLogEnum result, Date startDateOperation) {
 		
 		LogDTO logDTO = LogDTO.builder().
-				op_issuer(issuer).
 				message(message).
-				operation(operation.getCode()).
+				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
@@ -117,19 +112,15 @@ public class LoggerHelper {
  
 	} 
 	
-	public void error(String message, ILogEnum operation,  
-			   ResultLogEnum result, Date startDateOperation,
-			   ILogEnum error, String issuer) {
+	public void error(String message, String operation,  
+			   ResultLogEnum result, Date startDateOperation) {
 		
 		LogDTO logDTO = LogDTO.builder().
-				op_issuer(issuer).
 				message(message).
-				operation(operation.getCode()).
+				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				op_error(error.getCode()).
-				op_error_description(error.getDescription()).
 				build();
 		
 		final String logMessage = StringUtility.toJSON(logDTO);

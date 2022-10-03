@@ -1,43 +1,54 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-
 public final class ActionBuilderEDS {
-    private final List<IActionStepEDS> steps;
+
+    private final LinkedHashMap<String, IActionStepEDS> steps;
 
     private ActionBuilderEDS() {
-        this.steps = new ArrayList<>();
+        steps = new LinkedHashMap<>();
     }
 
     public static ActionBuilderEDS builder() {
         return new ActionBuilderEDS();
     }
 
-    public ActionBuilderEDS step(IActionStepEDS step) {
+    public ActionBuilderEDS step(String name, IActionStepEDS step) {
         // Add to list
-        steps.add(step);
+        steps.put(name, step);
         // Return builder
         return this;
     }
 
-    public ActionRes execute() {
-        // Working var
+    public ActionRes execute(OnStepCallback cb) {
         ActionRes res = OK;
-        // Stop if any step is KO
-        for (int i = 0; i < steps.size() && res == OK; i++) {
+
+        // Iterate entryset of map
+        for (Map.Entry<String, IActionStepEDS> entry : steps.entrySet()) {
             // Get step
-            IActionStepEDS step = steps.get(i);
+            IActionStepEDS step = entry.getValue();
             // Execute it
             res = step.execute();
+
+            // Logging output
+            cb.onStepComplete(entry.getKey(), res);
+
+            // Exit when not OK
+            if (res != OK) break;
         }
-        // Return result
+
         return res;
     }
 
+    @FunctionalInterface
+    public interface OnStepCallback {
+        void onStepComplete(String name, ActionRes status);
+    }
 }

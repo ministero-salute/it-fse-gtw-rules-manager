@@ -33,14 +33,19 @@ public class InvokeEDSClientScheduler {
 
 	@Autowired
 	private ProfileUtility profiles;
+
 	@Autowired
 	private SchemaExecutor schema;
+	
 	@Autowired
 	private SchematronExecutor schematron;
+	
 	@Autowired
 	private XslExecutor xsl;
+	
 	@Autowired
 	private TerminologyExecutor terminology;
+	
 	@Autowired
 	private StructureExecutor structures;
 
@@ -55,14 +60,13 @@ public class InvokeEDSClientScheduler {
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() {
-		// Log me
-		log.info("[EDS] Starting scheduled updating process");
-		// Run executors
+		
+		log.debug("[EDS] Starting scheduled updating process");
+		
 		start(schema, schematron, xsl, terminology);
-		// Run multi-layer executor
 		structures.execute();
-		// Log me
-		log.info("[EDS] Updating process completed");
+
+		log.debug("[EDS] Updating process completed");
 	}
 
 	private void start(ExecutorEDS<?> ...executor) {

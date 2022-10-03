@@ -8,6 +8,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.Term
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.TerminologySetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
@@ -23,8 +24,8 @@ public class TerminologyExecutor extends ExecutorEDS<TerminologySetDTO> {
     @Autowired
     private TerminologyQuery query;
 
-    protected TerminologyExecutor(TerminologyCFG config, BridgeEDS bridge) {
-        super(config, bridge);
+    protected TerminologyExecutor(TerminologyCFG config, BridgeEDS bridge, LoggerHelper loggerHelper) {
+        super(config, bridge, loggerHelper);
     }
 
     @Override
