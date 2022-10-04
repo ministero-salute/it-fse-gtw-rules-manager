@@ -52,7 +52,7 @@ public class InvokeEDSClientScheduler {
 	@PostConstruct
 	public void postConstruct() {
 		if(!profiles.isTestProfile() && !profiles.isDevProfile()) {
-			log.info("[EDS] Executing post construct");
+			log.debug("[EDS] Executing post construct");
 			action();
 		}
 	}

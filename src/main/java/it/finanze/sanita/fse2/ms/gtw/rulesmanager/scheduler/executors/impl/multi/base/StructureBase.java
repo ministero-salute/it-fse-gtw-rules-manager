@@ -78,7 +78,7 @@ public abstract class StructureBase<T> extends ExecutorEDS<T> {
         // Working var
         ActionRes res = KO;
         // Log me
-        log.info("[EDS][{}] Cloning current branch for staging", getConfig().getTitle());
+        log.debug("[EDS][{}] Cloning current branch for staging", getConfig().getTitle());
         // Let's clone
         try {
             // Assign the collection
@@ -90,7 +90,7 @@ public abstract class StructureBase<T> extends ExecutorEDS<T> {
             // Set flag
             res = OK;
             // Log me
-            log.info("[EDS][{}] Staging branch ready", getConfig().getTitle());
+            log.debug("[EDS][{}] Staging branch ready", getConfig().getTitle());
         } catch (EdsDbException ex) {
             log.error(
                 format("[EDS][%s] Unable to duplicate collection", getConfig().getTitle()),

@@ -136,7 +136,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
 
     protected void registerAdditionalHandlers() {
         // Log me
-        log.info("[EDS][{}] Registering additional handlers {}", config.getTitle(),
+        log.debug("[EDS][{}] Registering additional handlers {}", config.getTitle(),
             getCustomSteps()
                 .stream()
                 .map(Entry::getKey)
@@ -188,7 +188,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             // Set the flag
             res = EMPTY;
             // Log me
-            log.info("[{}] Changeset is empty, quitting ...", config.getTitle());
+            log.debug("[{}] Changeset is empty, quitting ...", config.getTitle());
         }
         return res;
     }
@@ -288,7 +288,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Verify return condition
         if (this.changeset.getTotalNumberOfElements() == 0) {
             res = OK;
-            log.info("[{}] Changeset is empty, data is aligned", config.getTitle());
+            log.debug("[{}] Changeset is empty, data is aligned", config.getTitle());
         }
         
         return res;
