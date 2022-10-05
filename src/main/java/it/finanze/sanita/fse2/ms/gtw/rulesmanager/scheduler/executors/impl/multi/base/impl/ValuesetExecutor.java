@@ -4,7 +4,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.pare
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.ValuesetSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.ValuesetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IStructureRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.ValuesetQuery;
@@ -26,8 +25,8 @@ public class ValuesetExecutor extends StructureBase<ValuesetSetDTO> {
     @Autowired
     private ValuesetQuery query;
 
-    protected ValuesetExecutor(ValuesetCFG config, BridgeEDS bridge, LoggerHelper loggerHelper) {
-        super(config, bridge, loggerHelper);
+    protected ValuesetExecutor(ValuesetCFG config, BridgeEDS bridge) {
+        super(config, bridge);
     }
 
     @Override
