@@ -51,7 +51,7 @@ public class InvokeEDSClientScheduler {
 
 	@PostConstruct
 	public void postConstruct() {
-		if(!profiles.isTestProfile() && !profiles.isDevProfile()) {
+		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
 			log.debug("[EDS] Executing post construct");
 			action();
 		}

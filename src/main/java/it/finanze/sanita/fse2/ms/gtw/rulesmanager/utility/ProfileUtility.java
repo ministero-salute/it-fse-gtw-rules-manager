@@ -26,13 +26,13 @@ public class ProfileUtility {
         return exists.isPresent();
     }
 
-    public boolean isDevProfile() {
+    public boolean isDevOrDockerProfile() {
         // Get profiles
         String[] profiles = environment.getActiveProfiles();
         // Verify if exists the test profile
         Optional<String> exists = stream(profiles)
             .map(String::toLowerCase)
-            .filter(i -> i.equals(Constants.Profile.DEV))
+            .filter(i -> (i.equals(Constants.Profile.DEV) || i.equals(Constants.Profile.DOCKER)))
             .findFirst();
         // Return
         return exists.isPresent();

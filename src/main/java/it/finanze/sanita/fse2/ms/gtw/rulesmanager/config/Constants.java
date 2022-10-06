@@ -4,12 +4,12 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
  * 
  * @author vincenzoingenito
  *
- * Constants application.
+ *         Constants application.
  */
 public final class Constants {
 
 	/**
-	 *	Path scan.
+	 * Path scan.
 	 */
 	public static final class ComponentScan {
 
@@ -32,12 +32,12 @@ public final class Constants {
 		 * Configuration path.
 		 */
 		public static final String CONFIG = "it.sanita.rulesmanager.config";
-		
+
 		/**
 		 * Configuration mongo path.
 		 */
 		public static final String CONFIG_MONGO = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.config";
-		
+
 		/**
 		 * Configuration mongo repository path.
 		 */
@@ -46,7 +46,6 @@ public final class Constants {
 		public static final String UTILITY = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility";
 
 		public static final String SCHEDULER_QUERIES = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity";
-
 
 		public static final class Collections {
 
@@ -57,11 +56,11 @@ public final class Constants {
 			public static final String TERMINOLOGY = "terminology";
 
 			public static final String XSL_TRANSFORM = "xsl_transform";
-			
+
 			public static final String STRUCTURE_DEFINITION = "structure_definition";
-			
+
 			public static final String STRUCTURE_MAP = "structure_map";
-			
+
 			public static final String STRUCTURE_VALUESET = "structure_valueset";
 
 			public static final String STRUCTURES = "structures";
@@ -70,13 +69,13 @@ public final class Constants {
 
 			}
 		}
-		
+
 		private ComponentScan() {
-			//This method is intentionally left blank.
+			// This method is intentionally left blank.
 		}
 
 	}
- 
+
 	public static final class Profile {
 
 		/**
@@ -93,17 +92,22 @@ public final class Constants {
 		 */
 		public static final String DEV = "dev";
 
-		/** 
+		/**
+		 * Dev profile.
+		 */
+		public static final String DOCKER = "docker";
+
+		/**
 		 * Constructor.
 		 */
 		private Profile() {
-			//This method is intentionally left blank.
+			// This method is intentionally left blank.
 		}
 
 	}
-  
+
 	/**
-	 *	Constants.
+	 * Constants.
 	 */
 	private Constants() {
 
