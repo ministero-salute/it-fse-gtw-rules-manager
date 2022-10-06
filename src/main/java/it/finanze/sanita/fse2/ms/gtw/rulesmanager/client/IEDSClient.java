@@ -18,4 +18,6 @@ public interface IEDSClient {
     <T> T getDocument(ChangesetCFG spec, String id, Class<T> type) throws EdsClientException;
     // Chunk interface
     <T> T getSnapshot(ChunkChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException;
+    <T> T getChunkIns(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException;
+    <T> T getChunkDel(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException;
 }

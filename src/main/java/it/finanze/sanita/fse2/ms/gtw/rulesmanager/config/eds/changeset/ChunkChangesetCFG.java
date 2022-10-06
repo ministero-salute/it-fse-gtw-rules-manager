@@ -2,6 +2,9 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset;
 
 import lombok.Getter;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 @Getter
 public abstract class ChunkChangesetCFG extends ChangesetCFG {
 
@@ -13,4 +16,13 @@ public abstract class ChunkChangesetCFG extends ChangesetCFG {
         this.chunkInsert = chunkInsert;
         this.chunkDelete = chunkDelete;
     }
+
+    public URI getChunkIns(String id, int idx) throws URISyntaxException {
+        return new URI(chunkInsert).resolve(id).resolve(String.valueOf(idx));
+    }
+
+    public URI getChunkDel(String id, int idx) throws URISyntaxException {
+        return new URI(chunkDelete).resolve(id).resolve(String.valueOf(idx));
+    }
+
 }

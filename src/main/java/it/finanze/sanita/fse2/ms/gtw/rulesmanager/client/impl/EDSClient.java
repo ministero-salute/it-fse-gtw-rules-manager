@@ -51,6 +51,32 @@ public class EDSClient implements IEDSClient {
     }
 
     @Override
+    public <T> T getChunkIns(ChunkChangesetCFG spec, String id, int idx,  Class<T> type) throws EdsClientException {
+        // Execute request
+        ResponseEntity<T> response;
+        try {
+            response = client.getForEntity(spec.getChunkIns(id, idx), type);
+        }catch (Exception e) {
+            throw new EdsClientException("Error while executing the request", e);
+        }
+        // Return data
+        return response.getBody();
+    }
+
+    @Override
+    public <T> T getChunkDel(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException {
+        // Execute request
+        ResponseEntity<T> response;
+        try {
+            response = client.getForEntity(spec.getChunkDel(id, idx), type);
+        }catch (Exception e) {
+            throw new EdsClientException("Error while executing the request", e);
+        }
+        // Return data
+        return response.getBody();
+    }
+
+    @Override
     public <T> T getStatus(ChangesetCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
