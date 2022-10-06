@@ -47,10 +47,13 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         this.mappers = createDefaultMapper();
     }
 
-    // TO IMPLEMENT BY THE CALLER
-    protected abstract ParameterizedTypeReference<ChangeSetDTO<T>> getType();
     protected String[] getSteps() {
         return ActionEDS.defaults();
+    }
+
+    // TO IMPLEMENT BY THE CALLER
+    protected ParameterizedTypeReference<ChangeSetDTO<T>> getType() {
+        throw new UnsupportedOperationException("getType() is not implemented!");
     }
 
     // HANDLERs
