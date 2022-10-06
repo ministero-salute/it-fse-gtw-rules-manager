@@ -2,6 +2,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.impl;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,6 +30,19 @@ public class EDSClient implements IEDSClient {
         ResponseEntity<T> response;
         try {
             response = client.getForEntity(spec.getDataReq(id), type);
+        }catch (Exception e) {
+            throw new EdsClientException("Error while executing the request", e);
+        }
+        // Return data
+        return response.getBody();
+    }
+
+    @Override
+    public <T> T getSnapshot(ChunkChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException {
+        // Execute request
+        ResponseEntity<T> response;
+        try {
+            response = client.getForEntity(spec.getStatusReq(lastUpdate), type);
         }catch (Exception e) {
             throw new EdsClientException("Error while executing the request", e);
         }
