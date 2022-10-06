@@ -1,14 +1,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base;
 
-import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
-import org.bson.Document;
+import static java.util.stream.StreamSupport.stream;
 
 import java.util.List;
 
-import static java.util.stream.StreamSupport.stream;
+import org.bson.Document;
+
+import com.mongodb.client.MongoCollection;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
 
 public final class EDSTestUtils {
+    
     public static boolean compareDeeply(MongoCollection<Document> src, MongoCollection<Document> dest, IQueryEDS<?> query) {
         // Now compare deeply
         long count = src.countDocuments();
