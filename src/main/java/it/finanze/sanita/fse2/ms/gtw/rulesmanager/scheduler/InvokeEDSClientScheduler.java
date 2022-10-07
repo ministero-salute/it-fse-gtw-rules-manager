@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TerminologyExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -47,7 +47,7 @@ public class InvokeEDSClientScheduler {
 	private TerminologyExecutor terminology;
 	
 	@Autowired
-	private StructureExecutor structures;
+	private FhirStructuresExecutors fhirExecutor;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -58,13 +58,12 @@ public class InvokeEDSClientScheduler {
 	}
 	
 	@Scheduled(cron = "${eds.scheduler.invoke}")
-	@SchedulerLock(name = "invokeEDSClientScheduler")
+//	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() {
 		
 		log.debug("[EDS] Starting scheduled updating process");
 		
-		start(schema, schematron, xsl, terminology);
-		structures.execute();
+		start(/*schema, schematron, xsl, terminology,*/fhirExecutor);
 
 		log.debug("[EDS] Updating process completed");
 	}

@@ -12,6 +12,7 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static java.lang.String.format;
 
 public interface IActionRetryEDS {
+	
     static <T> Optional<T> retryOnException(IActionFnEDS<T> fn, ChangesetCFG config, Logger log, int times) {
         // Working var
         Optional<T> obj = Optional.empty();
