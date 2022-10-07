@@ -162,6 +162,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- TRACING -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
 
 	</dependencies>
 
