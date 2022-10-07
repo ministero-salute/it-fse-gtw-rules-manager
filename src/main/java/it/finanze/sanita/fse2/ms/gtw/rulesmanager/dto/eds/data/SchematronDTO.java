@@ -29,7 +29,7 @@ public class SchematronDTO {
         @JsonProperty
         private String contentSchematron;
         @JsonProperty
-        private String templateIdExtension;
+        private String version;
         @JsonProperty
         private String templateIdRoot;
         @JsonProperty

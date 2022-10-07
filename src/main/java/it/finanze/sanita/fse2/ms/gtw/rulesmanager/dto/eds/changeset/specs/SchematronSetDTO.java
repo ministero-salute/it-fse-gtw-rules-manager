@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class SchematronSetDTO {
     String templateIdRoot;
-    String templateIdExtension;
+    String version;
 }

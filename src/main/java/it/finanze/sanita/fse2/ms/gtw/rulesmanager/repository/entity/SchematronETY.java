@@ -23,7 +23,7 @@ public class SchematronETY {
 	public static final String FIELD_ID = "_id";
     public static final String FIELD_FILENAME = "name_schematron";
     public static final String FIELD_CONTENT = "content_schematron";
-    public static final String FIELD_TEMPLATE_ID_EXT = "template_id_extension";
+    public static final String VERSION = "version";
     public static final String FIELD_ROOT = "template_id_root";
     public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
@@ -36,8 +36,8 @@ public class SchematronETY {
 	private String nameSchematron;
 	@Field(name = FIELD_ROOT)
 	private String templateIdRoot;
-	@Field(name = FIELD_TEMPLATE_ID_EXT)
-	private String templateIdExtension;
+	@Field(name = VERSION)
+	private String version;
 	@Field(name = FIELD_LAST_UPDATE)
 	private Date lastUpdateDate;
 	@Field(name = FIELD_LAST_SYNC)
@@ -47,11 +47,11 @@ public class SchematronETY {
         this.contentSchematron = new Binary(Files.readAllBytes(path));
     }
 
-    public static SchematronETY fromPath(Path path, String extension, String root) throws IOException {
+    public static SchematronETY fromPath(Path path, String version, String root) throws IOException {
         SchematronETY entity = new SchematronETY();
         entity.setNameSchematron(path.getFileName().toString());
         entity.setContentSchemaFromPath(path);
-        entity.setTemplateIdExtension(extension);
+        entity.setVersion(version);
         entity.setTemplateIdRoot(root);
         entity.setLastUpdateDate(new Date());
         entity.setLastSync(new Date());

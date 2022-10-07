@@ -29,7 +29,7 @@ public class SchedulerCTL extends AbstractCTL implements ISchedulerCTL {
 
 	@Override
 	public SchedulerResponseDTO runScheduler(HttpServletRequest request) {
-//		edsClientScheduler.action();
+		edsClientScheduler.action();
 		Map<String,Integer> counter = counterSRV.countCfgItems();
 		return new SchedulerResponseDTO(getLogTraceInfo(), counter);
 	}

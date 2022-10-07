@@ -195,7 +195,7 @@ public class EDSEntityTest {
 		schematron.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
 		schematron.setNameSchematron("testFilenameDefinition");
 		schematron.setTemplateIdRoot("testidRoot"); 
-		schematron.setTemplateIdExtension("1.0"); 
+		schematron.setVersion("1.0"); 
 		schematron.setContentSchematron("SGVsbG8gV29ybGQ="); 
 		schematron.setLastUpdateDate(new Date()); 
 		
