@@ -76,7 +76,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
                 throw new IllegalArgumentException("Unregistered handler: " + step);
             }
             // Add
-            builder.step(step, mappers.get(step));
+            builder.addStep(step, mappers.get(step));
         }
         // Execute
         ActionRes res = builder.execute((name, status) -> {

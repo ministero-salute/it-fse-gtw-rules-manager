@@ -1,18 +1,18 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_CODE;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_DESCRIPTION;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_ID;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_LAST_SYNC;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_LAST_UPDATE;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.FIELD_SYSTEM;
-
+import com.mongodb.client.model.Filters;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.*;
 
 @Component
 public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
@@ -25,7 +25,7 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
     @Override
     public Document getUpsertQuery(TerminologyDTO dto) {
         // Get data
-        TerminologyDTO.Terminology terminology = dto.getDocument();
+        Terminology terminology = dto.getDocument();
         // Create
         return new org.bson.Document()
             .append(FIELD_ID, new ObjectId(terminology.getId()))
@@ -33,6 +33,20 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
             .append(FIELD_CODE, terminology.getCode())
             .append(FIELD_DESCRIPTION, terminology.getDescription())
             .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate());
+    }
+
+    public Document getUpsertQuery(Terminology terminology) {
+        // Create
+        return new org.bson.Document()
+            .append(FIELD_ID, new ObjectId(terminology.getId()))
+            .append(FIELD_SYSTEM, terminology.getSystem())
+            .append(FIELD_CODE, terminology.getCode())
+            .append(FIELD_DESCRIPTION, terminology.getDescription())
+            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate());
+    }
+
+    public List<Document> getUpsertQueries(List<Terminology> dto) {
+        return dto.stream().map(this::getUpsertQuery).collect(Collectors.toList());
     }
 
     /**
@@ -55,6 +69,10 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
     @Override
     public Document getDeleteQuery(String id) {
         return getFilterQuery(id);
+    }
+
+    public Bson getDeleteQueries(List<String> ids) {
+        return Filters.in(FIELD_ID, ids);
     }
 
     /**

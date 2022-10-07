@@ -1,11 +1,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk;
 
+import com.mongodb.MongoException;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertManyResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkDelDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
@@ -18,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.AbstractMap;
 import java.util.Date;
 import java.util.Optional;
 
@@ -102,6 +109,90 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             );
         }
         return res;
+    }
+
+    @Override
+    public IChunkHandlerEDS onChunkInsertion() {
+        return (staging, snapshot, chunk, max) -> {
+            // Log me
+            log.debug("[{}][Insert] Retrieving chunk {}/{}", getConfig().getTitle(), chunk + 1, max);
+            // Working var
+            int process = 0;
+            // Working var
+            Optional<TerminologyChunkInsDTO> dto;
+            // Retrieve data
+            dto = retryOnException(() -> getBridge().getClient().getChunkIns(
+                getConfigAsChunked(),
+                snapshot,
+                chunk,
+                TerminologyChunkInsDTO.class
+                ), getConfig(), log
+            );
+            // Verify
+            ActionRes res = dto.isPresent() ? OK : KO;
+            // Insert into db if request didn't fail
+            if(res == OK) {
+                try {
+                    // Insert
+                    InsertManyResult status = staging.insertMany(query.getUpsertQueries(dto.get().getDocuments()));
+                    // Calculate insertions
+                    process = status.getInsertedIds().size();
+                }catch (MongoException ex) {
+                    log.error(
+                        format("[EDS][%s] Unable to insert chunk documents", getConfig().getTitle()),
+                        ex
+                    );
+                    // Set flag
+                    res = KO;
+                }
+            }else {
+                log.error("[EDS][{}] Unable to retrieve chunk document for insertion", getConfig().getTitle());
+            }
+            return new AbstractMap.SimpleImmutableEntry<>(res, process);
+        };
+    }
+
+    @Override
+    public IChunkHandlerEDS onChunkDeletions() {
+        return (staging, snapshot, chunk, max) -> {
+            // Log me
+            log.debug("[{}][Delete] Retrieving chunk {}/{}", getConfig().getTitle(), chunk + 1, max);
+            // Working var
+            int process = 0;
+            // Working var
+            Optional<TerminologyChunkDelDTO> dto;
+            // Retrieve data
+            dto = retryOnException(() -> getBridge().getClient().getChunkDel(
+                    getConfigAsChunked(),
+                    snapshot,
+                    chunk,
+                    TerminologyChunkDelDTO.class
+                ), getConfig(), log
+            );
+            // Verify
+            ActionRes res = dto.isPresent() ? OK : KO;
+            // Delete docs if request didn't fail
+            if(res == OK) {
+                try {
+                    // Delete
+                    DeleteResult status = staging.deleteMany(
+                        query.getDeleteQueries(dto.get().getDocuments())
+                    );
+                    // Calculate deletions
+                    process = (int) status.getDeletedCount();
+                }catch (MongoException ex) {
+                    log.error(
+                        format("[EDS][%s] Unable to delete chunk documents", getConfig().getTitle()),
+                        ex
+                    );
+                    // Set flag
+                    res = KO;
+                }
+            }else {
+                log.error("[EDS][{}] Unable to retrieve chunk document for deletion", getConfig().getTitle());
+            }
+            return new AbstractMap.SimpleImmutableEntry<>(res, process);
+        };
     }
 
     @Override

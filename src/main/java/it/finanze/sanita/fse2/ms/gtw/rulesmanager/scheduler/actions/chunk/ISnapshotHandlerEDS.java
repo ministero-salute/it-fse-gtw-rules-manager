@@ -21,6 +21,7 @@ public interface ISnapshotHandlerEDS {
           // Working var
           SimpleImmutableEntry<ActionRes, Integer> res = new SimpleImmutableEntry<>(OK, 0);
           int process = 0;
+          String snapshot = changeset.getChunks().getSnapshotID();
           // Create evaluator instance
           IChunkHandlerEDS hnd = onChunkInsertion();
           // Retrieve chunk offset
@@ -28,7 +29,7 @@ public interface ISnapshotHandlerEDS {
           // Process
           for (int i = 0; i < chunks && res.getKey() == OK; i++) {
                // Execute and get result
-               res = onEvaluator(mongo, hnd, i);
+               res = onEvaluator(mongo, hnd, snapshot, i, chunks);
                // Apply conversion logic
                if(res.getKey() == OK) process += res.getValue();
           }
@@ -39,6 +40,7 @@ public interface ISnapshotHandlerEDS {
           // Working var
           SimpleImmutableEntry<ActionRes, Integer> res = new SimpleImmutableEntry<>(OK, 0);
           int process = 0;
+          String snapshot = changeset.getChunks().getSnapshotID();
           // Create evaluator instance
           IChunkHandlerEDS hnd = onChunkDeletions();
           // Retrieve chunk offset
@@ -46,15 +48,21 @@ public interface ISnapshotHandlerEDS {
           // Process
           for (int i = 0; i < chunks && res.getKey() == OK; i++) {
                // Execute and get result
-               res = onEvaluator(mongo, hnd, i);
+               res = onEvaluator(mongo, hnd, snapshot, i, chunks);
                // Apply conversion logic
                if(res.getKey() == OK) process += res.getValue();
           }
           // Return dataset
           return process;
      }
-     default SimpleImmutableEntry<ActionRes, Integer> onEvaluator(MongoCollection<Document> mongo, IChunkHandlerEDS hnd, int idx) {
+     default SimpleImmutableEntry<ActionRes, Integer> onEvaluator(
+         MongoCollection<Document> mongo,
+         IChunkHandlerEDS hnd,
+         String snapshot,
+         int chunk,
+         int max
+     ) {
           // Invoke handler
-          return hnd.handle(mongo, idx);
+          return hnd.handle(mongo, snapshot, chunk, max);
      }
 }

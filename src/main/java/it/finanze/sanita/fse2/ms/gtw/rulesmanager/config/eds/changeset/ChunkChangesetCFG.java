@@ -1,6 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset;
 
 import lombok.Getter;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,11 +19,11 @@ public abstract class ChunkChangesetCFG extends ChangesetCFG {
     }
 
     public URI getChunkIns(String id, int idx) throws URISyntaxException {
-        return new URI(chunkInsert).resolve(id).resolve(String.valueOf(idx));
+        return new URI(chunkInsert + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
     }
 
     public URI getChunkDel(String id, int idx) throws URISyntaxException {
-        return new URI(chunkDelete).resolve(id).resolve(String.valueOf(idx));
+        return new URI(chunkDelete + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
     }
 
 }

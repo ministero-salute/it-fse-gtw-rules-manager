@@ -1,12 +1,12 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 public final class ActionBuilderEDS {
 
@@ -20,30 +20,24 @@ public final class ActionBuilderEDS {
         return new ActionBuilderEDS();
     }
 
-    public ActionBuilderEDS step(String name, IActionStepEDS step) {
+    public void addStep(String name, IActionStepEDS step) {
         // Add to list
         steps.put(name, step);
-        // Return builder
-        return this;
     }
 
     public ActionRes execute(OnStepCallback cb) {
         ActionRes res = OK;
-
-        // Iterate entryset of map
+        // Iterate entry-set of map
         for (Map.Entry<String, IActionStepEDS> entry : steps.entrySet()) {
             // Get step
             IActionStepEDS step = entry.getValue();
             // Execute it
             res = step.execute();
-
-            // Logging output
+            // Logging step status
             cb.onStepComplete(entry.getKey(), res);
-
             // Exit when not OK
             if (res != OK) break;
         }
-
         return res;
     }
 
