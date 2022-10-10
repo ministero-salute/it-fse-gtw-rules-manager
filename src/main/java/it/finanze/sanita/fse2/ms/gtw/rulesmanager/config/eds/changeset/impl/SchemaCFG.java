@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class SchemaCFG extends ChangesetCFG {
     private static final String SCHEMA = "schema";
+    
     protected SchemaCFG(
         @Value("${eds.changeset.schema.status}")
         String status,
