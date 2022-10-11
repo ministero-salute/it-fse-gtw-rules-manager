@@ -63,7 +63,7 @@ public class InvokeEDSClientScheduler {
 		
 		log.debug("[EDS] Starting scheduled updating process");
 		
-		start(/*schema, schematron, xsl, terminology,*/fhirExecutor);
+		start(schema, schematron, xsl, terminology,fhirExecutor);
 
 		log.debug("[EDS] Updating process completed");
 	}

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
 
 @Component
 public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
@@ -91,7 +92,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     			Document doc = new Document();
     			doc.put("name_map", map.getNameMap());
     			doc.put("filename_map", map.getFilenameMap());
-    			doc.put("content_map",new Binary(map.getContentMap().getBytes()));
+    			doc.put("content_map",new Binary(StringUtility.decodeBase64(map.getContentMap())));
     			mapsToSave.add(doc);
     		}
     	}
@@ -105,7 +106,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     			Document doc = new Document();
     			doc.put("name_definition", definition.getNameDefinition());
     			doc.put("filename_definition", definition.getFilenameDefinition());
-    			doc.put("content_definition",new Binary(definition.getContentDefinition().getBytes()));
+    			doc.put("content_definition",new Binary(StringUtility.decodeBase64(definition.getContentDefinition())));
     			definitionsToSave.add(doc);
     		}
     	}
@@ -120,7 +121,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     			Document doc = new Document();
     			doc.put("name_valueset", valueset.getNameValueset());
     			doc.put("filename_valueset", valueset.getFilenameValueset());
-    			doc.put("content_valueset",new Binary(valueset.getContentValueset().getBytes()));
+    			doc.put("content_valueset", new Binary(StringUtility.decodeBase64(valueset.getContentValueset())));
     			valuesetsToSave.add(doc);
     		}
     	}
