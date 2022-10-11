@@ -5,25 +5,15 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.FhirStructuresCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.SchemaCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.FhirStructuresSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.parents.MapCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.MapSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.MapDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IStructureRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.FhirStructuresQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.HandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
 
 
 @Slf4j
@@ -34,7 +24,7 @@ public class FhirStructuresExecutors extends ExecutorEDS<FhirStructuresSetDTO> {
     private FhirStructuresQuery query;
   
 
-    protected FhirStructuresExecutors(MapCFG config, BridgeEDS bridge) {
+    protected FhirStructuresExecutors(FhirStructuresCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
 

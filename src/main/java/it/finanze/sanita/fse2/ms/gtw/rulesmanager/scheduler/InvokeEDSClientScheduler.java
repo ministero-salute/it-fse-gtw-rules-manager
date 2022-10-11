@@ -1,5 +1,15 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static java.lang.String.format;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
@@ -8,20 +18,9 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.Schem
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor.STRUCTURES_TITLE;
-import static java.lang.String.format;
 
 /**
  * Invoke EDS Client Scheduler, handles the invocations to EDS Client endpoints.
