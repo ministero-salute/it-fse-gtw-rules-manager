@@ -28,7 +28,8 @@ import static java.lang.String.format;
 public class StructureExecutor implements IExecutableEDS {
 
     private static final String TITLE = "Structures";
-    
+    public static final String STRUCTURES_TITLE = "structures";
+
     @Autowired
     private IStructureRepo repository;
 

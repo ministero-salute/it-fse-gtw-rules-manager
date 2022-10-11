@@ -5,8 +5,8 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TerminologyExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor.STRUCTURES_TITLE;
 import static java.lang.String.format;
 
 /**
@@ -43,7 +44,7 @@ public class InvokeEDSClientScheduler {
 	private XslExecutor xsl;
 
 	@Autowired
-	private TerminologyExecutor terminology;
+	private TermsChunkExecutor terminology;
 
 	@Autowired
 	private StructureExecutor structures;
@@ -64,9 +65,18 @@ public class InvokeEDSClientScheduler {
 		// Run executors
 		start(schema, schematron, xsl, terminology);
 		// Run multi-layer executor
-		structures.execute();
+		startMulti(structures);
 		// Log me
 		log.info("[EDS] Updating process completed");
+	}
+
+	private void startMulti(StructureExecutor executor) {
+		// Verify execution result even after retries
+		ActionRes exec = retryExecutorOnException(executor, log);
+		// Log if went wrong
+		if (exec == KO) {
+			log.error(format("[EDS] Unable to update the %s collection", STRUCTURES_TITLE));
+		}
 	}
 
 	private void start(ExecutorEDS<?> ...executor) {

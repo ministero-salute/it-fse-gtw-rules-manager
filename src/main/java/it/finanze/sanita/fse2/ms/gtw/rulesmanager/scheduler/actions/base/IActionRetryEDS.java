@@ -2,7 +2,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -35,7 +34,7 @@ public interface IActionRetryEDS {
         return retryOnException(fn, config, log, RETRY_VALUE);
     }
 
-    static ActionRes retryExecutorOnException(ExecutorEDS<?> executor, Logger log, int times) {
+    static ActionRes retryExecutorOnException(IExecutableEDS executor, Logger log, int times) {
         // Working var
         ActionRes res = KO;
         // Execute
@@ -51,7 +50,7 @@ public interface IActionRetryEDS {
         return res;
     }
 
-    static ActionRes retryExecutorOnException(ExecutorEDS<?> executor, Logger log) {
+    static ActionRes retryExecutorOnException(IExecutableEDS executor, Logger log) {
         return retryExecutorOnException(executor, log, RETRY_VALUE);
     }
 }
