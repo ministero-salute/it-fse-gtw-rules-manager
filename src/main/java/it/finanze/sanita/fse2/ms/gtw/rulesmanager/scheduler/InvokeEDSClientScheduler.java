@@ -1,26 +1,27 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
-import static java.lang.String.format;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TerminologyExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.multi.StructureExecutor.STRUCTURES_TITLE;
+import static java.lang.String.format;
 
 /**
  * Invoke EDS Client Scheduler, handles the invocations to EDS Client endpoints.
@@ -36,16 +37,16 @@ public class InvokeEDSClientScheduler {
 
 	@Autowired
 	private SchemaExecutor schema;
-	
+
 	@Autowired
 	private SchematronExecutor schematron;
-	
+
 	@Autowired
 	private XslExecutor xsl;
-	
+
 	@Autowired
-	private TerminologyExecutor terminology;
-	
+	private TermsChunkExecutor terminology;
+
 	@Autowired
 	private FhirStructuresExecutors fhirExecutor;
 
@@ -59,15 +60,15 @@ public class InvokeEDSClientScheduler {
 	
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
-	public void action() {
-		
-		log.debug("[EDS] Starting scheduled updating process");
-		
-		start(schema, schematron, xsl, terminology,fhirExecutor);
-
-		log.debug("[EDS] Updating process completed");
-	}
-
+	public void action() { 
+		// Log me
+		log.info("[EDS] Starting scheduled updating process");
+		// Run executors
+		start(schema, schematron, xsl, terminology,fhirExecutor); 
+		// Log me
+		log.info("[EDS] Updating process completed");
+	} 
+ 
 	private void start(ExecutorEDS<?> ...executor) {
 		for (ExecutorEDS<?> executorEDS : executor) {
 			// Configuration

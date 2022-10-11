@@ -11,8 +11,12 @@ import java.util.List;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 public interface IDocumentHandlerEDS<T> {
-     IActionHandlerEDS<T> onInsertion();
-     IActionHandlerEDS<T> onDeletions();
+     default IActionHandlerEDS<T> onInsertion() {
+          throw new UnsupportedOperationException("onInsertion() is not implemented!");
+     }
+     default IActionHandlerEDS<T> onDeletions() {
+          throw new UnsupportedOperationException("onDeletions() is not implemented!");
+     }
 
      default int onInsertionProcessing(MongoCollection<Document> mongo, ChangeSetDTO<T> changeset) {
           // Working var

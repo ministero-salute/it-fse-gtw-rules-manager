@@ -1,6 +1,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,4 +14,6 @@ public final class BridgeEDS {
     private IExecutorRepo repository;
     @Autowired
     private IEDSClient client;
+    @Autowired
+    private LoggerHelper kafkaLogger;
 }
