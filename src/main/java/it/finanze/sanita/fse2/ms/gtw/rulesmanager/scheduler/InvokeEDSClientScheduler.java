@@ -58,7 +58,7 @@ public class InvokeEDSClientScheduler {
 	}
 	
 	@Scheduled(cron = "${eds.scheduler.invoke}")
-//	@SchedulerLock(name = "invokeEDSClientScheduler")
+	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() {
 		
 		log.debug("[EDS] Starting scheduled updating process");

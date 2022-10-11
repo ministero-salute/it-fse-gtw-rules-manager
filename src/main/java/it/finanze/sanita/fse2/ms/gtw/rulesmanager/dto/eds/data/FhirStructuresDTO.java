@@ -3,8 +3,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.types.Binary;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -33,11 +31,11 @@ public class FhirStructuresDTO {
     private String version;
     @JsonProperty
     private String templateIdRoot;
+    @JsonProperty
+    private String rootMap;
 
     @Data
     public static class Valueset {
-        @JsonProperty
-        private String id;
         @JsonProperty
         private String filenameValueset;
         @JsonProperty
@@ -49,8 +47,6 @@ public class FhirStructuresDTO {
     @Data
     public static class Definition {
         @JsonProperty
-        private String id;
-        @JsonProperty
         private String filenameDefinition;
         @JsonProperty
         private String nameDefinition;
@@ -60,8 +56,6 @@ public class FhirStructuresDTO {
 
     @Data
     public static class FhirStructures {
-        @JsonProperty
-        private String id;
         @JsonProperty
         private String filenameMap;
         @JsonProperty

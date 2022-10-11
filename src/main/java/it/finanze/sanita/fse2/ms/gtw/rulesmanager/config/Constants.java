@@ -57,13 +57,7 @@ public final class Constants {
 
 			public static final String XSL_TRANSFORM = "xsl_transform";
 
-			public static final String STRUCTURE_DEFINITION = "structure_definition";
-
-			public static final String STRUCTURE_MAP = "structure_map";
-
-			public static final String STRUCTURE_VALUESET = "structure_valueset";
-
-			public static final String STRUCTURES = "structures";
+			public static final String FHIR_TRANSFORM = "transform";
 
 			private Collections() {
 

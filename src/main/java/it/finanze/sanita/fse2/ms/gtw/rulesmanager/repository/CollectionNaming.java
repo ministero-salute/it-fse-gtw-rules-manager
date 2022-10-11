@@ -43,37 +43,13 @@ public class CollectionNaming {
         }
         return Constants.ComponentScan.Collections.XSL_TRANSFORM;
     }
-    
-    @Bean("structureDefinitionBean")
-    public String getStructureDefinitionCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURE_DEFINITION;
-        }
-        return Constants.ComponentScan.Collections.STRUCTURE_DEFINITION;
-    }
-    
-    @Bean("structureMapBean")
-    public String getStructureMapCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURE_MAP;
-        }
-        return Constants.ComponentScan.Collections.STRUCTURE_MAP;
-    }
-    
-    @Bean("valuesetBean")
-    public String getValusetCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURE_VALUESET;
-        }
-        return Constants.ComponentScan.Collections.STRUCTURE_VALUESET;
-    }
 
     @Bean("structuresBean")
     public String getStructuresCollection() {
         if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.STRUCTURES;
+            return Constants.Profile.TEST_PREFIX + Constants.ComponentScan.Collections.FHIR_TRANSFORM;
         }
-        return Constants.ComponentScan.Collections.STRUCTURES;
+        return Constants.ComponentScan.Collections.FHIR_TRANSFORM;
     }
     
     
