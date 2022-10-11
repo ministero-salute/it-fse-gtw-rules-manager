@@ -72,7 +72,7 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
     }
 
     public Bson getDeleteQueries(List<String> ids) {
-        return Filters.in(FIELD_ID, ids);
+        return Filters.in(FIELD_ID, ids.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
     /**
