@@ -27,6 +27,7 @@ public class SchematronETY {
     public static final String FIELD_ROOT = "template_id_root";
     public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
+    public static final String FIELD_DELETED = "deleted";
 
 	@Id
 	private String id;
@@ -42,6 +43,8 @@ public class SchematronETY {
 	private Date lastUpdateDate;
 	@Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
+	@Field(name = FIELD_DELETED)
+    private Boolean deleted;
 
 	public void setContentSchemaFromPath(Path path) throws IOException {
         this.contentSchematron = new Binary(Files.readAllBytes(path));
@@ -55,6 +58,7 @@ public class SchematronETY {
         entity.setTemplateIdRoot(root);
         entity.setLastUpdateDate(new Date());
         entity.setLastSync(new Date());
+        entity.setDeleted(false);
         return entity;
     }
 	 

@@ -37,6 +37,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     	doc.put("maps", mapsToSave);
     	doc.put("definitions", definitionsToSave);
     	doc.put("valuesets", valuesetsToSave);
+    	doc.put("_id", new ObjectId(dto.getId()));
     	doc.put("template_id_root", dto.getTemplateIdRoot());
     	doc.put("last_update_date", dto.getLastUpdateDate());
     	doc.put("version", dto.getVersion());

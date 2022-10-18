@@ -26,6 +26,8 @@ public class FhirStructuresDTO {
     @JsonProperty
     private List<Valueset> valuesets;
     @JsonProperty
+    private String id;
+    @JsonProperty
     private Date lastUpdateDate;
     @JsonProperty
     private String version;

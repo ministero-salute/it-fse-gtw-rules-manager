@@ -23,6 +23,8 @@ public class TerminologyETY {
     public static final String FIELD_DESCRIPTION = "description";
 	public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
+    public static final String FIELD_DELETED = "deleted";
+
 
 	@Id
 	private String id;
@@ -36,6 +38,8 @@ public class TerminologyETY {
     private Date lastUpdateDate;
     @Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
+    @Field(name = FIELD_DELETED)
+    private Date deleted;
 
 	@Override
 	public boolean equals(Object obj) {

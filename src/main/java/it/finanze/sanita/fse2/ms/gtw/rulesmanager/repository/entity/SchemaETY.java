@@ -28,6 +28,8 @@ public class SchemaETY {
     public static final String FIELD_ROOT_SCHEMA = "root_schema";
     public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
+    public static final String FIELD_DELETED= "deleted";
+
 
     @Id
     private String id;
@@ -43,6 +45,8 @@ public class SchemaETY {
     private Date lastUpdateDate;
     @Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
+	@Field(name = FIELD_DELETED)
+    private Boolean deleted;
 
     public void setContentSchemaFromPath(Path path) throws IOException {
         this.contentSchema = new Binary(Files.readAllBytes(path));
@@ -56,6 +60,7 @@ public class SchemaETY {
         entity.setRootSchema(root);
         entity.setLastUpdateDate(new Date());
         entity.setLastSync(new Date());
+        entity.setDeleted(false);
         return entity;
     }
 
@@ -66,7 +71,8 @@ public class SchemaETY {
             .append(FIELD_CONTENT, entity.contentSchema)
             .append(FIELD_TYPE_ID_EXT, entity.typeIdExtension)
             .append(FIELD_ROOT_SCHEMA, entity.rootSchema)
-            .append(FIELD_LAST_UPDATE, entity.lastUpdateDate);
+            .append(FIELD_LAST_UPDATE, entity.lastUpdateDate)
+        	.append(FIELD_DELETED, entity.deleted); 
     }
 
 }
