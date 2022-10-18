@@ -32,7 +32,8 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
             .append(FIELD_SYSTEM, terminology.getSystem())
             .append(FIELD_CODE, terminology.getCode())
             .append(FIELD_DESCRIPTION, terminology.getDescription())
-            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate());
+            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate())
+            .append(FIELD_DELETED, false);
     }
 
     public Document getUpsertQuery(Terminology terminology) {
@@ -42,7 +43,8 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
             .append(FIELD_SYSTEM, terminology.getSystem())
             .append(FIELD_CODE, terminology.getCode())
             .append(FIELD_DESCRIPTION, terminology.getDescription())
-            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate());
+            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate())
+            .append(FIELD_DELETED, false);
     }
 
     public List<Document> getUpsertQueries(List<Terminology> dto) {
@@ -89,6 +91,7 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
             .append(FIELD_CODE, doc.getString(FIELD_CODE))
             .append(FIELD_DESCRIPTION, doc.getString(FIELD_DESCRIPTION))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
-            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC));
+            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
+            .append(FIELD_DELETED, doc.getBoolean(FIELD_DELETED));
     }
 }

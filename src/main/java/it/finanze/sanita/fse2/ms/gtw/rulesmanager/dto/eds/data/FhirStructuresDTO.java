@@ -35,6 +35,8 @@ public class FhirStructuresDTO {
     private String templateIdRoot;
     @JsonProperty
     private String rootMap;
+    @JsonProperty
+    private Boolean deleted;
 
     @Data
     public static class Valueset {

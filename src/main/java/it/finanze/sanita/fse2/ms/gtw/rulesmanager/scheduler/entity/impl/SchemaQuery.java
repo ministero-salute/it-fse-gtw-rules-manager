@@ -30,8 +30,8 @@ public class SchemaQuery implements IQueryEDS<SchemaDTO> {
             .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schema.getContentSchema())))
             .append(FIELD_TYPE_ID_EXT, schema.getTypeIdExtension())
             .append(FIELD_ROOT_SCHEMA, schema.getRootSchema())
-            .append(FIELD_LAST_UPDATE, schema.getLastUpdateDate());
-           // .append(FIELD_DELETED, false);
+            .append(FIELD_LAST_UPDATE, schema.getLastUpdateDate())
+            .append(FIELD_DELETED, false);
     }
 
     /**

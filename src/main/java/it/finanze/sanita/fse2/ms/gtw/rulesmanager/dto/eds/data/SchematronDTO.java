@@ -34,5 +34,7 @@ public class SchematronDTO {
         private String templateIdRoot;
         @JsonProperty
         private Date lastUpdateDate;
+        @JsonProperty
+        private Boolean deleted;
     }
 }

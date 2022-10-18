@@ -32,5 +32,7 @@ public class TerminologyDTO {
         private String description;
         @JsonProperty
         private Date lastUpdateDate;
+        @JsonProperty
+        private Boolean deleted;
     }
 }

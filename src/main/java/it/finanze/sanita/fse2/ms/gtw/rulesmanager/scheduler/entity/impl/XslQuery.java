@@ -29,7 +29,8 @@ public class XslQuery implements IQueryEDS<XslDTO> {
             .append(FIELD_FILENAME, xsl.getNameXslTransform())
             .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(xsl.getContentXslTransform())))
             .append(FIELD_VERSION, xsl.getVersion())
-            .append(FIELD_LAST_UPDATE, xsl.getLastUpdateDate());
+            .append(FIELD_LAST_UPDATE, xsl.getLastUpdateDate())
+            .append(FIELD_DELETED,  false); 
     }
 
     /**
@@ -69,6 +70,7 @@ public class XslQuery implements IQueryEDS<XslDTO> {
             .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
             .append(FIELD_ROOT, doc.getString(FIELD_ROOT))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
-            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC));
+            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
+            .append(FIELD_DELETED,  doc.getBoolean(FIELD_DELETED)); 
     }
 }
