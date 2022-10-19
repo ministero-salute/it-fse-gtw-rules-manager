@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MockStructures extends StructureBase<MockData> {
 
-    @Autowired
+//    @Autowired
     private IStructureRepo repository;
 
     protected MockStructures(MockConfig config, BridgeEDS bridge) {
