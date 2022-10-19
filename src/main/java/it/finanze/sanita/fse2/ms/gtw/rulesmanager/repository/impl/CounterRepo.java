@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CounterRepo implements ICounterRepo {
 
-	private final long DAY_IN_MS = 1000 * 60 * 60 * 24; 
+	private final long DAY_IN_MS = (long) 1000 * 60 * 60 * 24; 
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
