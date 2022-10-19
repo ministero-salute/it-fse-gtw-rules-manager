@@ -37,5 +37,7 @@ public class XslDTO {
         private String version;
         @JsonProperty
         private Date lastUpdateDate;
+        @JsonProperty
+        private Boolean deleted;
     }
 }

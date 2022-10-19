@@ -43,5 +43,7 @@ public class SchemaDTO {
         private Boolean rootSchema;
         @JsonProperty
         private Date lastUpdateDate;
+        @JsonProperty
+        private Boolean deleted;
     }
 }

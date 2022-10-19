@@ -9,6 +9,8 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.Schem
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY.FIELD_LAST_SYNC;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY.FIELD_LAST_UPDATE;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY.FIELD_ROOT;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchematronETY.FIELD_DELETED;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +42,12 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     	doc.put("maps", mapsToSave);
     	doc.put("definitions", definitionsToSave);
     	doc.put("valuesets", valuesetsToSave);
+    	doc.put("_id", new ObjectId(dto.getId()));
     	doc.put("template_id_root", dto.getTemplateIdRoot());
     	doc.put("last_update_date", dto.getLastUpdateDate());
     	doc.put("version", dto.getVersion());
     	doc.put("root_map", dto.getRootMap());
+    	doc.put("deleted", dto.getDeleted()); 
     	// Create
     	return doc;
     }
@@ -85,7 +89,8 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
             .append("version", doc.getString("version"))
             .append(FIELD_ROOT, doc.getString(FIELD_ROOT))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
-            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC));
+            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
+            .append(FIELD_DELETED, doc.getBoolean(FIELD_DELETED)); 
     }
     
     private List<Document> buildMapDocuments(List<FhirStructuresDTO.FhirStructures> maps) {

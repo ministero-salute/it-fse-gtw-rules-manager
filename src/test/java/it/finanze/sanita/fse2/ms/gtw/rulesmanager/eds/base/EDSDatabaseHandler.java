@@ -1,10 +1,23 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.CONFIG_MONGO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.REPOSITORY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.SCHEDULER_QUERIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.UTILITY;
 
 import java.io.IOException;
 
+@ComponentScans( value = {
+	    @ComponentScan(CONFIG_MONGO),
+	    @ComponentScan(REPOSITORY),
+	    @ComponentScan(SCHEDULER_QUERIES),
+	    @ComponentScan(UTILITY)
+	})
 public abstract class EDSDatabaseHandler extends EDSEntityHandler {
     @Autowired
     private MongoTemplate mongo;

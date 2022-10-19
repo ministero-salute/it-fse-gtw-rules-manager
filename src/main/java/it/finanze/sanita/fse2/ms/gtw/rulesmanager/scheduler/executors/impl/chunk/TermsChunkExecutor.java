@@ -6,6 +6,8 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chun
 import com.mongodb.MongoException;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertManyResult;
+import com.mongodb.client.result.UpdateResult;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
@@ -31,6 +33,7 @@ import java.util.AbstractMap;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.mongodb.client.model.Updates.set;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
 import static java.lang.String.format;
@@ -177,12 +180,9 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             // Delete docs if request didn't fail
             if(res == OK) {
                 try {
-                    // Delete
-                    DeleteResult status = staging.deleteMany(
-                        query.getDeleteQueries(dto.get().getDocuments())
-                    );
+                    UpdateResult result = staging.updateMany(query.getDeleteQueries(dto.get().getDocuments()), set("deleted", true)); 
                     // Calculate deletions
-                    process = (int) status.getDeletedCount();
+                    process = (int) result.getModifiedCount(); 
                 }catch (MongoException ex) {
                     log.error(
                         format("[EDS][%s] Unable to delete chunk documents", getConfig().getTitle()),

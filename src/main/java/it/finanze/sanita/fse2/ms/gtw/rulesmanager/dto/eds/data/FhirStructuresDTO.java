@@ -29,6 +29,8 @@ public class FhirStructuresDTO {
     @JsonProperty
     private List<Valueset> valuesets;
     @JsonProperty
+    private String id;
+    @JsonProperty
     private Date lastUpdateDate;
     @JsonProperty
     private String version;
@@ -36,6 +38,8 @@ public class FhirStructuresDTO {
     private String templateIdRoot;
     @JsonProperty
     private String rootMap;
+    @JsonProperty
+    private Boolean deleted;
 
     @Data
     public static class Valueset {

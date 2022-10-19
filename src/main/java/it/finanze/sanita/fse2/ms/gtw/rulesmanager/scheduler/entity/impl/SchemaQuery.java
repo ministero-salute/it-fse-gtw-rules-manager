@@ -33,7 +33,8 @@ public class SchemaQuery implements IQueryEDS<SchemaDTO> {
             .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schema.getContentSchema())))
             .append(FIELD_TYPE_ID_EXT, schema.getTypeIdExtension())
             .append(FIELD_ROOT_SCHEMA, schema.getRootSchema())
-            .append(FIELD_LAST_UPDATE, schema.getLastUpdateDate());
+            .append(FIELD_LAST_UPDATE, schema.getLastUpdateDate())
+            .append(FIELD_DELETED, false);
     }
 
     /**
@@ -72,6 +73,7 @@ public class SchemaQuery implements IQueryEDS<SchemaDTO> {
             .append(FIELD_TYPE_ID_EXT, doc.getString(FIELD_TYPE_ID_EXT))
             .append(FIELD_ROOT_SCHEMA, doc.getBoolean(FIELD_ROOT_SCHEMA))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
-            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC));
+            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
+            .append(FIELD_DELETED, doc.getBoolean(FIELD_DELETED)); 
     }
 }

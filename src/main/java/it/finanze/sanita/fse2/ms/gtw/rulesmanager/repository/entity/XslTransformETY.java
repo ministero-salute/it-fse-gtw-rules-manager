@@ -28,6 +28,8 @@ public class XslTransformETY {
 	public static final String FIELD_ROOT = "template_id_root";
 	public static final String FIELD_LAST_UPDATE = "last_update_date";
 	public static final String FIELD_LAST_SYNC = "last_sync";
+	public static final String FIELD_DELETED = "deleted";
+	
 
 	@Id
 	private String id;
@@ -46,6 +48,9 @@ public class XslTransformETY {
 	
 	@Field(name = FIELD_LAST_UPDATE)
     private Date lastUpdateDate;
+	
+	@Field(name = FIELD_DELETED)
+    private Date deleted;
 	
 	 
 }
