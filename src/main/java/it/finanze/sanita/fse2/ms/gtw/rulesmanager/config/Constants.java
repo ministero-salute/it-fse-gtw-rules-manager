@@ -47,7 +47,7 @@ public final class Constants {
 		public static final String REPOSITORY = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository";
 
 		public static final String UTILITY = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility";
-
+		
 		public static final String SCHEDULER_QUERIES = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity";
 
 		public static final class Collections {

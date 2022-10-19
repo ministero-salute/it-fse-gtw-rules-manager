@@ -19,12 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.util.Date;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.CONFIG_MONGO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.REPOSITORY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.SCHEDULER_QUERIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.UTILITY;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
@@ -35,6 +41,12 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
+@ComponentScans( value = {
+	    @ComponentScan(CONFIG_MONGO),
+	    @ComponentScan(REPOSITORY),
+	    @ComponentScan(SCHEDULER_QUERIES),
+	    @ComponentScan(UTILITY)
+	})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EDSExecutorTest extends EDSDatabaseHandler {
 
