@@ -37,7 +37,6 @@ public abstract class AbstractTest {
 
         for (int i = 0; i < actual.size(); i++) { 
             assertTrue(actual.get(i).getNameSchematron().equals(expected.get(i).getNameSchematron()), String.format( "Actual Schematron name is %s and expected is %s", actual.get(i).getNameSchematron(), expected.get(i).getNameSchematron()));
-//            assertTrue(actual.get(i).getXsdSchemaVersion().equals(expected.get(i).getXsdSchemaVersion()), String.format( "Actual schematron version is %s and expected is %s", actual.get(i).getXsdSchemaVersion(), expected.get(i).getXsdSchemaVersion()));
             assertTrue((actual.get(i).getContentSchematron() == null && expected.get(i).getContentSchematron() == null)
                     || (actual.get(i).getContentSchematron().equals(expected.get(i).getContentSchematron())), "Content schematron is different");
         }
