@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.Collections;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Collections;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ICounterRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICounterSRV;
