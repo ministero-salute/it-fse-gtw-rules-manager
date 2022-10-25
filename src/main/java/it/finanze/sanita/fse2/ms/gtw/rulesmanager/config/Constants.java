@@ -73,6 +73,11 @@ public final class Constants {
 
 	}
 
+	public static final class AppConstants {
+		
+		public static final String MOCKED_GATEWAY_NAME = "mocked-gateway";
+	}
+
 	public static final class Profile {
 
 		/**

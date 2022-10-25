@@ -22,4 +22,7 @@ public class LogDTO {
 	
 	private String op_timestamp_end;
 	
+	private String gateway_name;
+	
+	private String microservice_name;
 }
