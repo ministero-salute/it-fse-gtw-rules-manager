@@ -21,6 +21,6 @@ public class FhirStructuresCFG extends ChangesetCFG {
         @Value("${eds.changeset.fhir.data}")
         String data
     ) {
-        super(status, data, Constants.ComponentScan.Collections.FHIR_TRANSFORM);
+        super(status, data, Constants.Collections.FHIR_TRANSFORM);
     }
 }

@@ -19,22 +19,22 @@ public final class Constants {
 		/**
 		 * Base path.
 		 */
-		public static final String BASE = "it.sanita.rulesmanager";
+		public static final String BASE = "it.finanze.sanita.fse2.ms.gtw.rulesmanager";
 
 		/**
 		 * Controller path.
 		 */
-		public static final String CONTROLLER = "it.sanita.rulesmanager.controller";
+		public static final String CONTROLLER = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller";
 
 		/**
 		 * Service path.
 		 */
-		public static final String SERVICE = "it.sanita.rulesmanager.service";
+		public static final String SERVICE = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.service";
 
 		/**
 		 * Configuration path.
 		 */
-		public static final String CONFIG = "it.sanita.rulesmanager.config";
+		public static final String CONFIG = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.config";
 
 		/**
 		 * Configuration mongo path.
@@ -50,27 +50,28 @@ public final class Constants {
 		
 		public static final String SCHEDULER_QUERIES = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity";
 
-		public static final class Collections {
-
-			public static final String SCHEMA = "schema";
-
-			public static final String SCHEMATRON = "schematron";
-
-			public static final String TERMINOLOGY = "terminology";
-
-			public static final String XSL_TRANSFORM = "xsl_transform";
-
-			public static final String FHIR_TRANSFORM = "transform";
-
-			private Collections() {
-
-			}
-		}
 
 		private ComponentScan() {
 			// This method is intentionally left blank.
 		}
 
+	}
+	
+	public static final class Collections {
+
+		public static final String SCHEMA = "schema";
+
+		public static final String SCHEMATRON = "schematron";
+
+		public static final String TERMINOLOGY = "terminology";
+
+		public static final String XSL_TRANSFORM = "xsl_transform";
+
+		public static final String FHIR_TRANSFORM = "transform";
+
+		private Collections() {
+
+		}
 	}
 
 	public static final class AppConstants {
