@@ -13,7 +13,6 @@ import java.util.Date;
 /**
  * EDS Client interface used to retrieve data according
  * the specific onChangeset subtype
- * @author G. Baittiner
  */
 public interface IEDSClient {
     // Standard interface

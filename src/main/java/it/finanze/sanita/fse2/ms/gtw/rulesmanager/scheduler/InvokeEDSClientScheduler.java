@@ -27,7 +27,6 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 /**
  * Invoke EDS Client Scheduler, handles the invocations to EDS Client endpoints.
- * @author G. Baittiner
  * @author Riccardo Bonesi
  */
 @Slf4j
