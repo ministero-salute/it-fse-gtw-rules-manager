@@ -28,7 +28,7 @@
 		<container.output.runtime>${container.output}/runtime</container.output.runtime>
 		<!-- Sonar integration -->
 		<sonar.organization>ministero-salute</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url> 
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.exclusions> 
 				src/main/java/it/finanze/sanita/fse2/ms/gtw/rulesmanager/logging/*
 		</sonar.exclusions>
@@ -84,13 +84,6 @@
 			<groupId>ch.qos.logback.contrib</groupId>
 			<artifactId>logback-jackson</artifactId>
 			<version>0.1.5</version>
-		</dependency>
-
-		<!-- LOGSTASH LOGBACK ENCODER -->
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>7.2</version>
 		</dependency>
 
 		<!-- DEVTOOL -->
@@ -149,17 +142,6 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-		</dependency>
-
-		<!-- KAFKA -->
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- TRACING -->

@@ -39,3 +39,11 @@ kafka.log.base-topic=MDS-SA-0004_FU_001_LOG
 kafka.producer.client-id=springboot-gtw-rules-manager
 kafka.bootstrap-servers=kafka.bootstrap-servers=${KAFKA_HOST}:${KAFKA_PORT1},${KAFKA_HOST}:${KAFKA_PORT2},${KAFKA_HOST}:${KAFKA_PORT3}
 
+28/10/2022
+Removed:
+log.level
+log.kafka-log.enable
+kafka.log.base-topic
+kafka.producer.client-id
+kafka.bootstrap-servers
+ms.url.gtw-config
