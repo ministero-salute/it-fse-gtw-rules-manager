@@ -68,6 +68,8 @@ public final class Constants {
 		public static final String XSL_TRANSFORM = "xsl_transform";
 
 		public static final String FHIR_TRANSFORM = "transform";
+		
+		public static final String DICTIONARY = "dictionary";
 
 		private Collections() {
 

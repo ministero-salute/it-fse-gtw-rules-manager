@@ -15,12 +15,14 @@ import org.springframework.stereotype.Component;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IDictionaryRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -52,6 +54,9 @@ public class InvokeEDSClientScheduler {
 	@Autowired
 	private FhirStructuresExecutors fhirExecutor;
 
+	@Autowired
+	private ICodeSystemVersionSRV codeSystemVersionSRV;
+	
 	@PostConstruct
 	public void postConstruct() {
 		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
@@ -82,5 +87,7 @@ public class InvokeEDSClientScheduler {
 				log.error(format("[EDS] Unable to update the %s collection", config.getTitle()));
 			}
 		}
+		
+		codeSystemVersionSRV.syncCodeSystemVersions(); 
 	}
 }

@@ -22,9 +22,11 @@ public class TerminologyETY {
 
 	public static final String FIELD_ID = "_id";
     public static final String FIELD_SYSTEM = "system";
+    public static final String FIELD_VERSION = "version";
     public static final String FIELD_CODE = "code";
     public static final String FIELD_DESCRIPTION = "description";
-	public static final String FIELD_LAST_UPDATE = "last_update_date";
+    public static final String FIELD_RELEASE_DATE = "release_date";
+    public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
     public static final String FIELD_DELETED = "deleted";
 
@@ -33,16 +35,21 @@ public class TerminologyETY {
 	private String id;
 	@Field(name = FIELD_SYSTEM)
 	private String system;
+	@Field(name = FIELD_VERSION)
+	private String version;
 	@Field(name = FIELD_CODE)
 	private String code;
 	@Field(name = FIELD_DESCRIPTION)
 	private String description;
+	@Field(name = FIELD_RELEASE_DATE)
+    private Date releaseDate;
 	@Field(name = FIELD_LAST_UPDATE)
     private Date lastUpdateDate;
     @Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
     @Field(name = FIELD_DELETED)
     private Date deleted;
+    
 
 	@Override
 	public boolean equals(Object obj) {

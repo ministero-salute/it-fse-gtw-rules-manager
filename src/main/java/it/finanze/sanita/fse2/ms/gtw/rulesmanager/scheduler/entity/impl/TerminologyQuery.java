@@ -33,8 +33,10 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
         return new org.bson.Document()
             .append(FIELD_ID, new ObjectId(terminology.getId()))
             .append(FIELD_SYSTEM, terminology.getSystem())
+            .append(FIELD_VERSION, terminology.getVersion())
             .append(FIELD_CODE, terminology.getCode())
             .append(FIELD_DESCRIPTION, terminology.getDescription())
+            .append(FIELD_RELEASE_DATE, terminology.getReleaseDate())
             .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate())
             .append(FIELD_DELETED, false);
     }
@@ -44,8 +46,10 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
         return new org.bson.Document()
             .append(FIELD_ID, new ObjectId(terminology.getId()))
             .append(FIELD_SYSTEM, terminology.getSystem())
+            .append(FIELD_VERSION, terminology.getVersion())
             .append(FIELD_CODE, terminology.getCode())
             .append(FIELD_DESCRIPTION, terminology.getDescription())
+            .append(FIELD_RELEASE_DATE, terminology.getReleaseDate())
             .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate())
             .append(FIELD_DELETED, false);
     }
@@ -91,6 +95,7 @@ public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
         return new org.bson.Document()
             .append(FIELD_ID, doc.getObjectId(FIELD_ID))
             .append(FIELD_SYSTEM, doc.getString(FIELD_SYSTEM))
+            .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
             .append(FIELD_CODE, doc.getString(FIELD_CODE))
             .append(FIELD_DESCRIPTION, doc.getString(FIELD_DESCRIPTION))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))

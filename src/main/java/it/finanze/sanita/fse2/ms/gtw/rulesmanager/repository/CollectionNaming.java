@@ -54,6 +54,13 @@ public class CollectionNaming {
         }
         return Constants.Collections.FHIR_TRANSFORM;
     }
-    
+
+    @Bean("dictionaryBean")
+    public String getDictionaryCollection() {
+        if (profileUtility.isTestProfile()) {
+            return Constants.Profile.TEST_PREFIX + Constants.Collections.DICTIONARY;
+        }
+        return Constants.Collections.DICTIONARY;
+    }    
     
 }

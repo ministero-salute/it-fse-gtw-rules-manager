@@ -30,9 +30,13 @@ public class TerminologyDTO {
         @JsonProperty
         private String system;
         @JsonProperty
+        private String version;
+        @JsonProperty
         private String code;
         @JsonProperty
         private String description;
+        @JsonProperty
+        private Date releaseDate;
         @JsonProperty
         private Date lastUpdateDate;
         @JsonProperty
