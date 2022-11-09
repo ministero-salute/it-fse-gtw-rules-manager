@@ -18,7 +18,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
- *  @author vincenzoingenito
  *  Configuration class redis.
  */
 @Configuration

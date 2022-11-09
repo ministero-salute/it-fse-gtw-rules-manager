@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 /**
  * Configuration properties for EDS Client.
  * 
- * @author Simone Lungarella
  */
 @Getter
 @Component

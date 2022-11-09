@@ -10,7 +10,6 @@ import lombok.Setter;
 
 /**
  * 
- * @author vincenzoingenito
  *
  *         Base response.
  */

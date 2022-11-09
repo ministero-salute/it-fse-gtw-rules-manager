@@ -22,7 +22,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchedulerResponseDTO;
 /**
  * Controller test.
  * 
- * @author vincenzoingenito
  */
 @RequestMapping(path = "/v1")
 @Tag(name = "Servizio di test")

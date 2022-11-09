@@ -6,7 +6,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions;
 /**
  * Exception Class to handle errors in resposnes from EDS Client.
  * 
- * @author Simone Lungarella
  */
 public class EDSClientException extends RuntimeException {
 

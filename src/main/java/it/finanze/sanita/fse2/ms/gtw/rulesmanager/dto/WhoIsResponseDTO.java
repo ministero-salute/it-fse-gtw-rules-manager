@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 /**
  * DTO that represents the response of the who-is api.
  * 
- * @author Simone Lungarella
  */
 @Getter
 @NoArgsConstructor

@@ -15,7 +15,6 @@ import java.util.Date;
 
 /** 
  * 
- * @author vincenzoingenito 
  */ 
 @Service
 @Slf4j

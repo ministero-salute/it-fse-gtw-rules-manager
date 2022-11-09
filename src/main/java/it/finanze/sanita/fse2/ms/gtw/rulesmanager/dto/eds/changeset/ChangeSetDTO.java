@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * DTO for Change Set status endpoint response.
  *
- * @author Riccardo Bonesi
  *
  */
 @Getter

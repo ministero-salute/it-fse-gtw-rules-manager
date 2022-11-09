@@ -11,7 +11,6 @@ import java.io.*;
 /**
  * The Class FileUtils.
  *
- * @author vincenzoingenito
  * 
  */
 @Slf4j
