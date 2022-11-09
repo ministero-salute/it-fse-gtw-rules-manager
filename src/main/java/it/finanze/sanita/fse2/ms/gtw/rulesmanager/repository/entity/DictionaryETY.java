@@ -37,5 +37,7 @@ public class DictionaryETY {
     private Date releaseDate;
     @Field(name = FIELD_WHITELIST)
     private boolean whiteList;
+    @Field(name = "deleted")
+    private boolean deleted;
 	
 }

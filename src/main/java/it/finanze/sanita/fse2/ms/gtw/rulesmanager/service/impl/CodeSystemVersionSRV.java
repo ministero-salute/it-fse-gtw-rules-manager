@@ -55,6 +55,7 @@ public class CodeSystemVersionSRV implements ICodeSystemVersionSRV {
 		ety.setVersion(terminology.getVersion());
 		ety.setCreationDate(terminology.getCreationDate());
 		ety.setReleaseDate(terminology.getReleaseDate());
+		ety.setDeleted(false);
 		if (terminology.getCode() != null) ety.setWhiteList(terminology.getCode().equals("#WHITELIST#"));
 		return ety;
 	}
