@@ -5,6 +5,9 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.mongo;
 
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.mongo.MongoLockProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -65,5 +68,8 @@ public class MongoDatabaseCFG {
         return new MongoTemplate(factory, converter);
     }
 
-
+    @Bean
+    public LockProvider lockProvider(MongoTemplate template) {
+        return new MongoLockProvider(template.getDb());
+    }
 }

@@ -111,13 +111,6 @@
 			<artifactId>mongodb-driver-sync</artifactId>
 		</dependency>
 
-		<!-- REDIS -->
-
-		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
 		<dependency>
@@ -129,13 +122,12 @@
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>
 			<artifactId>shedlock-spring</artifactId>
-			<version>4.41.0</version>
+			<version>4.42.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>
-			<artifactId>shedlock-provider-redis-spring</artifactId>
-			<version>4.41.0</version>
+			<artifactId>shedlock-provider-mongo</artifactId>
+			<version>4.42.0</version>
 		</dependency>
 
 		<!-- GSON -->
