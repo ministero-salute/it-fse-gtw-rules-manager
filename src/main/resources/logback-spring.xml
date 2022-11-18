@@ -46,6 +46,27 @@
 		</encoder>
 	</appender>
 
+	<logger name="kafka-logger" level="${log.level}"
+		additivity="false">
+		<appender name="kafka-appender" class="it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.KafkaAppender">
+			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				<pattern>%msg%n</pattern>
+			</encoder>
+
+			<topic>${kafka.log.base-topic}</topic>
+			<keyingStrategy class="it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.HostNameKeyingStrategy" />
+			<deliveryStrategy class="it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.BlockingDeliveryStrategy">
+				<timeout>0</timeout>
+			</deliveryStrategy>
+
+			<producerConfig>bootstrap.servers=${kafka.bootstrap-servers}</producerConfig>
+
+			<producerConfig>metadata.fetch.timeout.ms=99999999999</producerConfig>
+			<producerConfig>metadata.fetch.timeout.ms=0</producerConfig>
+			<producerConfig>client.id=${kafka.producer.client-id}</producerConfig>
+		</appender>
+	</logger>
+
 	<!-- LOG everything at INFO level -->
 	<root level="${APP_LOGGING_ROOT_LEVEL:-INFO}">
 		<!--<appender-ref ref="RollingFile" /> -->
