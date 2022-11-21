@@ -4,10 +4,8 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
@@ -15,7 +13,9 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.Terminolog
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.TermActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
@@ -23,15 +23,15 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.Terminol
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.base.EmptySetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.AbstractMap;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.AbstractMap.SimpleImmutableEntry;
 
 import static com.mongodb.client.model.Updates.set;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
@@ -47,6 +47,9 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
 
     @Autowired
     private TerminologyQuery query;
+
+    @Autowired
+    private ICodeSystemVersionSRV codeSystemVersionSRV;
 
     private ChangeSetChunkDTO snapshot;
 
@@ -236,5 +239,34 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         setCollection(null);
         setOperations(null);
         return ActionRes.OK;
+    }
+
+    protected ActionRes onCodeSystemSync() {
+        ActionRes res = KO;
+        try {
+            // Execute syncing
+            codeSystemVersionSRV.syncCodeSystemVersions();
+            // Set flag
+            res = OK;
+        }catch (Exception ex) {
+            log.error(
+                format("[%s] Unable to sync code-system collection", getConfig().getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+
+    @Override
+    protected String[] getSteps() {
+        return TermActionEDS.defaults();
+    }
+
+    @Override
+    protected List<Map.Entry<String, IActionStepEDS>> getCustomSteps() {
+        // Add additional handlers
+        return Collections.singletonList(new SimpleImmutableEntry<>(
+            TermActionEDS.ON_CS_SYNC, this::onCodeSystemSync
+        ));
     }
 }

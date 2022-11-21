@@ -5,6 +5,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service;
 
 public interface ICodeSystemVersionSRV {
 
-    public void syncCodeSystemVersions();
+    void syncCodeSystemVersions();
     
 }
