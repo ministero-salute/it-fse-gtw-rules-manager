@@ -3,14 +3,14 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import java.util.Date;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
 
 /**
  * Model to save terminology.
@@ -23,9 +23,10 @@ public class DictionaryETY {
 	public static final String FIELD_ID = "_id";
     public static final String FIELD_SYSTEM = "system";
     public static final String FIELD_VERSION = "version";
-	public static final String FIELD_CREATION_UPDATE = "creation_date";
+	public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_RELEASE_DATE = "release_date";
     public static final String FIELD_WHITELIST = "whitelist";
+    public static final String FIELD_DELETED = "deleted";
 
 
 	@Id
@@ -34,13 +35,24 @@ public class DictionaryETY {
 	private String system;
 	@Field(name = FIELD_VERSION)
 	private String version;
-	@Field(name = FIELD_CREATION_UPDATE)
+	@Field(name = FIELD_CREATION_DATE)
     private Date creationDate;
     @Field(name = FIELD_RELEASE_DATE)
     private Date releaseDate;
     @Field(name = FIELD_WHITELIST)
     private boolean whiteList;
-    @Field(name = "deleted")
+    @Field(name = FIELD_DELETED)
     private boolean deleted;
-	
+
+    public static DictionaryETY fromMap(TerminologyMapDTO map) {
+        DictionaryETY entity = new DictionaryETY();
+        entity.setSystem(map.getSystem());
+        entity.setVersion(map.getVersion());
+        entity.setCreationDate(map.getCreationDate());
+        entity.setReleaseDate(map.getReleaseDate());
+        entity.setWhiteList(map.isWhiteList());
+        entity.setDeleted(false);
+        return entity;
+    }
+
 }
