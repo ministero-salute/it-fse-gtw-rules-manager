@@ -5,12 +5,11 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Date;
 
 /**
  * Model to save terminology.
@@ -22,8 +21,10 @@ public class TerminologyETY {
 
 	public static final String FIELD_ID = "_id";
     public static final String FIELD_SYSTEM = "system";
+	public static final String FIELD_SYSTEM_ID_REF = FIELD_ID + "." + FIELD_SYSTEM;
     public static final String FIELD_VERSION = "version";
-    public static final String FIELD_CODE = "code";
+	public static final String FIELD_VERSION_ID_REF = FIELD_ID + "." + FIELD_VERSION;
+	public static final String FIELD_CODE = "code";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RELEASE_DATE = "release_date";
     public static final String FIELD_LAST_UPDATE = "last_update_date";
@@ -49,7 +50,7 @@ public class TerminologyETY {
     private Date lastSync;
     @Field(name = FIELD_DELETED)
     private Date deleted;
-    
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -81,8 +82,4 @@ public class TerminologyETY {
 		result = prime * result + ((system == null) ? 0 : system.hashCode());
 		return result;
 	}
-	 
-	
-	
-	
 }

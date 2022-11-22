@@ -3,12 +3,13 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository;
 
-import java.util.List;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+
+import java.util.List;
 
 public interface ITerminologyRepo {
 
-	List<TerminologyMapDTO> getAllCodeSystemVersions();
+	List<TerminologyMapDTO> getAllCodeSystemVersions(String collection) throws EdsDbException;
 	
 }

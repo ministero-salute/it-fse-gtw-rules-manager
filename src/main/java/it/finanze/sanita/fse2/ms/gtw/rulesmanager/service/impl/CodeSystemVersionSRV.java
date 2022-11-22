@@ -4,6 +4,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IDictionaryRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
@@ -37,9 +38,9 @@ public class CodeSystemVersionSRV implements ICodeSystemVersionSRV {
 		}
 	}
 
-	private List<DictionaryETY> getCodeSystemVersions() {
+	private List<DictionaryETY> getCodeSystemVersions() throws EdsDbException {
 		return terminologyRepo
-				.getAllCodeSystemVersions()
+				.getAllCodeSystemVersions("terminology")
 				.stream()
 				.filter(Objects::nonNull)
 				.map(DictionaryETY::fromMap)

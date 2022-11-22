@@ -12,6 +12,12 @@ import java.util.Date;
 @Data
 public class TerminologyMapDTO {
 
+	public static final String FIELD_SYSTEM = "system";
+	public static final String FIELD_VERSION = "version";
+	public static final String FIELD_CODE = "code";
+	public static final String FIELD_RELEASE_DATE = "releaseDate";
+	public static final String FIELD_CREATION_DATE = "creationDate";
+
 	public static final String WHITELIST_FLAG = "#WHITELIST#";
 
 	private String system;
