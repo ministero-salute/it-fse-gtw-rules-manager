@@ -23,6 +23,8 @@ public abstract class ChangesetCFG {
     public static final String LAST_UPDATE_FIELD = "lastUpdate";
     public static final String STAGING_QUALIFIER = "-staging";
 
+    public static final String BACKUP_QUALIFIER = "-backup";
+
     public static final int RETRY_VALUE = 3;
 
     private final String title;
@@ -30,7 +32,7 @@ public abstract class ChangesetCFG {
     private final String staging;
     private final String statusURL;
     private final String dataURL;
-    private final String parent;
+    private final ChangesetCFG parent;
 
     protected ChangesetCFG(String status, String data, String production) {
         this.title = production.substring(0, 1).toUpperCase() + production.substring(1);
@@ -41,7 +43,7 @@ public abstract class ChangesetCFG {
         this.parent = null;
     }
 
-    protected ChangesetCFG(String status, String data, String production, String parent) {
+    protected ChangesetCFG(String status, String data, String production, ChangesetCFG parent) {
         this.title = production.substring(0, 1).toUpperCase() + production.substring(1);
         this.production = production;
         this.staging = production + STAGING_QUALIFIER;
@@ -50,7 +52,7 @@ public abstract class ChangesetCFG {
         this.parent = parent;
     }
 
-    public String getParent() {
+    public ChangesetCFG getParent() {
         // Minor check to prevent issues
         Objects.requireNonNull(parent, "The parent property hasn't been specified on this configuration");
         return parent;

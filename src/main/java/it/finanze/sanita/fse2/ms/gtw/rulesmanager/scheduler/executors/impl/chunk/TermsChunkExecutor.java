@@ -13,11 +13,10 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.Terminolog
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionCallbackEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.TermActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
@@ -30,12 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Map.Entry;
+import java.util.AbstractMap;
+import java.util.Date;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Updates.set;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
 import static java.lang.String.format;
 
@@ -53,6 +53,11 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     private ICodeSystemVersionSRV csv;
 
     private ChangeSetChunkDTO snapshot;
+
+    private IActionCallbackEDS onBeforeSwap;
+
+    private IActionCallbackEDS onSuccessSwap;
+    private IActionCallbackEDS onFailedSwap;
 
     protected TermsChunkExecutor(TerminologyChunkedCFG config, BridgeEDS bridge) {
         super(config, bridge);
@@ -242,35 +247,57 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         return ActionRes.OK;
     }
 
-    protected ActionRes onCodeSystemSync() {
+    @Override
+    protected ActionRes onSwap() {
+        // Working var
         ActionRes res = KO;
-        try {
-            // Execute syncing
-            csv.syncCodeSystemVersions();
-            // Set flag
-            res = OK;
-        }catch (Exception ex) {
-            log.error(
-                format("[%s] Unable to sync code-system collection", getConfig().getTitle()),
-                ex
-            );
+        // Verify pre-callback has been provided
+        if(onBeforeSwap != null) {
+            // Log me
+            log.debug("[{}] Executing pre-swap operation", getConfig().getTitle());
+            // Execute callback
+            CallbackRes cb = onBeforeSwap.execute();
+            // Check if we can keep going
+            if(cb == CB_OK) {
+                // Log me
+                log.debug("[{}] Pre-swap operation success", getConfig().getTitle());
+                // Execute swapping
+                res = super.onSwap();
+            } else {
+                // Log me
+                log.debug("[{}] Pre-swap operation failure", getConfig().getTitle());
+            }
+        }else{
+            res = super.onSwap();
         }
+        // Verify post-callback has been provided
+        if(onFailedSwap != null && res == KO) {
+            // Log me
+            log.debug("[{}] Executing on-fail-swap to recover data", getConfig().getTitle());
+            // Execute recovery procedure
+            CallbackRes cb = onFailedSwap.execute();
+            // Check
+            if(cb == CB_OK) {
+                log.debug("[{}] Data successfully reverted", getConfig().getTitle());
+            } else {
+                log.debug("[{}] Unable to recover data", getConfig().getTitle());
+                log.error("[{}][FATAL] Unable to recover data, integrity is compromised!", getConfig().getTitle());
+            }
+        }
+        // Verify success callback has been provided
+        if(onSuccessSwap != null && res == OK) {
+            // Log me
+            log.debug("[{}] Executing on-success-swap operation", getConfig().getTitle());
+            // Execute recovery procedure
+            CallbackRes cb = onSuccessSwap.execute();
+            // Check
+            if(cb == CB_OK) {
+                log.debug("[{}] Post-swap operation success", getConfig().getTitle());
+            } else {
+                log.debug("[{}] Post-swap operation failure", getConfig().getTitle());
+            }
+        }
+
         return res;
-    }
-
-    @Override
-    protected String[] getSteps() {
-        return TermActionEDS.defaults();
-    }
-
-    @Override
-    protected List<Entry<String, IActionStepEDS>> getCustomSteps() {
-        // Create list
-        List<Entry<String, IActionStepEDS>> hnd = new ArrayList<>();
-        hnd.add(new SimpleImmutableEntry<>(
-            TermActionEDS.ON_CS_SYNC, this::onCodeSystemSync
-        ));
-        // Add additional handlers
-        return hnd;
     }
 }

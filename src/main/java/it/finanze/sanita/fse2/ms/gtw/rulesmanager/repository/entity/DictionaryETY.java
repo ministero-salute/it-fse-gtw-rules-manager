@@ -44,14 +44,14 @@ public class DictionaryETY {
     @Field(name = FIELD_DELETED)
     private boolean deleted;
 
-    public static DictionaryETY fromMap(TerminologyMapDTO map) {
-        DictionaryETY entity = new DictionaryETY();
-        entity.setSystem(map.getSystem());
-        entity.setVersion(map.getVersion());
-        entity.setCreationDate(map.getCreationDate());
-        entity.setReleaseDate(map.getReleaseDate());
-        entity.setWhiteList(map.isWhiteList());
-        entity.setDeleted(false);
+    public static org.bson.Document fromMap(TerminologyMapDTO map) {
+        org.bson.Document entity = new org.bson.Document();
+        entity.put(FIELD_SYSTEM, map.getSystem());
+        entity.put(FIELD_VERSION, map.getVersion());
+        entity.put(FIELD_CREATION_DATE, map.getCreationDate());
+        entity.put(FIELD_RELEASE_DATE, map.getReleaseDate());
+        entity.put(FIELD_WHITELIST, map.isWhiteList());
+        entity.put(FIELD_DELETED, false);
         return entity;
     }
 

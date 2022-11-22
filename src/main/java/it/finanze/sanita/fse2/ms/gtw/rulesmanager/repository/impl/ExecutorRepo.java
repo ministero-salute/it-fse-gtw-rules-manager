@@ -40,6 +40,15 @@ public class ExecutorRepo implements IExecutorRepo {
         }
     }
 
+    public void rename(String src, String target) throws EdsDbException {
+        // Must exists
+        boolean exists = exists(src);
+        // Throw if it doesn't
+        if(!exists) throw new EdsDbException("The src collection does not exists");
+        // Now rename
+        rename(mongo.getCollection(src), target);
+    }
+
     public boolean exists(String name) throws EdsDbException {
         // Working var
         boolean exists;

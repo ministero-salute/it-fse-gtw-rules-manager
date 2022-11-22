@@ -18,5 +18,5 @@ public final class BridgeEDS {
     @Autowired
     private IEDSClient client;
     @Autowired
-    private LoggerHelper kafkaLogger;
+    private LoggerHelper logger;
 }

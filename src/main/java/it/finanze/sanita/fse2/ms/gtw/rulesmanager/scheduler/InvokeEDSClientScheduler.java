@@ -6,10 +6,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.*;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +44,10 @@ public class InvokeEDSClientScheduler {
 	private TermsChunkExecutor terminology;
 
 	@Autowired
-	private FhirStructuresExecutors fhirExecutor;
+	private FhirStructuresExecutors fhir;
+
+	@Autowired
+	private DictionaryExecutor dictionary;
 	
 	@PostConstruct
 	public void postConstruct() {
@@ -62,11 +62,25 @@ public class InvokeEDSClientScheduler {
 	public void action() { 
 		// Log me
 		log.info("[EDS] Starting scheduled updating process");
+		// Setup executors
+		setup();
 		// Run executors
-		start(schema, schematron, xsl, terminology,fhirExecutor); 
+		start(schema, schematron, xsl, terminology, fhir);
 		// Log me
 		log.info("[EDS] Updating process completed");
-	} 
+	}
+
+	private void setup() {
+		terminology.setOnBeforeSwap(
+			() -> dictionary.execute().toCallback()
+		);
+		terminology.setOnFailedSwap(
+			() -> dictionary.onRecovery()
+		);
+		terminology.setOnSuccessSwap(
+			() -> dictionary.onClean().toCallback()
+		);
+	}
  
 	private void start(ExecutorEDS<?> ...executor) {
 		for (ExecutorEDS<?> executorEDS : executor) {

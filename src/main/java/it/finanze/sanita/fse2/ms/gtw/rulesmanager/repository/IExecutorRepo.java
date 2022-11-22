@@ -11,6 +11,7 @@ import java.util.Date;
 
 public interface IExecutorRepo {
     void rename(MongoCollection<Document> src, String target) throws EdsDbException;
+    void rename(String src, String target) throws EdsDbException;
     boolean exists(String name) throws EdsDbException;
     void drop(String name) throws EdsDbException;
     MongoCollection<Document> create(String name) throws EdsDbException;

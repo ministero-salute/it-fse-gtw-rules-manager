@@ -84,12 +84,12 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Execute
         ActionRes res = builder.execute((name, status) -> {
             if (status == ActionRes.KO)  {
-                bridge.getKafkaLogger().error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, startingDate);
+                bridge.getLogger().error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, startingDate);
             }
         });
 
         if (res == ActionRes.OK) {
-            bridge.getKafkaLogger().info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, startingDate);
+            bridge.getLogger().info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, startingDate);
         }
         
         // Log me
