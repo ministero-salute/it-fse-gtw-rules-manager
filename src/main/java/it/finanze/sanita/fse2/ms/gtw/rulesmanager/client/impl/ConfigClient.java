@@ -18,8 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Implementation of gtw-config Client.
- * 
- * @author Simone Lungarella
  */
 @Slf4j
 @Component

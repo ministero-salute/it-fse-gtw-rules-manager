@@ -18,10 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/** 
- * 
- * @author vincenzoingenito 
- */ 
 @Service
 @Slf4j
 public class LoggerHelper {
