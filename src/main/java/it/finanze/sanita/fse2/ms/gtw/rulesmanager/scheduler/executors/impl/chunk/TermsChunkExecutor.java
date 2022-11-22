@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
 
 import static com.mongodb.client.model.Updates.set;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
@@ -263,10 +264,13 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
-    protected List<Map.Entry<String, IActionStepEDS>> getCustomSteps() {
-        // Add additional handlers
-        return Collections.singletonList(new SimpleImmutableEntry<>(
+    protected List<Entry<String, IActionStepEDS>> getCustomSteps() {
+        // Create list
+        List<Entry<String, IActionStepEDS>> hnd = new ArrayList<>();
+        hnd.add(new SimpleImmutableEntry<>(
             TermActionEDS.ON_CS_SYNC, this::onCodeSystemSync
         ));
+        // Add additional handlers
+        return hnd;
     }
 }
