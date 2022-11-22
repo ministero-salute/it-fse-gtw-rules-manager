@@ -50,7 +50,7 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     private TerminologyQuery query;
 
     @Autowired
-    private ICodeSystemVersionSRV codeSystemVersionSRV;
+    private ICodeSystemVersionSRV csv;
 
     private ChangeSetChunkDTO snapshot;
 
@@ -246,7 +246,7 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         ActionRes res = KO;
         try {
             // Execute syncing
-            codeSystemVersionSRV.syncCodeSystemVersions();
+            csv.syncCodeSystemVersions();
             // Set flag
             res = OK;
         }catch (Exception ex) {
