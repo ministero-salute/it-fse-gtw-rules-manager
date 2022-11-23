@@ -78,7 +78,7 @@ public class InvokeEDSClientScheduler {
 			() -> dictionary.onRecovery()
 		);
 		terminology.setOnSuccessSwap(
-			() -> dictionary.onClean().toCallback()
+			() -> dictionary.onCleanBackup().toCallback()
 		);
 	}
  

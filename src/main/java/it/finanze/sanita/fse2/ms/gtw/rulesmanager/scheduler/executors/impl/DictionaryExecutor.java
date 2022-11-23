@@ -30,23 +30,26 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
 
     @Override
     public ActionRes onClean() {
-        // Execute clean by super-class
-        ActionRes res = super.onClean();
-        // Keep going
-        if(res == OK) {
-            // Drop previous staging collection if exists
-            log.debug("[{}] Dropping previous branch for backup if exists", getConfig().getTitle());
-            try {
-                // Drop it
-                getBridge().getRepository().drop(getConfig().getBackup());
-            } catch (EdsDbException ex) {
-                log.error(
-                    format("[%s] Unable to drop previous backup collection", getConfig().getTitle()),
-                    ex
-                );
-                // Set flag
-                res = KO;
-            }
+        // Delete staging if exists, then move on back-up.
+        // If staging is erroneous it exits, otherwise returns the back-up returned value.
+        return super.onClean() == OK ? onCleanBackup() : KO;
+    }
+
+    public ActionRes onCleanBackup() {
+        // Working var
+        ActionRes res = KO;
+        // Drop previous staging collection if exists
+        log.debug("[{}] Dropping previous branch for backup if exists", getConfig().getTitle());
+        try {
+            // Drop it
+            getBridge().getRepository().drop(getConfig().getBackup());
+            // Set flag
+            res = OK;
+        } catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to drop previous backup collection", getConfig().getTitle()),
+                ex
+            );
         }
         return res;
     }
