@@ -266,6 +266,8 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             } else {
                 // Log me
                 log.debug("[{}] Pre-swap operation failure", getConfig().getTitle());
+                // Remove staging
+                onClean();
             }
         }else{
             res = super.onSwap();
