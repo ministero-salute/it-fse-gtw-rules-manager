@@ -47,3 +47,8 @@ kafka.log.base-topic
 kafka.producer.client-id
 kafka.bootstrap-servers
 ms.url.gtw-config
+
+23/11/2022
+Removed:
+eds.changeset.terminology.status
+eds.changeset.terminology.data
