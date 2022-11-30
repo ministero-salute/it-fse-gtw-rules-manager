@@ -25,15 +25,19 @@ public class CodeSystemVersionSRV implements ICodeSystemVersionSRV {
 	private ITerminologyRepo repository;
 	
 	@Override
-	public void syncCodeSystemVersions(String terminology, MongoCollection<Document> dictionary) throws EdsDbException {
+	public int syncCodeSystemVersions(String terminology, MongoCollection<Document> dictionary) throws EdsDbException {
 		// Retrieve data
 		List<Document> dictionaries = getDictionaries(terminology);
 		// Execute insertion
-		try {
-			dictionary.insertMany(dictionaries);
-		} catch(MongoException ex) {
-			throw new EdsDbException("Unable to sync code-system versions" , ex);
+		// Note: We need to check dictionaries.size() because insertMany() does not allow empty lists
+		if(!dictionaries.isEmpty()) {
+			try {
+				dictionary.insertMany(dictionaries);
+			} catch(MongoException ex) {
+				throw new EdsDbException("Unable to sync code-system versions" , ex);
+			}
 		}
+		return dictionaries.size();
 	}
 
 	private List<Document> getDictionaries(String repository) throws EdsDbException {

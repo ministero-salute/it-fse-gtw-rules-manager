@@ -79,13 +79,18 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
         log.debug("[{}] Start processing data on staging", getConfig().getTitle());
         try {
             // Sync
-            csv.syncCodeSystemVersions(
+            int docs = csv.syncCodeSystemVersions(
                 getConfig().getParent().getStaging(),
                 getCollection()
             );
+            // Emptiness check
+            if(docs == 0) {
+                log.debug("[{}] Skipping processing because no dictionaries were found", getConfig().getTitle());
+            } else {
+                log.debug("[{}] Operations have been applied on staging", getConfig().getTitle());
+            }
             // Set flag
             res = OK;
-            log.debug("[{}] Operations have been applied on staging", getConfig().getTitle());
         }catch (Exception ex) {
             log.error(
                 format("[%s] Unable to process collection due to unknown error", getConfig().getTitle()),
@@ -143,7 +148,7 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
             }
             // Set flag
             res = OK;
-            log.debug("[{}] Creating backup branch", getConfig().getTitle());
+            log.debug("[{}] Backup branch has been created", getConfig().getTitle());
         } catch (EdsDbException ex) {
             log.error(
                 format("[%s] Unable to duplicate collection", getConfig().getTitle()),

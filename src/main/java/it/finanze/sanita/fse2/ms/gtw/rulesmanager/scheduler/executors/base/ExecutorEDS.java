@@ -13,8 +13,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionBuilde
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IDocumentHandlerEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IExecutableEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import lombok.Getter;
@@ -35,7 +33,7 @@ import static java.lang.String.format;
 @Slf4j
 @Getter
 @Setter
-public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecutableEDS {
+public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecutableEDS, IRecoverableEDS {
 
     private ChangesetCFG config;
     private BridgeEDS bridge;
@@ -54,6 +52,10 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         return ActionEDS.defaults();
     }
 
+    protected String[] getRecoverySteps() {
+        return ActionEDS.recovery();
+    }
+
     // TO IMPLEMENT BY THE CALLER
     protected ParameterizedTypeReference<ChangeSetDTO<T>> getType() {
         throw new UnsupportedOperationException("getType() is not implemented!");
@@ -62,17 +64,29 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     // HANDLERs
     @Override
     public ActionRes execute() {
-
-        final Date startingDate = new Date();
         log.debug("[{}] Starting updating process", config.getTitle());
+        ActionRes res = startup(getSteps());
+        log.debug("[{}] Ending updating process", config.getTitle());
+        return res;
+    }
+    @Override
+    public ActionRes recovery() {
+        log.debug("[{}] Starting recovery process", config.getTitle());
+        ActionRes res = startup(getRecoverySteps());
+        log.debug("[{}] Ending recovery process", config.getTitle());
+        return res;
+    }
+
+    private ActionRes startup(String[] steps) {
+
+        Date timestamp = new Date();
 
         // Register additional handlers if necessary
         if(!getCustomSteps().isEmpty()) registerAdditionalHandlers();
 
-        ActionBuilderEDS builder = ActionBuilderEDS.builder();
-        String[] steps = getSteps();
-
         // Add to builder
+        ActionBuilderEDS builder = ActionBuilderEDS.builder();
+
         for(String step: steps) {
             // Verify handler is available
             if(!mappers.containsKey(step)) {
@@ -84,17 +98,13 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Execute
         ActionRes res = builder.execute((name, status) -> {
             if (status == ActionRes.KO)  {
-                bridge.getLogger().error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, startingDate);
+                bridge.getLogger().error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
             }
         });
 
         if (res == ActionRes.OK) {
-            bridge.getLogger().info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, startingDate);
+            bridge.getLogger().info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
         }
-        
-        // Log me
-        log.debug("[{}] Ending updating process", config.getTitle());
-        // Bye
         return res;
     }
 
@@ -107,7 +117,9 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(CLEAN, this::onClean);
         mapper.put(CHANGESET_PROD, this::onChangesetProd);
         mapper.put(CHANGESET_EMPTY, this::onChangesetEmpty);
+        mapper.put(CHANGESET_RECOVERY, this::onChangesetRecovery);
         mapper.put(STAGING, this::onStaging);
+        mapper.put(STAGING_RECOVERY, this::onStagingRecovery);
         mapper.put(PROCESSING, this::onProcessing);
         mapper.put(VERIFY, this::onVerify);
         mapper.put(SYNC, this::onSync);
@@ -300,11 +312,18 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         this.operations = null;
         return ActionRes.OK;
     }
+    // === RECOVERY ===
+    protected ActionRes onChangesetRecovery() {
+        return onChangeset(() -> null);
+    }
+    protected ActionRes onStagingRecovery() {
+        return emptyStaging();
+    }
     // === ACTIONS ===
     protected ActionRes emptyStaging() {
         // Working var
         ActionRes res = KO;
-        log.debug("[{}] Database seems empty, using new collection as staging", config.getTitle());
+        log.debug("[{}] Creating new empty collection as staging", config.getTitle());
         try {
             // Assign the collection
             collection = bridge.getRepository().create(config.getStaging());

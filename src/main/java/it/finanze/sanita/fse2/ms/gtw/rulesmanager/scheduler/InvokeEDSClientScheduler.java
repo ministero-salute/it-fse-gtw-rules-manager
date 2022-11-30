@@ -5,6 +5,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryRecoveryOnException;
 import static java.lang.String.format;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ public class InvokeEDSClientScheduler {
 
 	@Autowired
 	private DictionaryExecutor dictionary;
-	 
-	
+
+
 	@Async
 	@EventListener(ApplicationStartedEvent.class)
 	void initialize() {
@@ -65,7 +66,7 @@ public class InvokeEDSClientScheduler {
 		}
 	}
 
-	
+
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() { 
@@ -100,6 +101,11 @@ public class InvokeEDSClientScheduler {
 			// Log if went wrong
 			if (exec == KO) {
 				log.error(format("[EDS] Unable to update the %s collection", config.getTitle()));
+				// Init recovery sequence
+				ActionRes recovery = retryRecoveryOnException(executorEDS, log);
+				if(recovery == KO) {
+					log.error(format("[EDS] Unable to recover the %s collection", config.getTitle()));
+				}
 			}
 		}
 	}

@@ -26,11 +26,13 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.AbstractMap;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Updates.set;
@@ -148,10 +150,17 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             // Insert into db if request didn't fail
             if(res == OK) {
                 try {
-                    // Insert
-                    InsertManyResult status = staging.insertMany(query.getUpsertQueries(dto.get().getDocuments()));
-                    // Calculate insertions
-                    process = status.getInsertedIds().size();
+                    // Retrieve docs
+                    List<Document> docs = query.getUpsertQueries(dto.get().getDocuments());
+                    // Note: We need to check docs.size() because insertMany() does not allow empty lists
+                    if(!docs.isEmpty()) {
+                        // Insert
+                        InsertManyResult status = staging.insertMany(docs);
+                        // Calculate insertions
+                        process = status.getInsertedIds().size();
+                    } else {
+                        log.debug("[{}][Insert] Skipping empty chunk with index {}", getConfig().getTitle(), chunk);
+                    }
                 }catch (MongoException ex) {
                     log.error(
                         format("[EDS][%s] Unable to insert chunk documents", getConfig().getTitle()),
@@ -189,9 +198,17 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             // Delete docs if request didn't fail
             if(res == OK) {
                 try {
-                    UpdateResult result = staging.updateMany(query.getDeleteQueries(dto.get().getDocuments()), set("deleted", true)); 
-                    // Calculate deletions
-                    process = (int) result.getModifiedCount(); 
+                    // Retrieve docs
+                    List<String> docs = dto.get().getDocuments();
+                    // Note: We check docs.size() just to be sure updateMany() is not going to be an empty stmt
+                    if(!docs.isEmpty()) {
+                        // Execute
+                        UpdateResult result = staging.updateMany(query.getDeleteQueries(docs), set("deleted", true));
+                        // Calculate deletions
+                        process = (int) result.getModifiedCount();
+                    } else {
+                        log.debug("[{}][Delete] Skipping empty chunk with index {}", getConfig().getTitle(), chunk);
+                    }
                 }catch (MongoException ex) {
                     log.error(
                         format("[EDS][%s] Unable to delete chunk documents", getConfig().getTitle()),

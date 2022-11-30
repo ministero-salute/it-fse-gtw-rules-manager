@@ -68,4 +68,31 @@ public final class ActionEDS {
         };
     }
 
+    /**
+     * Retrieve changeset using null value (reset)
+     */
+    public static final String CHANGESET_RECOVERY = "CHANGESET_RECOVERY";
+    /**
+     * Creates an empty staging collection
+     */
+    public static final String STAGING_RECOVERY = "STAGING_RECOVERY";
+    // We are skipping the empty check because if the remote instance
+    // is empty we want the production collection to be like it.
+    // We are also skipping the staging cloning process because
+    // we want to start from a brand-new collection.
+    public static String[] recovery() {
+        return new String[]{
+            RESET,
+            CLEAN,
+            CHANGESET_RECOVERY,
+            STAGING_RECOVERY,
+            PROCESSING,
+            VERIFY,
+            SYNC,
+            CHANGESET_STAGING,
+            CHANGESET_ALIGNMENT,
+            SWAP
+        };
+    }
+
 }

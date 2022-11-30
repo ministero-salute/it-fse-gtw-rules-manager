@@ -1,12 +1,13 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base;
 
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.base.BaseSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import org.bson.Document;
 
 import java.util.List;
