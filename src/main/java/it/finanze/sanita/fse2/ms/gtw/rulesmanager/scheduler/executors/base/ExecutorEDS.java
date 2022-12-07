@@ -64,15 +64,33 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     // HANDLERs
     @Override
     public ActionRes execute() {
+        // Working var
+        ActionRes res = KO;
         log.debug("[{}] Starting updating process", config.getTitle());
-        ActionRes res = startup(getSteps());
+        try {
+            res = startup(getSteps());
+        }catch (Exception ex) {
+            log.error(
+                format("[%s] Unable to properly quit execute() at runtime", config.getTitle()),
+                ex
+            );
+        }
         log.debug("[{}] Ending updating process", config.getTitle());
         return res;
     }
     @Override
     public ActionRes recovery() {
+        // Working var
+        ActionRes res = KO;
         log.debug("[{}] Starting recovery process", config.getTitle());
-        ActionRes res = startup(getRecoverySteps());
+        try {
+            res = startup(getRecoverySteps());
+        }catch (Exception ex) {
+            log.error(
+                format("[%s] Unable to properly quit recovery() at runtime", config.getTitle()),
+                ex
+            );
+        }
         log.debug("[{}] Ending recovery process", config.getTitle());
         return res;
     }
