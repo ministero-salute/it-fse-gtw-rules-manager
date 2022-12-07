@@ -25,6 +25,8 @@ public abstract class ChangesetCFG {
 
     public static final String BACKUP_QUALIFIER = "-backup";
 
+    public static final String PARENT_SEPARATOR = "|";
+
     public static final int RETRY_VALUE = 3;
 
     private final String title;
@@ -35,7 +37,7 @@ public abstract class ChangesetCFG {
     private final ChangesetCFG parent;
 
     protected ChangesetCFG(String status, String data, String production) {
-        this.title = production.substring(0, 1).toUpperCase() + production.substring(1);
+        this.title = capitalize(production);
         this.production = production;
         this.staging = production + STAGING_QUALIFIER;
         this.statusURL = status;
@@ -44,12 +46,16 @@ public abstract class ChangesetCFG {
     }
 
     protected ChangesetCFG(String status, String data, String production, ChangesetCFG parent) {
-        this.title = production.substring(0, 1).toUpperCase() + production.substring(1);
+        this.title = String.format("%s %s %s", parent.getTitle(), PARENT_SEPARATOR, capitalize(production));
         this.production = production;
         this.staging = production + STAGING_QUALIFIER;
         this.statusURL = status;
         this.dataURL = data;
         this.parent = parent;
+    }
+
+    private String capitalize(String value) {
+        return value.substring(0, 1).toUpperCase() + value.substring(1);
     }
 
     public ChangesetCFG getParent() {
