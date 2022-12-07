@@ -25,5 +25,7 @@ public class ChangeSetChunkDTO {
 
     private ChunksDTO chunks;
 
-    private int totalNumberOfElements;
+    private long totalNumberOfElements;
+
+    private long collectionSize;
 }

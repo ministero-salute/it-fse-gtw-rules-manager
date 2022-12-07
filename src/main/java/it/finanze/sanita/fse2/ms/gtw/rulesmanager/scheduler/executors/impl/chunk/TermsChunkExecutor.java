@@ -225,6 +225,31 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
+    protected ActionRes onVerifySize() {
+        ActionRes res = KO;
+        log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
+        try {
+            // Retrieve current size (after performing operations)
+            long size = getBridge().getRepository().countActiveDocuments(getCollection());
+            // Verify match
+            if(snapshot.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", getConfig().getTitle());
+                // Set flag
+                res = OK;
+            }else {
+                log.warn("[{}] Verification failure", getConfig().getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify collection size", getConfig().getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+
+    @Override
     protected ActionRes onSync() {
         ActionRes res = KO;
         log.debug("[{}] Syncing documents at {}",

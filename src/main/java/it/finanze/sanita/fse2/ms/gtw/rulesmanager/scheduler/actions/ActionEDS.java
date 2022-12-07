@@ -40,6 +40,10 @@ public final class ActionEDS {
      */
     public static final String VERIFY = "VERIFY";
     /**
+     * Verify collection size is the expected one
+     */
+    public static final String VERIFY_SIZE = "VERIFY_SIZE";
+    /**
      * Call the changeset to check if anything has been updated recently (after processing usually)
      */
     public static final String CHANGESET_ALIGNMENT = "CHANGESET_ALIGNMENT";
@@ -61,6 +65,7 @@ public final class ActionEDS {
             STAGING,
             PROCESSING,
             VERIFY,
+            VERIFY_SIZE,
             SYNC,
             CHANGESET_STAGING,
             CHANGESET_ALIGNMENT,

@@ -122,11 +122,11 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(STAGING_RECOVERY, this::onStagingRecovery);
         mapper.put(PROCESSING, this::onProcessing);
         mapper.put(VERIFY, this::onVerify);
+        mapper.put(VERIFY_SIZE, this::onVerifySize);
         mapper.put(SYNC, this::onSync);
         mapper.put(CHANGESET_STAGING, this::onChangesetStaging);
         mapper.put(CHANGESET_ALIGNMENT, this::onChangesetAlignment);
         mapper.put(SWAP, this::onSwap);
-
         return mapper;
     }
 
@@ -179,12 +179,34 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         return res;
     }
     protected ActionRes onChangesetEmpty() {
-        ActionRes res = OK;
+        // Working var
+        ActionRes res = KO;
+        // Verify emptiness
         if (this.changeset.getTotalNumberOfElements() == 0) {
-            // Set the flag
-            res = EXIT;
             // Log me
-            log.debug("[{}] Changeset is empty, quitting ...", config.getTitle());
+            log.debug("[{}] Changeset is empty", config.getTitle());
+            try {
+                log.debug("[{}] Verifying production matches size", config.getTitle());
+                // Retrieve current size
+                long size = bridge.getRepository().countActiveDocuments(config.getProduction());
+                // Verify match
+                if(changeset.getCollectionSize() == size) {
+                    log.debug("[{}] Verification success", config.getTitle());
+                    // Set flag
+                    res = EXIT;
+                }else {
+                    log.warn("[{}] Verification failure", config.getTitle());
+                }
+                log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
+            }catch (EdsDbException ex) {
+                log.error(
+                    format("[%s] Unable to verify if production matches expected size", config.getTitle()),
+                    ex
+                );
+            }
+        }else {
+            // Changeset is not empty
+            res = OK;
         }
         return res;
     }
@@ -238,8 +260,30 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         } else {
             log.warn("[{}] Verification failure", config.getTitle());
         }
-        log.debug("[{}] Expecting {}", config.getTitle(), operations.getExpectedInfo());
-        log.debug("[{}] Got {}", config.getTitle(), operations.getInfo());
+        log.debug("[{}] Expecting {} | Got {}", config.getTitle(), operations.getExpectedInfo(), operations.getInfo());
+        return res;
+    }
+    protected ActionRes onVerifySize() {
+        ActionRes res = KO;
+        log.debug("[{}] Verifying staging matches size", config.getTitle());
+        try {
+            // Retrieve current size (after performing operations)
+            long size = bridge.getRepository().countActiveDocuments(collection);
+            // Verify match
+            if(changeset.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", config.getTitle());
+                // Set flag
+                res = OK;
+            }else {
+                log.warn("[{}] Verification failure", config.getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify collection size", config.getTitle()),
+                ex
+            );
+        }
         return res;
     }
     protected ActionRes onSwap() {

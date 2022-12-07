@@ -7,6 +7,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import com.mongodb.MongoNamespace;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.RenameCollectionOptions;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_DELETED;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_LAST_SYNC;
 
 @Repository
@@ -157,6 +159,37 @@ public class ExecutorRepo implements IExecutorRepo {
         }catch (MongoException e) {
             throw new EdsDbException("Unable to add last_sync field on the given collection", e);
         }
+    }
+
+    @Override
+    public long countActiveDocuments(MongoCollection<Document> src) throws EdsDbException {
+        long size;
+        try {
+            size = src.countDocuments(
+                Filters.ne(FIELD_DELETED, true)
+            );
+        }catch (MongoException e) {
+            throw new EdsDbException("Unable to count document inside collection", e);
+        }
+        return size;
+    }
+
+    @Override
+    public long countActiveDocuments(String src) throws EdsDbException {
+        long size;
+        try {
+            // We are using getCollection because it may not exist,
+            // at the same time we don't want to enforce an exists() check
+            // because it may be legit. For example, when you run rules manager on
+            // an empty database, the changeset will return empty and if it's
+            // the first iteration there won't be any production collection yet
+            size = mongo.getCollection(src).countDocuments(
+                Filters.ne(FIELD_DELETED, true)
+            );
+        }catch (MongoException e) {
+            throw new EdsDbException("Unable to count document inside collection", e);
+        }
+        return size;
     }
 
 }
