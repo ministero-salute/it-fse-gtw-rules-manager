@@ -182,7 +182,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         ActionRes res = OK;
         if (this.changeset.getTotalNumberOfElements() == 0) {
             // Set the flag
-            res = EMPTY;
+            res = EXIT;
             // Log me
             log.debug("[{}] Changeset is empty, quitting ...", config.getTitle());
         }

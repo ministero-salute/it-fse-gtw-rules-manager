@@ -9,16 +9,16 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.Callbac
 public enum ActionRes {
     OK,
     KO,
-    EMPTY;
+    EXIT;
     public enum CallbackRes {
         CB_OK,
         CB_KO
     }
 
     /**
-     * @return Convert the current action as a callback treating the EMPTY flag as positive
+     * @return Convert the current action as a callback treating the EXIT flag as positive
      */
     public CallbackRes toCallback() {
-        return this == OK || this == EMPTY ? CB_OK : CB_KO;
+        return this == OK || this == EXIT ? CB_OK : CB_KO;
     }
 }

@@ -94,7 +94,7 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         ActionRes res = OK;
         if (this.snapshot.getTotalNumberOfElements() == 0) {
             // Set the flag
-            res = EMPTY;
+            res = EXIT;
             // Log me
             log.debug("[{}] Changeset is empty, quitting ...", getConfig().getTitle());
         }
