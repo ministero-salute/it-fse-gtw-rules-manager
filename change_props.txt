@@ -9,9 +9,6 @@ eds.url-config-items
 
 23/09/2022
 Added:
-# XSL
-eds.changeset.xsl.status=http://localhost:9086/v1/changeset/xslt/status
-eds.changeset.xsl.data=http://localhost:9086/v1/xslt/id/
 # Terminology
 eds.changeset.terminology.status=http://localhost:9088/v1/changeset/terminology/status
 eds.changeset.terminology.data=http://localhost:9088/v1/terminology/id/

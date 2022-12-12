@@ -22,7 +22,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.Dicti
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.XslExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +42,6 @@ public class InvokeEDSClientScheduler {
 
 	@Autowired
 	private SchematronExecutor schematron;
-
-	@Autowired
-	private XslExecutor xsl;
 
 	@Autowired
 	private TermsChunkExecutor terminology;
@@ -75,7 +71,7 @@ public class InvokeEDSClientScheduler {
 		// Setup executors
 		setup();
 		// Run executors
-		start(schema, schematron, xsl, terminology, fhir);
+		start(schema, schematron, terminology, fhir);
 		// Log me
 		log.info("[EDS] Updating process completed");
 	}

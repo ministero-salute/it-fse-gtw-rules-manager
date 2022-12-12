@@ -26,13 +26,10 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO.Schematron;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.XslDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.XslDTO.Xsl;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchematronQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.XslQuery;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
@@ -46,9 +43,6 @@ public class EDSEntityTest {
 	
 	@Autowired
 	public SchematronQuery schematronQuery; 
-	
-	@Autowired
-	public XslQuery xslQuery; 
 
 	@Autowired
 	public TerminologyQuery terminologyQuery; 
@@ -144,32 +138,6 @@ public class EDSEntityTest {
 		assertDoesNotThrow(() -> schematronQuery.getComparatorQuery(documentDto)); 
 	
 	} 
-	
-	@Test
-	void getUpsertQueryXslTest() {
-		XslDTO dto = new XslDTO(); 
-		Xsl xsl = new Xsl(); 
-		xsl.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		xsl.setNameXslTransform("testFilenameDefinition");
-		xsl.setTemplateIdRoot("testidRoot"); 
-		xsl.setVersion("1.0"); 
-		xsl.setContentXslTransform("SGVsbG8gV29ybGQ="); 
-		xsl.setLastUpdateDate(new Date()); 
-		
-		dto.setSpanID("spanID");
-		dto.setTraceID("traceID"); 
-		dto.setDocument(xsl); 
-		
-		Document documentDto = xslQuery.getUpsertQuery(dto); 
-		
-		assertEquals(Document.class, documentDto.getClass()); 
-		assertEquals(Document.class, xslQuery.getFilterQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		assertEquals(Document.class, xslQuery.getDeleteQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		
-		assertDoesNotThrow(() -> xslQuery.getComparatorQuery(documentDto)); 
-	
-	} 
-	
 	
 	@Test
 	void getUpsertQuerySchemaTest() {

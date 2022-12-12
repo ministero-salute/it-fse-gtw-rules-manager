@@ -39,14 +39,6 @@ public class CollectionNaming {
         return Constants.Collections.TERMINOLOGY;
     }
 
-    @Bean("xslTransformBean")
-    public String getXslTransformCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.XSL_TRANSFORM;
-        }
-        return Constants.Collections.XSL_TRANSFORM;
-    }
-
     @Bean("structuresBean")
     public String getStructuresCollection() {
         if (profileUtility.isTestProfile()) {
