@@ -84,8 +84,6 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-        // Changeset is empty, it should quit
-        assertEquals(EXIT, executor.onChangesetEmpty());
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0, 10));
         // Changeset is not empty, it should be OK
