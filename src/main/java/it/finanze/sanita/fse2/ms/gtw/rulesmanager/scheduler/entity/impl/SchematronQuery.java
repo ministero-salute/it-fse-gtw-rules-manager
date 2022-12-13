@@ -28,8 +28,8 @@ public class SchematronQuery implements IQueryEDS<SchematronDTO> {
         // Create
         return new org.bson.Document()
             .append(FIELD_ID, new ObjectId(schematron.getId()))
-            .append(FIELD_FILENAME, schematron.getNameSchematron())
-            .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schematron.getContentSchematron())))
+            .append(FIELD_FILENAME, schematron.getName())
+            .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schematron.getContent())))
             .append(VERSION, schematron.getVersion())
             .append(FIELD_ROOT, schematron.getTemplateIdRoot())
             .append(FIELD_LAST_UPDATE, schematron.getLastUpdateDate())

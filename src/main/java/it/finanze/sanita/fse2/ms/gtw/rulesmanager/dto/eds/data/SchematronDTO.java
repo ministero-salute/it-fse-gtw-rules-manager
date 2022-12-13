@@ -28,9 +28,9 @@ public class SchematronDTO {
         @JsonProperty
         private String id;
         @JsonProperty
-        private String nameSchematron;
+        private String name;
         @JsonProperty
-        private String contentSchematron;
+        private String content;
         @JsonProperty
         private String version;
         @JsonProperty

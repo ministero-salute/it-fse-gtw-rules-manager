@@ -119,10 +119,10 @@ public class EDSEntityTest {
 		SchematronDTO dto = new SchematronDTO(); 
 		Schematron schematron = new Schematron(); 
 		schematron.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		schematron.setNameSchematron("testFilenameDefinition");
+		schematron.setName("testFilenameDefinition");
 		schematron.setTemplateIdRoot("testidRoot"); 
 		schematron.setVersion("1.0"); 
-		schematron.setContentSchematron("SGVsbG8gV29ybGQ="); 
+		schematron.setContent("SGVsbG8gV29ybGQ="); 
 		schematron.setLastUpdateDate(new Date()); 
 		
 		dto.setSpanID("spanID");
