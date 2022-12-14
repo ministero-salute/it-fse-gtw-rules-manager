@@ -91,12 +91,34 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
 
     @Override
     protected ActionRes onChangesetEmpty() {
-        ActionRes res = OK;
+        // Working var
+        ActionRes res = KO;
+        // Verify emptiness
         if (this.snapshot.getTotalNumberOfElements() == 0) {
-            // Set the flag
-            res = EXIT;
             // Log me
-            log.debug("[{}] Changeset is empty, quitting ...", getConfig().getTitle());
+            log.debug("[{}] Changeset is empty", getConfig().getTitle());
+            try {
+                log.debug("[{}] Verifying production matches size", getConfig().getTitle());
+                // Retrieve current size
+                long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+                // Verify match
+                if(snapshot.getCollectionSize() == size) {
+                    log.debug("[{}] Verification success", getConfig().getTitle());
+                    // Set flag
+                    res = EXIT;
+                }else {
+                    log.warn("[{}] Verification failure", getConfig().getTitle());
+                }
+                log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+            }catch (EdsDbException ex) {
+                log.error(
+                    format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
+                    ex
+                );
+            }
+        }else {
+            // Changeset is not empty
+            res = OK;
         }
         return res;
     }
