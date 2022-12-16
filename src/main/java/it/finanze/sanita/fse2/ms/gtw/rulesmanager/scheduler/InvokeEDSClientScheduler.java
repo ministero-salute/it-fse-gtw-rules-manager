@@ -70,7 +70,7 @@ public class InvokeEDSClientScheduler {
 		// Setup executors
 		setup();
 		// Run executors
-		start(schema);
+		start(schema, schematron, terminology, fhir);
 		// Log me
 		log.info("[EDS] Updating process completed");
 	}
