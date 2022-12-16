@@ -30,7 +30,7 @@ public class SchematronQuery implements IQueryEDS<SchematronDTO> {
             .append(FIELD_ID, new ObjectId(schematron.getId()))
             .append(FIELD_FILENAME, schematron.getName())
             .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schematron.getContent())))
-            .append(VERSION, schematron.getVersion())
+            .append(FIELD_VERSION, schematron.getVersion())
             .append(FIELD_ROOT, schematron.getTemplateIdRoot())
             .append(FIELD_LAST_UPDATE, schematron.getLastUpdateDate())
             .append(FIELD_DELETED, false);
@@ -70,7 +70,7 @@ public class SchematronQuery implements IQueryEDS<SchematronDTO> {
             .append(FIELD_ID, doc.getObjectId(FIELD_ID))
             .append(FIELD_FILENAME, doc.getString(FIELD_FILENAME))
             .append(FIELD_CONTENT, doc.get(FIELD_CONTENT, Binary.class))
-            .append(VERSION, doc.getString(VERSION))
+            .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
             .append(FIELD_ROOT, doc.getString(FIELD_ROOT))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
             .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
