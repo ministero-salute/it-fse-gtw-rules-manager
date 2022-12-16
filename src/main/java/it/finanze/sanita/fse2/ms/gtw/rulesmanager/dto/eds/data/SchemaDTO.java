@@ -21,13 +21,7 @@ public class SchemaDTO {
     @JsonProperty
     private String spanID;
     @JsonProperty
-    private Payload data;
-
-    @Data
-    public static class Payload {
-        @JsonProperty
-        private Schema document;
-    }
+    private Schema document;
 
     @Data
     public static class Schema {

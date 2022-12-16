@@ -25,7 +25,7 @@ public class SchemaQuery implements IQueryEDS<SchemaDTO> {
     @Override
     public Document getUpsertQuery(SchemaDTO dto) {
         // Get data
-        SchemaDTO.Schema schema = dto.getData().getDocument();
+        SchemaDTO.Schema schema = dto.getDocument();
         // Create
         return new org.bson.Document()
             .append(FIELD_ID, new ObjectId(schema.getId()))

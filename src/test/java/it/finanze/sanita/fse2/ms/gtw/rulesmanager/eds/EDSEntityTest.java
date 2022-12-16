@@ -3,24 +3,8 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Date;
-
-import org.bson.Document;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Payload;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO.Schematron;
@@ -30,6 +14,17 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyE
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchematronQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
@@ -148,14 +143,11 @@ public class EDSEntityTest {
 		schema.setRootSchema(true); 
 		schema.setTypeIdExtension("extension");  
 		schema.setContentSchema("SGVsbG8gV29ybGQ=");
-		schema.setLastUpdateDate(new Date()); 
-		
-		Payload payload = new Payload(); 
-		payload.setDocument(schema); 
+		schema.setLastUpdateDate(new Date());
 		
 		dto.setSpanID("spanID");
 		dto.setTraceID("traceID"); 
-		dto.setData(payload); 
+		dto.setDocument(schema);
 		
 		Document documentDto = schemaQuery.getUpsertQuery(dto); 
 		

@@ -3,18 +3,6 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryRecoveryOnException;
-import static java.lang.String.format;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
@@ -26,6 +14,17 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryRecoveryOnException;
+import static java.lang.String.format;
 
 /**
  * Invoke EDS Client Scheduler, handles the invocations to EDS Client endpoints.
@@ -71,7 +70,7 @@ public class InvokeEDSClientScheduler {
 		// Setup executors
 		setup();
 		// Run executors
-		start(schema, schematron, terminology, fhir);
+		start(schema);
 		// Log me
 		log.info("[EDS] Updating process completed");
 	}
