@@ -6,19 +6,24 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.*;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.DictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryRecoveryOnException;
 import static java.lang.String.format;
 
 /**
@@ -38,9 +43,6 @@ public class InvokeEDSClientScheduler {
 	private SchematronExecutor schematron;
 
 	@Autowired
-	private XslExecutor xsl;
-
-	@Autowired
 	private TermsChunkExecutor terminology;
 
 	@Autowired
@@ -48,15 +50,18 @@ public class InvokeEDSClientScheduler {
 
 	@Autowired
 	private DictionaryExecutor dictionary;
-	
-	@PostConstruct
-	public void postConstruct() {
+
+
+	@Async
+	@EventListener(ApplicationStartedEvent.class)
+	void initialize() {
 		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
 			log.debug("[EDS] Executing post construct");
 			action();
 		}
 	}
-	
+
+
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
 	public void action() { 
@@ -65,7 +70,7 @@ public class InvokeEDSClientScheduler {
 		// Setup executors
 		setup();
 		// Run executors
-		start(schema, schematron, xsl, terminology, fhir);
+		start(schema, schematron, terminology, fhir);
 		// Log me
 		log.info("[EDS] Updating process completed");
 	}
@@ -91,6 +96,11 @@ public class InvokeEDSClientScheduler {
 			// Log if went wrong
 			if (exec == KO) {
 				log.error(format("[EDS] Unable to update the %s collection", config.getTitle()));
+				// Init recovery sequence
+				ActionRes recovery = retryRecoveryOnException(executorEDS, log);
+				if(recovery == KO) {
+					log.error(format("[EDS] Unable to recover the %s collection", config.getTitle()));
+				}
 			}
 		}
 	}

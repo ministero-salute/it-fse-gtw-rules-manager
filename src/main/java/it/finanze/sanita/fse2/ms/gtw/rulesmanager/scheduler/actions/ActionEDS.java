@@ -40,6 +40,10 @@ public final class ActionEDS {
      */
     public static final String VERIFY = "VERIFY";
     /**
+     * Verify collection size is the expected one
+     */
+    public static final String VERIFY_SIZE = "VERIFY_SIZE";
+    /**
      * Call the changeset to check if anything has been updated recently (after processing usually)
      */
     public static final String CHANGESET_ALIGNMENT = "CHANGESET_ALIGNMENT";
@@ -59,6 +63,34 @@ public final class ActionEDS {
             CHANGESET_PROD,
             CHANGESET_EMPTY,
             STAGING,
+            PROCESSING,
+            VERIFY,
+            VERIFY_SIZE,
+            SYNC,
+            CHANGESET_STAGING,
+            CHANGESET_ALIGNMENT,
+            SWAP
+        };
+    }
+
+    /**
+     * Retrieve changeset using null value (reset)
+     */
+    public static final String CHANGESET_RECOVERY = "CHANGESET_RECOVERY";
+    /**
+     * Creates an empty staging collection
+     */
+    public static final String STAGING_RECOVERY = "STAGING_RECOVERY";
+    // We are skipping the empty check because if the remote instance
+    // is empty we want the production collection to be like it.
+    // We are also skipping the staging cloning process because
+    // we want to start from a brand-new collection.
+    public static String[] recovery() {
+        return new String[]{
+            RESET,
+            CLEAN,
+            CHANGESET_RECOVERY,
+            STAGING_RECOVERY,
             PROCESSING,
             VERIFY,
             SYNC,

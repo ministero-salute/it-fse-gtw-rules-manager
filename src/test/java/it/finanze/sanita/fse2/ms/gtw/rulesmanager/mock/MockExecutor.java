@@ -109,11 +109,12 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             new Date(),
             new ArrayList<>(),
             new ArrayList<>(),
+            0,
             0
         );
     }
 
-    public static ChangeSetDTO<MockData> createChangeset(int insert, int delete) {
+    public static ChangeSetDTO<MockData> createChangeset(int insert, int delete, long size) {
 
         List<BaseSetDTO<MockData>> insertions = new ArrayList<>();
         List<BaseSetDTO<MockData>> deletions = new ArrayList<>();
@@ -132,7 +133,8 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             new Date(),
             insertions,
             deletions,
-            insert + delete
+            insert + delete,
+            size
         );
     }
 

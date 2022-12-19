@@ -30,10 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.Date;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.CONFIG_MONGO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.REPOSITORY;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.SCHEDULER_QUERIES;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.UTILITY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
@@ -87,10 +84,8 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-        // Changeset is empty, it should quit
-        assertEquals(EMPTY, executor.onChangesetEmpty());
         // Provide knowledge
-        when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0));
+        when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0, 10));
         // Changeset is not empty, it should be OK
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
@@ -133,7 +128,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup production
         setupProduction();
         // Setup changeset
-        executor.setChangeset(MockExecutor.createChangeset(10, 1));
+        executor.setChangeset(MockExecutor.createChangeset(10, 1, 9));
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         // Now check size
@@ -155,7 +150,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup production
         setupProduction();
         // Setup changeset
-        executor.setChangeset(MockExecutor.createChangeset(10,1));
+        executor.setChangeset(MockExecutor.createChangeset(10,1, 9));
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         assertEquals(OK, executor.onVerify());
@@ -190,7 +185,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup repository with document
         this.setupTestRepository(executor.getConfig().getStaging());
         // Create
-        ChangeSetDTO<MockData> changeset = createChangeset(10, 1);
+        ChangeSetDTO<MockData> changeset = createChangeset(10, 1, 9);
         // Setup changeset
         executor.setChangeset(changeset);
         // Call it
@@ -208,13 +203,13 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup production
         setupProduction();
         // Create empty changeset
-        ChangeSetDTO<MockData> changeset = createChangeset(0,0);
+        ChangeSetDTO<MockData> changeset = createChangeset(0,0, 0);
         // Set
         executor.setChangeset(changeset);
         // Call it
         assertEquals(OK, executor.onChangesetAlignment());
         // Create changeset
-        changeset = createChangeset(10,3);
+        changeset = createChangeset(10,3, 7);
         // Set
         executor.setChangeset(changeset);
         // Call it

@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * DTO for Change Set status endpoint response.
  *
- *
  */
 @Getter
 @Setter
@@ -40,6 +39,8 @@ public class ChangeSetDTO<T> {
 
     private List<BaseSetDTO<T>> deletions;
 
-    private int totalNumberOfElements;
+    private long totalNumberOfElements;
+
+    private long collectionSize;
 
 }

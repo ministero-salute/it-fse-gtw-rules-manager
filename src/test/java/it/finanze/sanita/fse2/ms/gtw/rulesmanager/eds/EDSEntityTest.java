@@ -3,13 +3,17 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Date;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO.Schematron;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchematronQuery;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -18,21 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Payload;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO.Schematron;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.XslDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.XslDTO.Xsl;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchematronQuery;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.XslQuery;
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
@@ -46,9 +38,6 @@ public class EDSEntityTest {
 	
 	@Autowired
 	public SchematronQuery schematronQuery; 
-	
-	@Autowired
-	public XslQuery xslQuery; 
 
 	@Autowired
 	public TerminologyQuery terminologyQuery; 
@@ -125,10 +114,10 @@ public class EDSEntityTest {
 		SchematronDTO dto = new SchematronDTO(); 
 		Schematron schematron = new Schematron(); 
 		schematron.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		schematron.setNameSchematron("testFilenameDefinition");
+		schematron.setName("testFilenameDefinition");
 		schematron.setTemplateIdRoot("testidRoot"); 
 		schematron.setVersion("1.0"); 
-		schematron.setContentSchematron("SGVsbG8gV29ybGQ="); 
+		schematron.setContent("SGVsbG8gV29ybGQ="); 
 		schematron.setLastUpdateDate(new Date()); 
 		
 		dto.setSpanID("spanID");
@@ -146,32 +135,6 @@ public class EDSEntityTest {
 	} 
 	
 	@Test
-	void getUpsertQueryXslTest() {
-		XslDTO dto = new XslDTO(); 
-		Xsl xsl = new Xsl(); 
-		xsl.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		xsl.setNameXslTransform("testFilenameDefinition");
-		xsl.setTemplateIdRoot("testidRoot"); 
-		xsl.setVersion("1.0"); 
-		xsl.setContentXslTransform("SGVsbG8gV29ybGQ="); 
-		xsl.setLastUpdateDate(new Date()); 
-		
-		dto.setSpanID("spanID");
-		dto.setTraceID("traceID"); 
-		dto.setDocument(xsl); 
-		
-		Document documentDto = xslQuery.getUpsertQuery(dto); 
-		
-		assertEquals(Document.class, documentDto.getClass()); 
-		assertEquals(Document.class, xslQuery.getFilterQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		assertEquals(Document.class, xslQuery.getDeleteQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		
-		assertDoesNotThrow(() -> xslQuery.getComparatorQuery(documentDto)); 
-	
-	} 
-	
-	
-	@Test
 	void getUpsertQuerySchemaTest() {
 		SchemaDTO dto = new SchemaDTO(); 
 		Schema schema = new Schema(); 
@@ -180,14 +143,11 @@ public class EDSEntityTest {
 		schema.setRootSchema(true); 
 		schema.setTypeIdExtension("extension");  
 		schema.setContentSchema("SGVsbG8gV29ybGQ=");
-		schema.setLastUpdateDate(new Date()); 
-		
-		Payload payload = new Payload(); 
-		payload.setDocument(schema); 
+		schema.setLastUpdateDate(new Date());
 		
 		dto.setSpanID("spanID");
 		dto.setTraceID("traceID"); 
-		dto.setData(payload); 
+		dto.setDocument(schema);
 		
 		Document documentDto = schemaQuery.getUpsertQuery(dto); 
 		

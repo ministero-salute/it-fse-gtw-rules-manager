@@ -3,13 +3,12 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data;
 
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Model to save fhir documents
@@ -23,23 +22,30 @@ public class FhirStructuresDTO {
     @JsonProperty
     private String spanID;
     @JsonProperty
-    private List<FhirStructures> maps;
-    @JsonProperty
-    private List<Definition> definitions;
-    @JsonProperty
-    private List<Valueset> valuesets;
-    @JsonProperty
-    private String id;
-    @JsonProperty
-    private Date lastUpdateDate;
-    @JsonProperty
-    private String version;
-    @JsonProperty
-    private String templateIdRoot;
-    @JsonProperty
-    private String rootMap;
-    @JsonProperty
-    private Boolean deleted;
+    private Transform document;
+
+    @Data
+    public static class Transform {
+        @JsonProperty
+        private List<FhirStructures> maps;
+        @JsonProperty
+        private List<Definition> definitions;
+        @JsonProperty
+        private List<Valueset> valuesets;
+        @JsonProperty
+        private String id;
+        @JsonProperty
+        private Date lastUpdateDate;
+        @JsonProperty
+        private String version;
+        @JsonProperty
+        private String templateIdRoot;
+        @JsonProperty
+        private String rootMap;
+        @JsonProperty
+        private Boolean deleted;
+
+    }
 
     @Data
     public static class Valueset {

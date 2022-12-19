@@ -5,6 +5,8 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.IExecutableEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.IRecoverableEDS;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -54,7 +56,27 @@ public interface IActionRetryEDS {
         return res;
     }
 
+    static ActionRes retryRecoveryOnException(IRecoverableEDS executor, Logger log, int times) {
+        // Working var
+        ActionRes res = KO;
+        // Execute
+        for (int i = 0; i <= times && res == KO; i++) {
+            // Invoke
+            res = executor.recovery();
+            // Log me
+            if(res == KO && i != times) {
+                log.error("[Executor][#{}] Restarting recovery due to exception", i + 1);
+            }
+        }
+        // Bye
+        return res;
+    }
+
     static ActionRes retryExecutorOnException(IExecutableEDS executor, Logger log) {
         return retryExecutorOnException(executor, log, RETRY_VALUE);
+    }
+
+    static ActionRes retryRecoveryOnException(IRecoverableEDS executor, Logger log) {
+        return retryRecoveryOnException(executor, log, RETRY_VALUE);
     }
 }

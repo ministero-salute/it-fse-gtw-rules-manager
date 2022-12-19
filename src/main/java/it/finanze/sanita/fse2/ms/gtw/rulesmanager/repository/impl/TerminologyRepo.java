@@ -41,14 +41,16 @@ public class TerminologyRepo implements ITerminologyRepo {
 				)
 				.first(TerminologyETY.FIELD_CODE).as(TerminologyMapDTO.FIELD_CODE)
 				.first(TerminologyETY.FIELD_LAST_UPDATE).as(TerminologyMapDTO.FIELD_CREATION_DATE)
-				.first(TerminologyETY.FIELD_RELEASE_DATE).as(TerminologyMapDTO.FIELD_RELEASE_DATE);
+				.first(TerminologyETY.FIELD_RELEASE_DATE).as(TerminologyMapDTO.FIELD_RELEASE_DATE)
+				.first(TerminologyETY.FIELD_DELETED).as(TerminologyMapDTO.FIELD_DELETED);
 			// Init aggregation pipeline
 			AggregationOperation project = project(
 				TerminologyETY.FIELD_SYSTEM_ID_REF, 
 				TerminologyETY.FIELD_VERSION_ID_REF,
 				TerminologyMapDTO.FIELD_CODE,
 				TerminologyMapDTO.FIELD_CREATION_DATE,
-				TerminologyMapDTO.FIELD_RELEASE_DATE
+				TerminologyMapDTO.FIELD_RELEASE_DATE,
+				TerminologyMapDTO.FIELD_DELETED
 			);
 			// Create aggregation definition
 			Aggregation agg = Aggregation.newAggregation(group, project);

@@ -9,6 +9,6 @@ import org.bson.Document;
 
 public interface ICodeSystemVersionSRV {
 
-    void syncCodeSystemVersions(String terminology, MongoCollection<Document> dictionary) throws EdsDbException;
+    int syncCodeSystemVersions(String terminology, MongoCollection<Document> dictionary) throws EdsDbException;
     
 }

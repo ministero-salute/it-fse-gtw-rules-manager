@@ -17,6 +17,7 @@ public class TerminologyMapDTO {
 	public static final String FIELD_CODE = "code";
 	public static final String FIELD_RELEASE_DATE = "releaseDate";
 	public static final String FIELD_CREATION_DATE = "creationDate";
+	public static final String FIELD_DELETED = "deleted";
 
 	public static final String WHITELIST_FLAG = "#WHITELIST#";
 
@@ -25,6 +26,7 @@ public class TerminologyMapDTO {
 	private String code;
 	private Date releaseDate;
 	private Date creationDate;
+	private boolean deleted;
 
 	public boolean isWhiteList() {
 		return code != null && code.equals(WHITELIST_FLAG);

@@ -59,8 +59,6 @@ public class ConfigClient implements IConfigClient {
                 log.error("Config Client - Error calling Config Client to get Gateway Name");
                 throw new BusinessException("The Config Client has returned an error");
             }
-        } catch (BusinessException be) {
-            throw be;
         } catch (Exception e) {
             throw new BusinessException("Error encountered while retrieving gateway name", e);
         }

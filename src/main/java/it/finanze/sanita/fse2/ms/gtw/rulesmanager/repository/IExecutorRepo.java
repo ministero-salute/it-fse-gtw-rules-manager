@@ -18,4 +18,6 @@ public interface IExecutorRepo {
     MongoCollection<Document> clone(String source, String dest) throws EdsDbException;
     Date getLastSync(String name) throws EdsDbException;
     void sync(String name, Date sync) throws EdsDbException;
+    long countActiveDocuments(MongoCollection<Document> src) throws EdsDbException;
+    long countActiveDocuments(String src) throws EdsDbException;
 }

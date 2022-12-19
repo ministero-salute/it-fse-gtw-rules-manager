@@ -18,7 +18,6 @@ import java.util.Date;
 
 /**
  * Concrete implementation for the eds client interface
- * 
  */
 @Component
 public class EDSClient implements IEDSClient {
