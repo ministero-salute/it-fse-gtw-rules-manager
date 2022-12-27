@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * @since 0.0.1
- */
 public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
 
     /**

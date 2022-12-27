@@ -4,10 +4,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.mongo;
 
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import net.javacrumbs.shedlock.core.LockProvider;
-import net.javacrumbs.shedlock.provider.mongo.MongoLockProvider;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -20,21 +16,20 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.mongo.MongoLockProvider;
 
 
 /**
  * Factory to create database instances
  */
 @Configuration
-@EnableMongoRepositories(basePackages = Constants.ComponentScan.CONFIG_MONGO)
 public class MongoDatabaseCFG {
 
 	@Autowired
 	private MongoPropertiesCFG props;
 
-    @Autowired
-    private ApplicationContext appContext;
 
     /**
      * Creates a new factory instance with the given connection string (properties.yml)
@@ -51,7 +46,7 @@ public class MongoDatabaseCFG {
      */
     @Bean
     @Primary
-    public MongoTemplate createTemplate() {
+    public MongoTemplate createTemplate(ApplicationContext appContext) {
         // Create new connection instance
         MongoDatabaseFactory factory = createFactory(props);
         // Assign application context to mongo

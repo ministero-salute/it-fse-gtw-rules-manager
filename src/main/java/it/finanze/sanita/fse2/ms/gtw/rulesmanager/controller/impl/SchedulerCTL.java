@@ -18,12 +18,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICounterSRV;
 @RestController
 public class SchedulerCTL extends AbstractCTL implements ISchedulerCTL {
 
-	/**
-	 * Serial version uid.
-	 */
-	private static final long serialVersionUID = 3260806709541019186L;
-
-	
 	@Autowired
 	private InvokeEDSClientScheduler edsClientScheduler;
 	

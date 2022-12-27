@@ -14,6 +14,11 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds;
 public class EdsDbException extends Exception {
 
     /**
+	 * Serial version uid.
+	 */
+	private static final long serialVersionUID = 3549009136273681390L;
+
+	/**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by
      * a call to {@link #initCause}.

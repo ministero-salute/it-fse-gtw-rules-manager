@@ -12,9 +12,6 @@ import java.util.Map;
 
 import static org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG;
 
-/**
- * @since 0.0.1
- */
 public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<E> implements AppenderAttachable<E> {
 
     protected String topic = null;
@@ -27,7 +24,7 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     protected boolean appendTimestamp = true;
 
-    protected Map<String,Object> producerConfig = new HashMap<String, Object>();
+    protected Map<String,Object> producerConfig = new HashMap<>();
 
     protected boolean checkPrerequisites() {
         boolean errorFree = true;

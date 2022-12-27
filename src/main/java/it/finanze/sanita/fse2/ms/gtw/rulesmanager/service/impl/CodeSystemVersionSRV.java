@@ -3,24 +3,25 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
+
 @Service
-@Slf4j
 public class CodeSystemVersionSRV implements ICodeSystemVersionSRV {
+	
 	@Autowired
 	private ITerminologyRepo repository;
 	

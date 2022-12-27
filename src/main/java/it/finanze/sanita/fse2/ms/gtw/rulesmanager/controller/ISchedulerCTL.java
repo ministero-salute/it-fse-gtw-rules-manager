@@ -3,8 +3,6 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller;
 
-import java.io.Serializable;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.MediaType;
@@ -21,11 +19,10 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchedulerResponseDTO;
 
 /**
  * Controller test.
- * 
  */
 @RequestMapping(path = "/v1")
 @Tag(name = "Servizio di test")
-public interface ISchedulerCTL extends Serializable {
+public interface ISchedulerCTL {
   
     
     @PostMapping("/run-scheduler")

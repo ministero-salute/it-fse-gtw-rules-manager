@@ -6,10 +6,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-/**
- * Interface for DeliveryStrategies.
- * @since 0.0.1
- */
 public interface DeliveryStrategy {
 
     /**
