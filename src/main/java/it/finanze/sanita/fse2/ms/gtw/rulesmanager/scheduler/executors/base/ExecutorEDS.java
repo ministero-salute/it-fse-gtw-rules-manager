@@ -168,7 +168,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         return new ArrayList<>();
     }
     // === STEPS ===
-    protected IActionFnEDS<Date> onLastUpdateProd() {
+    public IActionFnEDS<Date> onLastUpdateProd() {
         return () -> bridge.getRepository().getLastSync(config.getProduction());
     }
     protected IActionFnEDS<Date> onLastUpdateStaging() {

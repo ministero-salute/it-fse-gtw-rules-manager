@@ -13,6 +13,9 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,9 +37,12 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Compon
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangesetChunk;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangeset;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangesetChunk;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -57,8 +63,11 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     @Autowired
     private MockExecutor executor;
     @Autowired
+    private TermsChunkExecutor chunkExecutor; 
+    @Autowired
     private IExecutorRepo repository;
 
+ 
     @Test
     void clean() {
         // Setup production
@@ -74,18 +83,31 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(OK, executor.onClean());
         // Verify production integrity
         verifyProductionIntegrity();
+        
+        chunkExecutor.onChunkDeletions(); 
     }
+
 
     @Test
     void changeset() throws EdsClientException {
         // Setup production
         setupProduction();
+        executor.createChunks(3, 2, 5); 
+
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
+        //when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangeset());
+        when(client.getChunkIns(any(), any(), anyInt(), any())).thenReturn(emptyChangesetChunk());
+        when(client.getChunkDel(any(), any(), anyInt(), any())).thenReturn(emptyChangesetChunk());
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
+        
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0, 10));
+        //when(client.getSnapshot(any(), any(), any())).thenReturn(createChangesetChunk());
+        when(client.getChunkIns(any(), any(), anyInt(), any())).thenReturn(createChangesetChunk());
+        when(client.getChunkDel(any(), any(), anyInt(), any())).thenReturn(createChangesetChunk());
+
         // Changeset is not empty, it should be OK
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
@@ -96,8 +118,14 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
         // Verify production integrity
         verifyProductionIntegrity();
+        
     }
 
+    @Test
+    void chunkExecutorTest() {
+        chunkExecutor.execute(); 
+    } 
+    
     @Test
     void staging() {
         // Case #1 - Production exists
@@ -129,8 +157,13 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         setupProduction();
         // Setup changeset
         executor.setChangeset(MockExecutor.createChangeset(10, 1, 9));
+        executor.createChunks(3, 2, 5); 
+
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
+        
+        chunkExecutor.onChunkInsertion();
+
         // Now check size
         assertEquals(10, executor.getOperations().getInsertions());
         assertEquals(1, executor.getOperations().getDeletions());
@@ -143,7 +176,8 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(0, executor.getOperations().getOperations());
         // Verify production integrity
         verifyProductionIntegrity();
-    }
+    } 
+    
 
     @Test
     void verify() {

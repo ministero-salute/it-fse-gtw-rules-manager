@@ -3,6 +3,8 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * 
  *
@@ -10,6 +12,16 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
  */
 public final class Constants {
 
+	
+	@Value("${gtw.statusmanager.test.statusUrl}")
+	public static String STATUS_URL; 
+	
+	@Value("${gtw.statusmanager.test.dataUrl}")
+	public static String DATA_URL; 
+	
+	@Value("${gtw.statusmanager.test.mock}")
+	public static String MOCK; 
+	
 	/**
 	 * Path scan.
 	 */

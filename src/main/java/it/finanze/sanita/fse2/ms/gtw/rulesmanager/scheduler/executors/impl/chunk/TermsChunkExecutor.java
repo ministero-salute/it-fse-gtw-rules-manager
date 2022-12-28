@@ -6,12 +6,16 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chun
 import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkDelDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionCallbackEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
@@ -70,11 +74,24 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
-    protected ActionRes onChangeset(IActionFnEDS<Date> hnd) {
+	public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
         Optional<ChangeSetChunkDTO> data;
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
         // Retrieve HTTP request data
+        ChunkChangesetCFG chunkCfg = getConfigAsChunked(); 
+        ChangesetCFG cfg = getConfig(); 
+        IEDSClient client = getBridge().getClient(); 
+        try {
+			ChangeSetChunkDTO resp = client.getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class);
+		} catch (EdsClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+        
         data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);
         // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
