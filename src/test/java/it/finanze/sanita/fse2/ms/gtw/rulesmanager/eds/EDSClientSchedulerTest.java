@@ -6,6 +6,8 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Compon
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.UTILITY;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller.impl.SchedulerCTL;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.InvokeEDSClientScheduler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
@@ -38,11 +41,20 @@ public class EDSClientSchedulerTest {
 	@Autowired
 	public InvokeEDSClientScheduler scheduler; 
 	
+	@Autowired
+	public SchedulerCTL schedulerCtl; 
 	
 	@Test
 	void executeTest()
 	{
 		scheduler.action(); 
+		try{
+			schedulerCtl.runScheduler(null); 
+		} 
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		assertTrue(true); 
 	} 
 	

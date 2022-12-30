@@ -4,6 +4,8 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+
 import org.bson.Document;
 
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -29,7 +32,7 @@ public abstract class EDSEntityHandler {
      */
     public static final String SCHEMA_TEST_ROOT = "CDA.xsd";
 
-    public static final int SCHEMA_TEST_SIZE = 10;
+    public static final int SCHEMA_TEST_SIZE = 12;
 
     /**
      * Directory containing sample files to upload as test
@@ -42,10 +45,20 @@ public abstract class EDSEntityHandler {
         "schema",
         "standard");
 
+    public static final Path VOCAB_SAMPLE_FILES = Paths.get(
+            "src",
+            "test",
+            "resources",
+            "Files",
+            "vocabulary");
+    
     private final List<SchemaETY> entities;
+    private final List<TerminologyETY> terminologies;
+
 
     protected EDSEntityHandler() {
         this.entities = new ArrayList<>();
+        this.terminologies = new ArrayList<>(); 
     }
 
     protected void initTestEntities() throws IOException {
@@ -64,14 +77,42 @@ public abstract class EDSEntityHandler {
                 );
             }
         }
+    } 
+    
+    protected void initTestTerminologies() throws IOException {
+        // List of all files inside the sample modified directory
+    	TerminologyETY deletedTerminology = new TerminologyETY(); 
+    	deletedTerminology.setDeleted(true); 
+    	
+        try (Stream<Path> files = Files.list(VOCAB_SAMPLE_FILES)) {
+            // Convert to list
+            List<Path> samples = files.collect(Collectors.toList());
+            // Add to each map and convert
+            for (Path path : samples) {
+                this.terminologies.add(
+                    TerminologyETY.fromPath(
+                        path,
+                        "system", "version", "code", "description")
+                    );
+            }
+            this.terminologies.add(deletedTerminology); 
+        }
     }
 
     protected void clearTestEntities() {
         this.entities.clear();
+    } 
+    
+    protected void clearTestTerminologies() {
+        this.terminologies.clear();
     }
 
     protected List<SchemaETY> getEntities() {
         return new ArrayList<>(entities);
+    } 
+    
+    protected List<TerminologyETY> getTerminologies() {
+        return new ArrayList<>(terminologies);
     }
 
     protected List<Document> getModifiedEntitiesAsDocuments() {

@@ -53,16 +53,5 @@ public class SchematronETY {
         this.contentSchematron = new Binary(Files.readAllBytes(path));
     }
 
-    public static SchematronETY fromPath(Path path, String version, String root) throws IOException {
-        SchematronETY entity = new SchematronETY();
-        entity.setNameSchematron(path.getFileName().toString());
-        entity.setContentSchemaFromPath(path);
-        entity.setVersion(version);
-        entity.setTemplateIdRoot(root);
-        entity.setLastUpdateDate(new Date());
-        entity.setLastSync(new Date());
-        entity.setDeleted(false);
-        return entity;
-    }
 	 
 }

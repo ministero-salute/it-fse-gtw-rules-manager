@@ -91,7 +91,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
             .append(FIELD_DELETED, doc.getBoolean(FIELD_DELETED)); 
     }
     
-    private List<Document> buildMapDocuments(List<FhirStructuresDTO.FhirStructures> maps) {
+    public List<Document> buildMapDocuments(List<FhirStructuresDTO.FhirStructures> maps) {
     	List<Document> mapsToSave = new ArrayList<>();
     	if(maps!=null) {
     		for(FhirStructuresDTO.FhirStructures map : maps) {
@@ -105,7 +105,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     	return mapsToSave;
     }
     
-    private List<Document> buildDefinitionDocuments(List<FhirStructuresDTO.Definition> structureDefinitions) {
+    public List<Document> buildDefinitionDocuments(List<FhirStructuresDTO.Definition> structureDefinitions) {
     	List<Document> definitionsToSave = new ArrayList<>();
     	if(structureDefinitions!=null) {
     		for(FhirStructuresDTO.Definition definition : structureDefinitions) {
@@ -120,7 +120,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
     }
     
     
-    private List<Document> buildValuesetDocuments(List<FhirStructuresDTO.Valueset> valuesets) {
+    public List<Document> buildValuesetDocuments(List<FhirStructuresDTO.Valueset> valuesets) {
     	List<Document> valuesetsToSave = new ArrayList<>();
     	if(valuesets!=null) {
     		for(FhirStructuresDTO.Valueset valueset : valuesets) {

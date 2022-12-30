@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.EDSClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.FileUtility;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -141,9 +142,22 @@ class StringUtilityTest {
 		}
 	} 
     
+
     @Test
     void getFileFromInternalResourcesKo() {
     	assertNull(FileUtility.getFileFromInternalResources("fileKo.example")); 
+    } 
+    
+    @Test
+    void exceptionTests() {
+    	BusinessException businessExc = new BusinessException("business exc"); 
+    	EDSClientException edsExc = new EDSClientException("msg"); 
+    	EDSClientException edsExcThr = new EDSClientException("msgThr", new Exception()); 
+    	
+    	assertEquals("business exc", businessExc.getMessage()); 
+    	assertEquals("msg", edsExc.getMessage()); 
+    	assertEquals("msgThr", edsExcThr.getMessage()); 
+    	
     }
 
 }

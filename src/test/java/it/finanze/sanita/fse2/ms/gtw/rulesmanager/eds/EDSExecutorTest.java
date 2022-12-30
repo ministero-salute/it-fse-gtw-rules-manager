@@ -92,39 +92,38 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     void changeset() throws EdsClientException {
         // Setup production
         setupProduction();
-        executor.createChunks(3, 2, 5); 
 
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
-        //when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangeset());
-        when(client.getChunkIns(any(), any(), anyInt(), any())).thenReturn(emptyChangesetChunk());
-        when(client.getChunkDel(any(), any(), anyInt(), any())).thenReturn(emptyChangesetChunk());
+        when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangeset());
+        
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         
         // Provide knowledge
-        when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 0, 10));
-        //when(client.getSnapshot(any(), any(), any())).thenReturn(createChangesetChunk());
-        when(client.getChunkIns(any(), any(), anyInt(), any())).thenReturn(createChangesetChunk());
-        when(client.getChunkDel(any(), any(), anyInt(), any())).thenReturn(createChangesetChunk());
+        when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 1, 10));
+
 
         // Changeset is not empty, it should be OK
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
+        
+        
+        when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(0,0,0));
+        assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
+
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenThrow(
             new EdsClientException("Test error", new IOException("Test error"))
         );
         // Get status errored, it should be KO
         assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
+        
         // Verify production integrity
         verifyProductionIntegrity();
         
     }
 
-    @Test
-    void chunkExecutorTest() {
-        chunkExecutor.execute(); 
-    } 
+
     
     @Test
     void staging() {
@@ -157,12 +156,10 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         setupProduction();
         // Setup changeset
         executor.setChangeset(MockExecutor.createChangeset(10, 1, 9));
-        executor.createChunks(3, 2, 5); 
 
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         
-        chunkExecutor.onChunkInsertion();
 
         // Now check size
         assertEquals(10, executor.getOperations().getInsertions());
@@ -174,6 +171,20 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(0, executor.getOperations().getInsertions());
         assertEquals(0, executor.getOperations().getDeletions());
         assertEquals(0, executor.getOperations().getOperations());
+        // Verify production integrity
+        verifyProductionIntegrity();
+    } 
+    
+    @Test
+    void processingEmptyChangeset() {
+        // Setup production
+        setupProduction();
+        // Setup changeset
+        executor.setChangeset(emptyChangeset());
+
+        // Call processing with verified flag
+        assertEquals(OK, executor.onProcessing(true));
+        
         // Verify production integrity
         verifyProductionIntegrity();
     } 
