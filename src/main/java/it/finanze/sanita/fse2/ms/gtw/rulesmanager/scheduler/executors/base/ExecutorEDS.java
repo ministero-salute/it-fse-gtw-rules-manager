@@ -4,8 +4,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base;
 
 import com.mongodb.client.MongoCollection;
-
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
@@ -27,6 +25,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.AppConstants.LOG_TYPE_CONTROL;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
@@ -118,12 +117,12 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Execute
         ActionRes res = builder.execute((name, status) -> {
             if (status == ActionRes.KO)  {
-                bridge.getLogger().error(Constants.AppConstants.LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
+                bridge.getLogger().error(LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
             }
         });
 
         if (res == ActionRes.OK) {
-            bridge.getLogger().info(Constants.AppConstants.LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
+            bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
         }
         return res;
     }
