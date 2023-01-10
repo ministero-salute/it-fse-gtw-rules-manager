@@ -6,7 +6,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chun
 import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
@@ -100,32 +99,14 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         if (this.snapshot.getTotalNumberOfElements() == 0) {
             // Log me
             log.debug("[{}] Changeset is empty", getConfig().getTitle());
-            try {
-                log.debug("[{}] Verifying production matches size", getConfig().getTitle());
-                // Retrieve current size
-                long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
-                // Verify match
-                if(snapshot.getCollectionSize() == size) {
-                    log.debug("[{}] Verification success", getConfig().getTitle());
-                    // Set flag
-                    res = EXIT;
-                }else {
-                    log.warn("[{}] Verification failure", getConfig().getTitle());
-                }
-                log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-            }catch (EdsDbException ex) {
-                log.error(
-                    format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
-                    ex
-                );
-            }
+            // Now check size
+            res = onVerifyProductionSize();
         }else {
             // Changeset is not empty
             res = OK;
         }
         return res;
     }
-
     @Override
     protected ActionRes onProcessing() {
         ActionRes res = KO;
@@ -200,7 +181,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             return new AbstractMap.SimpleImmutableEntry<>(res, process);
         };
     }
-
     @Override
     public IChunkHandlerEDS onChunkDeletions() {
         return (staging, snapshot, chunk, max) -> {
@@ -250,30 +230,20 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
-    protected ActionRes onVerifySize() {
-        ActionRes res = KO;
-        log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
-        try {
-            // Retrieve current size (after performing operations)
-            long size = getBridge().getRepository().countActiveDocuments(getCollection());
-            // Verify match
-            if(snapshot.getCollectionSize() == size) {
-                log.debug("[{}] Verification success", getConfig().getTitle());
-                // Set flag
-                res = OK;
-            }else {
-                log.warn("[{}] Verification failure", getConfig().getTitle());
-            }
-            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-        }catch (EdsDbException ex) {
-            log.error(
-                format("[%s] Unable to verify collection size", getConfig().getTitle()),
-                ex
-            );
+    protected ActionRes onVerify() {
+        log.debug("[{}] Verifying staging matches checksum", getConfig().getTitle());
+        // Verify
+        ActionRes res = getOperations().isValid() ? OK : KO;
+        log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), getOperations().getExpectedInfo(), getOperations().getInfo());
+        if(res == OK) {
+            log.debug("[{}] Verification success", getConfig().getTitle());
+            // Now check size
+            res = onVerifyStagingSize();
+        } else {
+            log.warn("[{}] Verification failure", getConfig().getTitle());
         }
         return res;
     }
-
     @Override
     protected ActionRes onSync() {
         ActionRes res = KO;
@@ -294,7 +264,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
-
     @Override
     protected ActionRes onChangesetAlignment() {
         ActionRes res = KO;
@@ -305,7 +274,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
-
     @Override
     protected ActionRes onReset() {
         setSnapshot(null);
@@ -313,7 +281,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         setOperations(null);
         return ActionRes.OK;
     }
-
     @Override
     protected ActionRes onSwap() {
         // Working var
@@ -367,6 +334,54 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             }
         }
 
+        return res;
+    }
+
+    private ActionRes onVerifyStagingSize() {
+        ActionRes res = KO;
+        log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
+        try {
+            // Retrieve current size (after performing operations)
+            long size = getBridge().getRepository().countActiveDocuments(getCollection());
+            // Verify match
+            if(snapshot.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", getConfig().getTitle());
+                // Set flag
+                res = OK;
+            }else {
+                log.warn("[{}] Verification failure", getConfig().getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify collection size", getConfig().getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+    private ActionRes onVerifyProductionSize() {
+        // Working var
+        ActionRes res = KO;
+        try {
+            log.debug("[{}] Verifying production matches size", getConfig().getTitle());
+            // Retrieve current size
+            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            // Verify match
+            if(snapshot.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", getConfig().getTitle());
+                // Set flag
+                res = EXIT;
+            }else {
+                log.warn("[{}] Verification failure", getConfig().getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
+                ex
+            );
+        }
         return res;
     }
 }
