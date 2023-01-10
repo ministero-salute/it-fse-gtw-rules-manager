@@ -9,12 +9,14 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionBuilderEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.PlanEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.listeners.OnPlanListener;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.listeners.OnStepListener;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -97,34 +99,40 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
 
     private ActionRes startup(String[] steps) {
-
         Date timestamp = new Date();
-
         // Register additional handlers if necessary
         if(!getCustomSteps().isEmpty()) registerAdditionalHandlers();
-
         // Add to builder
-        ActionBuilderEDS builder = ActionBuilderEDS.builder();
-
+        PlanEDS plan = new PlanEDS();
         for(String step: steps) {
             // Verify handler is available
             if(!mappers.containsKey(step)) {
                 throw new IllegalArgumentException("Unregistered handler: " + step);
             }
             // Add
-            builder.addStep(step, mappers.get(step));
+            plan.addStep(step, mappers.get(step));
         }
+        // Add listeners
+        plan.addOnStepListener(this.onStepFailure(timestamp));
+        plan.addOnPlanListener(this.onPlanSuccess(timestamp));
         // Execute
-        ActionRes res = builder.execute((name, status) -> {
+        return plan.execute();
+    }
+
+    // === LISTENERS ===
+    private OnStepListener onStepFailure(Date timestamp) {
+        return (name, status) -> {
             if (status == ActionRes.KO)  {
                 bridge.getLogger().error(LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
             }
-        });
-
-        if (res == ActionRes.OK) {
-            bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
-        }
-        return res;
+        };
+    }
+    private OnPlanListener onPlanSuccess(Date timestamp) {
+        return (status) -> {
+            if (status == ActionRes.KO)  {
+                bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
+            }
+        };
     }
 
     // === MAPPER ===
@@ -148,7 +156,6 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(SWAP, this::onSwap);
         return mapper;
     }
-
     protected void registerAdditionalHandlers() {
         // Log me
         log.debug("[EDS][{}] Registering additional handlers {}", config.getTitle(),
@@ -162,10 +169,10 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             this.mappers.putIfAbsent(step.getKey(), step.getValue());
         }
     }
-
     protected List<Entry<String, IActionStepEDS>> getCustomSteps() {
         return new ArrayList<>();
     }
+
     // === STEPS ===
     public IActionFnEDS<Date> onLastUpdateProd() {
         return () -> bridge.getRepository().getLastSync(config.getProduction());
@@ -375,6 +382,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         this.operations = null;
         return ActionRes.OK;
     }
+
     // === RECOVERY ===
     protected ActionRes onChangesetRecovery() {
         return onChangeset(() -> null);
@@ -382,8 +390,9 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     protected ActionRes onStagingRecovery() {
         return emptyStaging();
     }
+
     // === ACTIONS ===
-    protected ActionRes emptyStaging() {
+    private ActionRes emptyStaging() {
         // Working var
         ActionRes res = KO;
         log.debug("[{}] Creating new empty collection as staging", config.getTitle());
@@ -403,7 +412,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Bye
         return res;
     }
-    protected ActionRes cloneStaging() {
+    private ActionRes cloneStaging() {
         // Working var
         ActionRes res = KO;
         log.debug("[{}] Cloning current branch for staging", config.getTitle());
