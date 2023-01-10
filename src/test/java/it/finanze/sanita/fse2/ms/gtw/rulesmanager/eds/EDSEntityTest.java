@@ -4,8 +4,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.SchedulerResponseDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.Definition;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.FhirStructures;
@@ -32,9 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -122,21 +118,6 @@ public class EDSEntityTest {
 		
 		assertDoesNotThrow(() -> ety.hashCode()); 
 
-	} 
-	
-	@Test
-	void schedulerResponseDtoTest() {
-		SchedulerResponseDTO dto = new SchedulerResponseDTO(); 
-		dto.setSpanID("span"); 
-		dto.setTraceID("trace"); 
-		
-		LogTraceInfoDTO lt = new LogTraceInfoDTO("trace", "span"); 
-		Map<String, Integer> inCounter = new HashMap<String, Integer>(); 
-		SchedulerResponseDTO dtoArgsConstructor = new SchedulerResponseDTO(lt, inCounter); 
-		
-		assertNotNull(dto); 
-		assertNotNull(dtoArgsConstructor); 
-	
 	}
 	
 	@Test

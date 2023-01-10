@@ -61,6 +61,11 @@ public class InvokeEDSClientScheduler {
 		}
 	}
 
+	@Async("single-thread-exec")
+	public void asyncAction() {
+		log.info("[EDS] Running on {}", Thread.currentThread().getName());
+		action();
+	}
 
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
