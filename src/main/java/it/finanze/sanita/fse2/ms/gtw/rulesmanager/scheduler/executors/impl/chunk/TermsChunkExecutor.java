@@ -78,22 +78,8 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         Optional<ChangeSetChunkDTO> data;
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
-        // Retrieve HTTP request data
-        ChunkChangesetCFG chunkCfg = getConfigAsChunked(); 
-        ChangesetCFG cfg = getConfig(); 
-        IEDSClient client = getBridge().getClient(); 
-        try {
-			ChangeSetChunkDTO resp = client.getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class);
-		} catch (EdsClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-        
-        data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);
-        // Set the flag
+        // Retrieve HTTP request datas 
+        data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);        // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
         if(data.isPresent()) {
             this.snapshot = data.get();
