@@ -129,7 +129,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
     private OnPlanListener onPlanSuccess(Date timestamp) {
         return (status) -> {
-            if (status == ActionRes.KO)  {
+            if (status == ActionRes.OK)  {
                 bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
             }
         };
@@ -206,15 +206,21 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     protected ActionRes onChangesetEmpty() {
         // Working var
         ActionRes res;
+        // Print stats (collection size)
+        statsSize(false);
         // Verify emptiness
         if (this.changeset.getTotalNumberOfElements() == 0) {
             // Log me
             log.debug("[{}] Changeset is empty", config.getTitle());
             // Now check size
             res = onVerifyProductionSize();
+            // Print stats (operation to apply)
+            if(res == EXIT) statsOps(false);
         }else {
             // Changeset is not empty
             res = OK;
+            // Print stats (operation to apply)
+            statsOps(true);
         }
         return res;
     }
@@ -282,6 +288,8 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             bridge.getRepository().rename(this.collection, config.getProduction());
             // Set flag
             res = OK;
+            // Display sizes after swapping
+            statsSize(true);
         } catch (EdsDbException ex) {
             log.error(
                 format("[%s] Unable to rename collection", config.getTitle()),
@@ -439,6 +447,35 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             );
         }
         return res;
+    }
+
+    // === STATS ===
+    protected void statsSize(boolean synchronised) {
+        try {
+            // Retrieve current production collection size
+            long size = bridge.getRepository().countActiveDocuments(config.getProduction());
+            // Display current and remote collection size
+            log.info("[{}][Stats] Displaying sizes {} elaboration",
+                config.getTitle(),
+                synchronised ? "after": "before"
+            );
+            log.info("[{}][Stats][Size] Local: {} | Remote: {}",
+                config.getTitle(), size,
+                changeset.getCollectionSize()
+            );
+        } catch (EdsDbException e) {
+            log.warn(
+                format("[%s] Unable to retrieve production size for inspection", config.getTitle()),
+                e
+            );
+        }
+    }
+    protected void statsOps(boolean toApply) {
+        if(toApply) {
+            log.info("[{}][Stats][Ops] {}", config.getTitle(), ProcessResult.info(changeset));
+        } else {
+            log.info("[{}][Stats][Ops] No operations to apply", config.getTitle());
+        }
     }
 
 }

@@ -6,15 +6,12 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chun
 import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkDelDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionCallbackEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
@@ -77,7 +74,7 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         Optional<ChangeSetChunkDTO> data;
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
-        // Retrieve HTTP request datas 
+        // Retrieve HTTP request data
         data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);        // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
         if(data.isPresent()) {
@@ -94,16 +91,22 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     @Override
     protected ActionRes onChangesetEmpty() {
         // Working var
-        ActionRes res = KO;
+        ActionRes res;
+        // Print stats (collection size)
+        statsSize(false);
         // Verify emptiness
         if (this.snapshot.getTotalNumberOfElements() == 0) {
             // Log me
             log.debug("[{}] Changeset is empty", getConfig().getTitle());
             // Now check size
             res = onVerifyProductionSize();
+            // Print stats (operation to apply)
+            if(res == EXIT) statsOps(false);
         }else {
             // Changeset is not empty
             res = OK;
+            // Print stats (operation to apply)
+            statsOps(true);
         }
         return res;
     }
@@ -333,7 +336,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
                 log.debug("[{}] Post-swap operation failure", getConfig().getTitle());
             }
         }
-
         return res;
     }
 
@@ -384,4 +386,37 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
+
+    // === STATS ===
+    @Override
+    protected void statsSize(boolean synchronised) {
+        try {
+            // Retrieve current production collection size
+            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            // Display current and remote collection size
+            log.info("[{}][Stats] Displaying sizes {} elaboration",
+                getConfig().getTitle(),
+                synchronised ? "after": "before"
+            );
+            log.info("[{}][Stats][Size] Local: {} | Remote: {}",
+                getConfig().getTitle(), size,
+                getSnapshot().getCollectionSize()
+            );
+        } catch (EdsDbException e) {
+            log.warn(
+                format("[%s] Unable to retrieve production size for inspection", getConfig().getTitle()),
+                e
+            );
+        }
+    }
+
+    @Override
+    protected void statsOps(boolean toApply) {
+        if(toApply) {
+            log.info("[{}][Stats][Ops] {}", getConfig().getTitle(), ProcessResult.info(snapshot));
+        } else {
+            log.info("[{}][Stats][Ops] No operations to apply", getConfig().getTitle());
+        }
+    }
+
 }

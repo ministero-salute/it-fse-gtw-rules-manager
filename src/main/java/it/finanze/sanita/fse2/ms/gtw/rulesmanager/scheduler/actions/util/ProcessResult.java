@@ -3,6 +3,8 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import lombok.Getter;
 
 import static java.lang.String.format;
@@ -48,6 +50,22 @@ public final class ProcessResult {
                 expectedInsertions,
                 expectedDeletions
             );
+    }
+
+    public static String info(ChangeSetDTO<?> changeset) {
+        return format(
+            "[ Insertions: %d | Deletions: %d ]",
+            changeset.getInsertions().size(),
+            changeset.getDeletions().size()
+        );
+    }
+
+    public static String info(ChangeSetChunkDTO snapshot) {
+        return format(
+            "[ Insertions: %d | Deletions: %d ]",
+            snapshot.getChunks().getInsertions().getChunksItems(),
+            snapshot.getChunks().getDeletions().getChunksItems()
+        );
     }
 
 }

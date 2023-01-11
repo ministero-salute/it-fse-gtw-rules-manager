@@ -33,6 +33,8 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
 
     @Override
     public ActionRes onClean() {
+        // Before cleaning, print size
+        statsSize(false);
         // Delete staging if exists, then move on back-up.
         // If staging is erroneous it exits, otherwise returns the back-up returned value.
         return super.onClean() == OK ? onCleanBackup() : KO;
@@ -175,5 +177,24 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
         }
         // Bye
         return res;
+    }
+
+    @Override
+    protected void statsSize(boolean synchronised) {
+        try {
+            // Retrieve current production collection size
+            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            // Display current and remote collection size
+            log.info("[{}][Stats] Displaying sizes {} elaboration",
+                getConfig().getTitle(),
+                synchronised ? "after": "before"
+            );
+            log.info("[{}][Stats][Size] Current: {}", getConfig().getTitle(), size);
+        } catch (EdsDbException e) {
+            log.warn(
+                format("[%s] Unable to retrieve production size for inspection", getConfig().getTitle()),
+                e
+            );
+        }
     }
 }
