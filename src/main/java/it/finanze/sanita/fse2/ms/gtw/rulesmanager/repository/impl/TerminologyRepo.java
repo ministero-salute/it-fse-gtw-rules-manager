@@ -37,7 +37,8 @@ public class TerminologyRepo implements ITerminologyRepo {
 			GroupOperation group = Aggregation
 				.group(
 					TerminologyETY.FIELD_SYSTEM, 
-					TerminologyETY.FIELD_VERSION
+					TerminologyETY.FIELD_VERSION,
+					TerminologyETY.FIELD_DELETED
 				)
 				.first(TerminologyETY.FIELD_CODE).as(TerminologyMapDTO.FIELD_CODE)
 				.first(TerminologyETY.FIELD_LAST_UPDATE).as(TerminologyMapDTO.FIELD_CREATION_DATE)
@@ -47,10 +48,10 @@ public class TerminologyRepo implements ITerminologyRepo {
 			AggregationOperation project = project(
 				TerminologyETY.FIELD_SYSTEM_ID_REF, 
 				TerminologyETY.FIELD_VERSION_ID_REF,
+				TerminologyETY.FIELD_DELETED,
 				TerminologyMapDTO.FIELD_CODE,
 				TerminologyMapDTO.FIELD_CREATION_DATE,
-				TerminologyMapDTO.FIELD_RELEASE_DATE,
-				TerminologyMapDTO.FIELD_DELETED
+				TerminologyMapDTO.FIELD_RELEASE_DATE
 			);
 			// Create aggregation definition
 			Aggregation agg = Aggregation.newAggregation(group, project);
