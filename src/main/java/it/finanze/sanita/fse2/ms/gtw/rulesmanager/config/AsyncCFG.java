@@ -14,6 +14,7 @@ public class AsyncCFG  {
     public Executor singleThreadExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(0);
         executor.initialize();
         return executor;
     }

@@ -133,4 +133,8 @@ public final class Constants {
 
 	}
 
+	public static final class Logs {
+		public static final String ERR_TASK_REJECTED = "Impossibile accettare nuove richieste, riprovare più tardi";
+	}
+
 }
