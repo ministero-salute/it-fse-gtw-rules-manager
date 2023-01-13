@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ResponseDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.tools.RunSchedulerDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +26,11 @@ public interface ISchedulerCTL {
     
     @PostMapping("/run-scheduler")
     @Operation(summary = "Run cfg items scheduler", description = "Run cft items scheduler.")
-    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = ResponseDTO.class)))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Richiesta update in coda", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ResponseDTO.class))),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE))
+        @ApiResponse(responseCode = "200", description = "Richiesta update in coda", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RunSchedulerDTO.class))),
+        @ApiResponse(responseCode = "423", description = "Richiesta update rigettata", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)),
+        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE))
     })
-    ResponseDTO runScheduler(HttpServletRequest request);
+    RunSchedulerDTO runScheduler(HttpServletRequest request);
     
 }
