@@ -134,7 +134,7 @@ public final class Constants {
 	}
 
 	public static final class Logs {
-		public static final String ERR_TASK_REJECTED = "Il processo risulta già avviato, riprovare più tardi";
+		public static final String ERR_SCH_RUNNING = "Il processo di aggiornamento risulta già avviato";
 		public static final String DTO_RUN_TASK_QUEUED = "Processo avviato, verifica i logs";
 	}
 

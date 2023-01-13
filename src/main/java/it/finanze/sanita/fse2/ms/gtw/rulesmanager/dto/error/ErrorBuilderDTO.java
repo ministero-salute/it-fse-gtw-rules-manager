@@ -6,8 +6,8 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.base.ErrorResponseDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsSchedulerRunningException;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Logs.ERR_TASK_REJECTED;
 import static org.apache.http.HttpStatus.SC_LOCKED;
 
 /**
@@ -21,13 +21,13 @@ public final class ErrorBuilderDTO {
      */
     private ErrorBuilderDTO() {}
 
-    public static ErrorResponseDTO createTaskRejectedError(LogTraceInfoDTO trace) {
+    public static ErrorResponseDTO createSchedulerRunningError(LogTraceInfoDTO trace, EdsSchedulerRunningException ex) {
         // Return associated information
         return new ErrorResponseDTO(
             trace,
             ErrorType.IO.getType(),
             ErrorType.IO.getTitle(),
-            ERR_TASK_REJECTED,
+            ex.getMessage(),
             SC_LOCKED,
             ErrorType.IO.toInstance(ErrorInstance.IO.QUEUE)
         );

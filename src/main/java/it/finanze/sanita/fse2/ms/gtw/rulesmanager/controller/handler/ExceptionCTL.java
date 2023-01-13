@@ -4,9 +4,9 @@ import brave.Tracer;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.ErrorBuilderDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.base.ErrorResponseDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsSchedulerRunningException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +21,12 @@ public class ExceptionCTL extends ResponseEntityExceptionHandler {
     @Autowired
     private Tracer tracer;
 
-    @ExceptionHandler(TaskRejectedException.class)
-    protected ResponseEntity<ErrorResponseDTO> handleTaskRejectedException(TaskRejectedException ex) {
+    @ExceptionHandler(EdsSchedulerRunningException.class)
+    protected ResponseEntity<ErrorResponseDTO> handleEdsSchedulerRunningException(EdsSchedulerRunningException ex) {
         // Log me
-        log.error("HANDLER handleTaskRejectedException()", ex);
+        log.error("HANDLER handleEdsSchedulerRunningException()", ex);
         // Create error DTO
-        ErrorResponseDTO out = ErrorBuilderDTO.createTaskRejectedError(getLogTraceInfo());
+        ErrorResponseDTO out = ErrorBuilderDTO.createSchedulerRunningError(getLogTraceInfo(), ex);
         // Set HTTP headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PROBLEM_JSON);
