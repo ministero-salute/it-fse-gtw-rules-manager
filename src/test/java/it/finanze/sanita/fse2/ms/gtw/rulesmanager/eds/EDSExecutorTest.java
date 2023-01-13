@@ -13,9 +13,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
-
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,14 +33,14 @@ import java.util.Date;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangesetChunk;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangesetChunk;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -64,10 +62,9 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     private MockExecutor executor;
     @Autowired
     private TermsChunkExecutor chunkExecutor; 
-    @Autowired
+    @SpyBean
     private IExecutorRepo repository;
 
- 
     @Test
     void clean() {
         // Setup production
@@ -187,15 +184,22 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         
         // Verify production integrity
         verifyProductionIntegrity();
-    } 
-    
+    }
+
 
     @Test
+    @SuppressWarnings("unchecked")
     void verify() {
+        // Define expected size
+        final long size = 9;
+        // Provide mock-knowledge (for staging that doesn't exist)
+        assertDoesNotThrow(() -> {
+            doReturn(size).when(repository).countActiveDocuments(nullable(MongoCollection.class));
+        });
         // Setup production
         setupProduction();
         // Setup changeset
-        executor.setChangeset(MockExecutor.createChangeset(10,1, 9));
+        executor.setChangeset(MockExecutor.createChangeset(10,1, size));
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         assertEquals(OK, executor.onVerify());
