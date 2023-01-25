@@ -3,25 +3,23 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors;
 
-import com.mongodb.MongoException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
-
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
+import static com.mongodb.client.model.Updates.set;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
+import static java.lang.String.format;
 
 import java.util.Optional;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
-import static java.lang.String.format;
+import org.slf4j.Logger;
+
+import com.mongodb.MongoException;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
 
 public final class HandlerEDS {
 

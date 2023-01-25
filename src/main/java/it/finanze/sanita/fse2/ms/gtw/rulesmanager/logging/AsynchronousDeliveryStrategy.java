@@ -9,9 +9,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.errors.TimeoutException;
 
-/**
- * @since 0.0.1
- */
 public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
 
     @Override
@@ -27,7 +24,7 @@ public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
                 }
             });
             return true;
-        } catch (/*BufferExhaustedException |*/ TimeoutException e) {
+        } catch (TimeoutException e) {
             failedDeliveryCallback.onFailedDelivery(event, e);
             return false;
         }

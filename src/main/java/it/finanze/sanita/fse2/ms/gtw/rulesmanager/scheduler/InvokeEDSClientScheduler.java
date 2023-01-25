@@ -51,6 +51,8 @@ public class InvokeEDSClientScheduler {
 	@Autowired
 	private DictionaryExecutor dictionary;
 
+	private boolean running;
+
 
 	@Async
 	@EventListener(ApplicationStartedEvent.class)
@@ -61,10 +63,17 @@ public class InvokeEDSClientScheduler {
 		}
 	}
 
+	@Async("single-thread-exec")
+	public void asyncAction() {
+		log.info("[EDS] Running on {}", Thread.currentThread().getName());
+		action();
+	}
 
 	@Scheduled(cron = "${eds.scheduler.invoke}")
 	@SchedulerLock(name = "invokeEDSClientScheduler")
-	public void action() { 
+	public void action() {
+		// Set run flag
+		running = true;
 		// Log me
 		log.info("[EDS] Starting scheduled updating process");
 		// Setup executors
@@ -73,6 +82,8 @@ public class InvokeEDSClientScheduler {
 		start(schema, schematron, terminology, fhir);
 		// Log me
 		log.info("[EDS] Updating process completed");
+		// Reset run flag
+		running = false;
 	}
 
 	private void setup() {
@@ -103,5 +114,9 @@ public class InvokeEDSClientScheduler {
 				}
 			}
 		}
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 }

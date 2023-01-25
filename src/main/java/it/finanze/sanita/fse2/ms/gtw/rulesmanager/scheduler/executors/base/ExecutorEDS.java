@@ -9,12 +9,14 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionBuilderEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.ProcessResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.PlanEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.listeners.OnPlanListener;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.plan.listeners.OnStepListener;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.AppConstants.LOG_TYPE_CONTROL;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
@@ -96,34 +99,40 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
 
     private ActionRes startup(String[] steps) {
-
         Date timestamp = new Date();
-
         // Register additional handlers if necessary
         if(!getCustomSteps().isEmpty()) registerAdditionalHandlers();
-
         // Add to builder
-        ActionBuilderEDS builder = ActionBuilderEDS.builder();
-
+        PlanEDS plan = new PlanEDS();
         for(String step: steps) {
             // Verify handler is available
             if(!mappers.containsKey(step)) {
                 throw new IllegalArgumentException("Unregistered handler: " + step);
             }
             // Add
-            builder.addStep(step, mappers.get(step));
+            plan.addStep(step, mappers.get(step));
         }
+        // Add listeners
+        plan.addOnStepListener(this.onStepFailure(timestamp));
+        plan.addOnPlanListener(this.onPlanSuccess(timestamp));
         // Execute
-        ActionRes res = builder.execute((name, status) -> {
-            if (status == ActionRes.KO)  {
-                bridge.getLogger().error("Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
-            }
-        });
+        return plan.execute();
+    }
 
-        if (res == ActionRes.OK) {
-            bridge.getLogger().info("Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
-        }
-        return res;
+    // === LISTENERS ===
+    private OnStepListener onStepFailure(Date timestamp) {
+        return (name, status) -> {
+            if (status == ActionRes.KO)  {
+                bridge.getLogger().error(LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
+            }
+        };
+    }
+    private OnPlanListener onPlanSuccess(Date timestamp) {
+        return (status) -> {
+            if (status == ActionRes.OK)  {
+                bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
+            }
+        };
     }
 
     // === MAPPER ===
@@ -140,14 +149,12 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(STAGING_RECOVERY, this::onStagingRecovery);
         mapper.put(PROCESSING, this::onProcessing);
         mapper.put(VERIFY, this::onVerify);
-        mapper.put(VERIFY_SIZE, this::onVerifySize);
         mapper.put(SYNC, this::onSync);
         mapper.put(CHANGESET_STAGING, this::onChangesetStaging);
         mapper.put(CHANGESET_ALIGNMENT, this::onChangesetAlignment);
         mapper.put(SWAP, this::onSwap);
         return mapper;
     }
-
     protected void registerAdditionalHandlers() {
         // Log me
         log.debug("[EDS][{}] Registering additional handlers {}", config.getTitle(),
@@ -161,12 +168,12 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             this.mappers.putIfAbsent(step.getKey(), step.getValue());
         }
     }
-
     protected List<Entry<String, IActionStepEDS>> getCustomSteps() {
         return new ArrayList<>();
     }
+
     // === STEPS ===
-    protected IActionFnEDS<Date> onLastUpdateProd() {
+    public IActionFnEDS<Date> onLastUpdateProd() {
         return () -> bridge.getRepository().getLastSync(config.getProduction());
     }
     protected IActionFnEDS<Date> onLastUpdateStaging() {
@@ -198,33 +205,22 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
     protected ActionRes onChangesetEmpty() {
         // Working var
-        ActionRes res = KO;
+        ActionRes res;
+        // Print stats (collection size)
+        statsSize(false);
         // Verify emptiness
         if (this.changeset.getTotalNumberOfElements() == 0) {
             // Log me
             log.debug("[{}] Changeset is empty", config.getTitle());
-            try {
-                log.debug("[{}] Verifying production matches size", config.getTitle());
-                // Retrieve current size
-                long size = bridge.getRepository().countActiveDocuments(config.getProduction());
-                // Verify match
-                if(changeset.getCollectionSize() == size) {
-                    log.debug("[{}] Verification success", config.getTitle());
-                    // Set flag
-                    res = EXIT;
-                }else {
-                    log.warn("[{}] Verification failure", config.getTitle());
-                }
-                log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
-            }catch (EdsDbException ex) {
-                log.error(
-                    format("[%s] Unable to verify if production matches expected size", config.getTitle()),
-                    ex
-                );
-            }
+            // Now check size
+            res = onVerifyProductionSize();
+            // Print stats (operation to apply)
+            if(res == EXIT) statsOps(false);
         }else {
             // Changeset is not empty
             res = OK;
+            // Print stats (operation to apply)
+            statsOps(true);
         }
         return res;
     }
@@ -273,34 +269,13 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         log.debug("[{}] Verifying staging matches checksum", config.getTitle());
         // Verify
         ActionRes res = operations.isValid() ? OK : KO;
+        log.debug("[{}] Expecting {} | Got {}", config.getTitle(), operations.getExpectedInfo(), operations.getInfo());
         if(res == OK) {
             log.debug("[{}] Verification success", config.getTitle());
+            // Now check size
+            res = onVerifyStagingSize();
         } else {
             log.warn("[{}] Verification failure", config.getTitle());
-        }
-        log.debug("[{}] Expecting {} | Got {}", config.getTitle(), operations.getExpectedInfo(), operations.getInfo());
-        return res;
-    }
-    protected ActionRes onVerifySize() {
-        ActionRes res = KO;
-        log.debug("[{}] Verifying staging matches size", config.getTitle());
-        try {
-            // Retrieve current size (after performing operations)
-            long size = bridge.getRepository().countActiveDocuments(collection);
-            // Verify match
-            if(changeset.getCollectionSize() == size) {
-                log.debug("[{}] Verification success", config.getTitle());
-                // Set flag
-                res = OK;
-            }else {
-                log.warn("[{}] Verification failure", config.getTitle());
-            }
-            log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
-        }catch (EdsDbException ex) {
-            log.error(
-                format("[%s] Unable to verify collection size", config.getTitle()),
-                ex
-            );
         }
         return res;
     }
@@ -313,6 +288,8 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             bridge.getRepository().rename(this.collection, config.getProduction());
             // Set flag
             res = OK;
+            // Display sizes after swapping
+            statsSize(true);
         } catch (EdsDbException ex) {
             log.error(
                 format("[%s] Unable to rename collection", config.getTitle()),
@@ -374,6 +351,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         this.operations = null;
         return ActionRes.OK;
     }
+
     // === RECOVERY ===
     protected ActionRes onChangesetRecovery() {
         return onChangeset(() -> null);
@@ -381,8 +359,9 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     protected ActionRes onStagingRecovery() {
         return emptyStaging();
     }
+
     // === ACTIONS ===
-    protected ActionRes emptyStaging() {
+    private ActionRes emptyStaging() {
         // Working var
         ActionRes res = KO;
         log.debug("[{}] Creating new empty collection as staging", config.getTitle());
@@ -402,7 +381,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         // Bye
         return res;
     }
-    protected ActionRes cloneStaging() {
+    private ActionRes cloneStaging() {
         // Working var
         ActionRes res = KO;
         log.debug("[{}] Cloning current branch for staging", config.getTitle());
@@ -421,4 +400,82 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         }
         return res;
     }
+
+    private ActionRes onVerifyProductionSize() {
+        // Working var
+        ActionRes res = KO;
+        try {
+            log.debug("[{}] Verifying production matches size", config.getTitle());
+            // Retrieve current size
+            long size = bridge.getRepository().countActiveDocuments(config.getProduction());
+            // Verify match
+            if(changeset.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", config.getTitle());
+                // Set flag
+                res = EXIT;
+            }else {
+                log.warn("[{}] Verification failure", config.getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify if production matches expected size", config.getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+    private ActionRes onVerifyStagingSize() {
+        ActionRes res = KO;
+        log.debug("[{}] Verifying staging matches size", config.getTitle());
+        try {
+            // Retrieve current size (after performing operations)
+            long size = bridge.getRepository().countActiveDocuments(collection);
+            // Verify match
+            if(changeset.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", config.getTitle());
+                // Set flag
+                res = OK;
+            }else {
+                log.warn("[{}] Verification failure", config.getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", config.getTitle(), changeset.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify collection size", config.getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+
+    // === STATS ===
+    protected void statsSize(boolean synchronised) {
+        try {
+            // Retrieve current production collection size
+            long size = bridge.getRepository().countActiveDocuments(config.getProduction());
+            // Display current and remote collection size
+            log.info("[{}][Stats] Displaying sizes {} elaboration",
+                config.getTitle(),
+                synchronised ? "after": "before"
+            );
+            log.info("[{}][Stats][Size] Local: {} | Remote: {}",
+                config.getTitle(), size,
+                changeset.getCollectionSize()
+            );
+        } catch (EdsDbException e) {
+            log.warn(
+                format("[%s] Unable to retrieve production size for inspection", config.getTitle()),
+                e
+            );
+        }
+    }
+    protected void statsOps(boolean toApply) {
+        if(toApply) {
+            log.info("[{}][Stats][Ops] {}", config.getTitle(), ProcessResult.info(changeset));
+        } else {
+            log.info("[{}][Stats][Ops] No operations to apply", config.getTitle());
+        }
+    }
+
 }

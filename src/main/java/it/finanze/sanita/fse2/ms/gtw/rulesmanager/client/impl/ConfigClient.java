@@ -30,7 +30,7 @@ public class ConfigClient implements IConfigClient {
     private String configHost;
 
     @Autowired
-    private transient RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
     private ProfileUtility profileUtility;

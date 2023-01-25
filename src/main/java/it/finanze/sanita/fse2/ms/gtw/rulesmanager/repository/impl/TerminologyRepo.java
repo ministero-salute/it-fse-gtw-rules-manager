@@ -3,12 +3,10 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl;
 
-import com.mongodb.MongoException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -16,12 +14,14 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.mongodb.MongoException;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 
 @Repository
-@Slf4j
 public class TerminologyRepo implements ITerminologyRepo {
 	
 	@Autowired

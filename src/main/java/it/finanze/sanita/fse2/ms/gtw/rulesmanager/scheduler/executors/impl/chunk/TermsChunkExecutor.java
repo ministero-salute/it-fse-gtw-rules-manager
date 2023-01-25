@@ -70,13 +70,12 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
-    protected ActionRes onChangeset(IActionFnEDS<Date> hnd) {
+	public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
         Optional<ChangeSetChunkDTO> data;
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
         // Retrieve HTTP request data
-        data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);
-        // Set the flag
+        data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);        // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
         if(data.isPresent()) {
             this.snapshot = data.get();
@@ -92,37 +91,25 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     @Override
     protected ActionRes onChangesetEmpty() {
         // Working var
-        ActionRes res = KO;
+        ActionRes res;
+        // Print stats (collection size)
+        statsSize(false);
         // Verify emptiness
         if (this.snapshot.getTotalNumberOfElements() == 0) {
             // Log me
             log.debug("[{}] Changeset is empty", getConfig().getTitle());
-            try {
-                log.debug("[{}] Verifying production matches size", getConfig().getTitle());
-                // Retrieve current size
-                long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
-                // Verify match
-                if(snapshot.getCollectionSize() == size) {
-                    log.debug("[{}] Verification success", getConfig().getTitle());
-                    // Set flag
-                    res = EXIT;
-                }else {
-                    log.warn("[{}] Verification failure", getConfig().getTitle());
-                }
-                log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-            }catch (EdsDbException ex) {
-                log.error(
-                    format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
-                    ex
-                );
-            }
+            // Now check size
+            res = onVerifyProductionSize();
+            // Print stats (operation to apply)
+            if(res == EXIT) statsOps(false);
         }else {
             // Changeset is not empty
             res = OK;
+            // Print stats (operation to apply)
+            statsOps(true);
         }
         return res;
     }
-
     @Override
     protected ActionRes onProcessing() {
         ActionRes res = KO;
@@ -197,7 +184,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
             return new AbstractMap.SimpleImmutableEntry<>(res, process);
         };
     }
-
     @Override
     public IChunkHandlerEDS onChunkDeletions() {
         return (staging, snapshot, chunk, max) -> {
@@ -247,30 +233,20 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
     }
 
     @Override
-    protected ActionRes onVerifySize() {
-        ActionRes res = KO;
-        log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
-        try {
-            // Retrieve current size (after performing operations)
-            long size = getBridge().getRepository().countActiveDocuments(getCollection());
-            // Verify match
-            if(snapshot.getCollectionSize() == size) {
-                log.debug("[{}] Verification success", getConfig().getTitle());
-                // Set flag
-                res = OK;
-            }else {
-                log.warn("[{}] Verification failure", getConfig().getTitle());
-            }
-            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-        }catch (EdsDbException ex) {
-            log.error(
-                format("[%s] Unable to verify collection size", getConfig().getTitle()),
-                ex
-            );
+    protected ActionRes onVerify() {
+        log.debug("[{}] Verifying staging matches checksum", getConfig().getTitle());
+        // Verify
+        ActionRes res = getOperations().isValid() ? OK : KO;
+        log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), getOperations().getExpectedInfo(), getOperations().getInfo());
+        if(res == OK) {
+            log.debug("[{}] Verification success", getConfig().getTitle());
+            // Now check size
+            res = onVerifyStagingSize();
+        } else {
+            log.warn("[{}] Verification failure", getConfig().getTitle());
         }
         return res;
     }
-
     @Override
     protected ActionRes onSync() {
         ActionRes res = KO;
@@ -291,7 +267,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
-
     @Override
     protected ActionRes onChangesetAlignment() {
         ActionRes res = KO;
@@ -302,7 +277,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
-
     @Override
     protected ActionRes onReset() {
         setSnapshot(null);
@@ -310,7 +284,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         setOperations(null);
         return ActionRes.OK;
     }
-
     @Override
     protected ActionRes onSwap() {
         // Working var
@@ -363,7 +336,87 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
                 log.debug("[{}] Post-swap operation failure", getConfig().getTitle());
             }
         }
-
         return res;
     }
+
+    private ActionRes onVerifyStagingSize() {
+        ActionRes res = KO;
+        log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
+        try {
+            // Retrieve current size (after performing operations)
+            long size = getBridge().getRepository().countActiveDocuments(getCollection());
+            // Verify match
+            if(snapshot.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", getConfig().getTitle());
+                // Set flag
+                res = OK;
+            }else {
+                log.warn("[{}] Verification failure", getConfig().getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify collection size", getConfig().getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+    private ActionRes onVerifyProductionSize() {
+        // Working var
+        ActionRes res = KO;
+        try {
+            log.debug("[{}] Verifying production matches size", getConfig().getTitle());
+            // Retrieve current size
+            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            // Verify match
+            if(snapshot.getCollectionSize() == size) {
+                log.debug("[{}] Verification success", getConfig().getTitle());
+                // Set flag
+                res = EXIT;
+            }else {
+                log.warn("[{}] Verification failure", getConfig().getTitle());
+            }
+            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
+        }catch (EdsDbException ex) {
+            log.error(
+                format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
+                ex
+            );
+        }
+        return res;
+    }
+
+    // === STATS ===
+    @Override
+    protected void statsSize(boolean synchronised) {
+        try {
+            // Retrieve current production collection size
+            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            // Display current and remote collection size
+            log.info("[{}][Stats] Displaying sizes {} elaboration",
+                getConfig().getTitle(),
+                synchronised ? "after": "before"
+            );
+            log.info("[{}][Stats][Size] Local: {} | Remote: {}",
+                getConfig().getTitle(), size,
+                getSnapshot().getCollectionSize()
+            );
+        } catch (EdsDbException e) {
+            log.warn(
+                format("[%s] Unable to retrieve production size for inspection", getConfig().getTitle()),
+                e
+            );
+        }
+    }
+
+    @Override
+    protected void statsOps(boolean toApply) {
+        if(toApply) {
+            log.info("[{}][Stats][Ops] {}", getConfig().getTitle(), ProcessResult.info(snapshot));
+        } else {
+            log.info("[{}][Stats][Ops] No operations to apply", getConfig().getTitle());
+        }
+    }
+
 }

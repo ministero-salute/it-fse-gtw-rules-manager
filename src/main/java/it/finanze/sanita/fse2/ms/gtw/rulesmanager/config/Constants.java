@@ -3,6 +3,8 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * 
  *
@@ -10,6 +12,16 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
  */
 public final class Constants {
 
+	
+	@Value("${gtw.statusmanager.test.statusUrl}")
+	public static String STATUS_URL; 
+	
+	@Value("${gtw.statusmanager.test.dataUrl}")
+	public static String DATA_URL; 
+	
+	@Value("${gtw.statusmanager.test.mock}")
+	public static String MOCK; 
+	
 	/**
 	 * Path scan.
 	 */
@@ -75,7 +87,13 @@ public final class Constants {
 
 	public static final class AppConstants {
 		
+		private AppConstants() {}
+		
 		public static final String MOCKED_GATEWAY_NAME = "mocked-gateway";
+		
+		public static final String LOG_TYPE_KPI = "kpi-structured-log";
+		public static final String LOG_TYPE_CONTROL = "control-structured-log";
+		
 	}
 
 	public static final class Profile {
@@ -113,6 +131,11 @@ public final class Constants {
 	 */
 	private Constants() {
 
+	}
+
+	public static final class Logs {
+		public static final String ERR_SCH_RUNNING = "Il processo di aggiornamento risulta già avviato";
+		public static final String DTO_RUN_TASK_QUEUED = "Processo avviato, verifica i logs";
 	}
 
 }

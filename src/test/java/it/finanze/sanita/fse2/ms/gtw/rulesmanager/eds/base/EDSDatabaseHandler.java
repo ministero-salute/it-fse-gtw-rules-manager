@@ -35,8 +35,11 @@ public abstract class EDSDatabaseHandler extends EDSEntityHandler {
         createTestSchema(name);
         // Init entities
         if(getEntities().size() == 0) initTestEntities();
+        if(getTerminologies().size() == 0) initTestTerminologies();
+
         // Add to collection
         addTestEntityToSchema(name);
+        addTestTerminologiesToSchema(name); 
     }
 
     protected void clearTestRepository(String name) {
@@ -52,6 +55,10 @@ public abstract class EDSDatabaseHandler extends EDSEntityHandler {
         mongo.insert(getEntities(), name);
     }
 
+    private void addTestTerminologiesToSchema(String name) {
+        mongo.insert(getTerminologies(), name);
+    }
+    
     private boolean isTestSchemaAvailable(String name) {
         return mongo.getCollectionNames().contains(name);
     }

@@ -44,21 +44,20 @@ public class LoggerHelper {
 	/* 
 	 * Implements structured logs, at all logging levels
 	 */
-	public void trace(String message, String operation, 
+	public void trace(String logType, String message, String operation, 
 			   ResultLogEnum result, Date startDateOperation) {
 		
-		final String gatewayName = getGatewayName();
-
 		LogDTO logDTO = LogDTO.builder().
 				message(message).
 				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(gatewayName).
+				gateway_name(getGatewayName()).
 				microservice_name(msName).
+				log_type(logType).
 				build();
-
+		
 		final String logMessage = StringUtility.toJSON(logDTO);
 		log.trace(logMessage);
 
@@ -67,18 +66,18 @@ public class LoggerHelper {
 		}
 	} 
 	
-	public void debug(String message,  String operation,  
+	public void debug(String logType, String message,  String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
 		
-			final String gatewayName = getGatewayName();
 			LogDTO logDTO = LogDTO.builder().
 				message(message).
 				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(gatewayName).
+				gateway_name(getGatewayName()).
 				microservice_name(msName).
+				log_type(logType).
 				build();
 		
 		final String logMessage = StringUtility.toJSON(logDTO);
@@ -89,18 +88,18 @@ public class LoggerHelper {
 		}
 	}
 
-	public void info(String message, String operation,  
+	public void info(String logType, String message, String operation,  
 			ResultLogEnum result, Date startDateOperation) {
 		
-			final String gatewayName = getGatewayName();
 			LogDTO logDTO = LogDTO.builder().
 				message(message).
 				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(gatewayName).
+				gateway_name(getGatewayName()).
 				microservice_name(msName).
+				log_type(logType).
 				build();
 		
 		final String logMessage = StringUtility.toJSON(logDTO);
@@ -110,19 +109,18 @@ public class LoggerHelper {
 		}
 	} 
 	
-	public void warn(String message, String operation,  
+	public void warn(String logType, String message, String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
 		
-		final String gatewayName = getGatewayName();
-
 		LogDTO logDTO = LogDTO.builder().
 				message(message).
 				operation(operation).
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(gatewayName).
+				gateway_name(getGatewayName()).
 				microservice_name(msName).
+				log_type(logType).
 				build();
 		
 		final String logMessage = StringUtility.toJSON(logDTO);
@@ -134,10 +132,9 @@ public class LoggerHelper {
  
 	} 
 	
-	public void error(String message, String operation,  
+	public void error(String logType,String message, String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
 		
-		final String gatewayName = getGatewayName();
 
 		LogDTO logDTO = LogDTO.builder().
 				message(message).
@@ -145,8 +142,9 @@ public class LoggerHelper {
 				op_result(result.getCode()).
 				op_timestamp_start(dateFormat.format(startDateOperation)).
 				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(gatewayName).
+				gateway_name(getGatewayName()).
 				microservice_name(msName).
+				log_type(logType).
 				build();
 		
 		final String logMessage = StringUtility.toJSON(logDTO);

@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Date;
 
 /**
@@ -49,7 +51,7 @@ public class TerminologyETY {
     @Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
     @Field(name = FIELD_DELETED)
-    private Date deleted;
+    private Boolean deleted;
 
 
 	@Override
@@ -81,5 +83,18 @@ public class TerminologyETY {
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		result = prime * result + ((system == null) ? 0 : system.hashCode());
 		return result;
-	}
+	} 
+	
+	
+    public static TerminologyETY fromPath(Path path, String system, String version,
+    		String code, String description) throws IOException {
+    	TerminologyETY entity = new TerminologyETY();
+        entity.setSystem(system); 
+        entity.setVersion(version); 
+        entity.setCode(code); 
+        entity.setDescription(description); 
+        entity.setLastUpdateDate(new Date());
+        entity.setLastSync(new Date());
+        return entity;
+    }
 }
