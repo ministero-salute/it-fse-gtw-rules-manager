@@ -401,7 +401,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         return res;
     }
 
-    private ActionRes onVerifyProductionSize() {
+    protected ActionRes onVerifyProductionSize() {
         // Working var
         ActionRes res = KO;
         try {
@@ -425,7 +425,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         }
         return res;
     }
-    private ActionRes onVerifyStagingSize() {
+    protected ActionRes onVerifyStagingSize() {
         ActionRes res = KO;
         log.debug("[{}] Verifying staging matches size", config.getTitle());
         try {
