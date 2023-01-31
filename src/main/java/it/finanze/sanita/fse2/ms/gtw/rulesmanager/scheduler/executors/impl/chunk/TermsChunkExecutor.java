@@ -339,7 +339,8 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         return res;
     }
 
-    private ActionRes onVerifyStagingSize() {
+    @Override
+    protected ActionRes onVerifyStagingSize() {
         ActionRes res = KO;
         log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
         try {
@@ -362,7 +363,9 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         }
         return res;
     }
-    private ActionRes onVerifyProductionSize() {
+
+    @Override
+    protected ActionRes onVerifyProductionSize() {
         // Working var
         ActionRes res = KO;
         try {
