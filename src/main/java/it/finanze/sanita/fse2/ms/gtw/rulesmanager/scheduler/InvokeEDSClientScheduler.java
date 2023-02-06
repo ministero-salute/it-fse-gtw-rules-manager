@@ -6,11 +6,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.DictionaryExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.FhirStructuresExecutors;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchematronExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.*;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -43,10 +39,13 @@ public class InvokeEDSClientScheduler {
 	private SchematronExecutor schematron;
 
 	@Autowired
-	private TermsChunkExecutor terminology;
+	private TermsExecutor terminology;
 
 	@Autowired
 	private FhirStructuresExecutors fhir;
+
+	@Autowired
+	private EnginesExecutor engines;
 
 	@Autowired
 	private DictionaryExecutor dictionary;
@@ -87,15 +86,14 @@ public class InvokeEDSClientScheduler {
 	}
 
 	private void setup() {
-		terminology.setOnBeforeSwap(
-			() -> dictionary.execute().toCallback()
-		);
-		terminology.setOnFailedSwap(
-			() -> dictionary.onRecovery()
-		);
-		terminology.setOnSuccessSwap(
-			() -> dictionary.onCleanBackup().toCallback()
-		);
+		// Setup terminology <-> dictionary relationship
+		terminology.setOnBeforeSwap(() -> dictionary.execute().toCallback());
+		terminology.setOnFailedSwap(() -> dictionary.onRecovery());
+		terminology.setOnSuccessSwap(() -> dictionary.onCleanBackup().toCallback());
+		// Setup fhir <-> engine relationship
+		fhir.setOnBeforeSwap(() -> engines.execute().toCallback());
+		fhir.setOnFailedSwap(() -> engines.onRecovery());
+		fhir.setOnSuccessSwap(() -> engines.onCleanBackup().toCallback());
 	}
  
 	private void start(ExecutorEDS<?> ...executor) {

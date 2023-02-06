@@ -5,9 +5,9 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.ActionEDS.*;
 
-public final class DictionaryActionEDS {
+public final class DerivedActionEDS {
 
-    private DictionaryActionEDS() {}
+    private DerivedActionEDS() {}
 
     public static String[] defaults() {
         return new String[] {

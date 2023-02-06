@@ -53,6 +53,14 @@ public class CollectionNaming {
             return Constants.Profile.TEST_PREFIX + Constants.Collections.DICTIONARY;
         }
         return Constants.Collections.DICTIONARY;
-    }    
-    
+    }
+
+    @Bean("engineBean")
+    public String getEngineCollection() {
+        if (profileUtility.isTestProfile()) {
+            return Constants.Profile.TEST_PREFIX + Constants.Collections.ENGINE;
+        }
+        return Constants.Collections.ENGINE;
+    }
+
 }

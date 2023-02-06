@@ -12,6 +12,7 @@ import com.mongodb.client.model.RenameCollectionOptions;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_DELETED;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_LAST_SYNC;
+import static com.mongodb.client.model.Accumulators.push;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.match;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.*;
+import static java.util.Arrays.asList;
 
 @Repository
 public class ExecutorRepo implements IExecutorRepo {
@@ -192,4 +196,31 @@ public class ExecutorRepo implements IExecutorRepo {
         return size;
     }
 
+    @Override
+    public List<ObjectId> getActiveDocumentsId(String name) throws EdsDbException {
+        // Verify we are working on an existing collection
+        if(!exists(name)) {
+            throw new EdsDbException("The source collection does not exists: " + name);
+        }
+
+        List<ObjectId> ids = new ArrayList<>();
+
+        try {
+            // Get collection
+            MongoCollection<Document> src = mongo.getCollection(name);
+            // Create query
+            Document agg = src.aggregate(
+                asList(
+                    match(Filters.ne(FIELD_DELETED, true)),
+                    group(null, push("docs", String.format("$%s", FIELD_ID)))
+                )
+            ).first();
+            // We should always have at least one not-null document
+            if(agg != null) ids = new ArrayList<>(agg.getList("docs", ObjectId.class));
+        }catch (MongoException e) {
+            throw new EdsDbException("Unable to get active document ids inside collection", e);
+        }
+
+        return ids;
+    }
 }

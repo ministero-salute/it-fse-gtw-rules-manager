@@ -13,7 +13,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TermsExecutor;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -61,7 +61,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     @Autowired
     private MockExecutor executor;
     @Autowired
-    private TermsChunkExecutor chunkExecutor; 
+    private TermsExecutor chunkExecutor;
     @SpyBean
     private IExecutorRepo repository;
 

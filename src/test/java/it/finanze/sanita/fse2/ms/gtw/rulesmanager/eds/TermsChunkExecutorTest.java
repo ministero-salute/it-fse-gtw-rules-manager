@@ -1,28 +1,11 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.CONFIG_MONGO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.REPOSITORY;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.SCHEDULER_QUERIES;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.UTILITY;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangesetChunk;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangesetChunk;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-
+import com.mongodb.client.MongoCollection;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSDatabaseHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TermsExecutor;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,15 +20,10 @@ import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.mongodb.client.MongoCollection;
-
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSDatabaseHandler;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.TermsChunkExecutor;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
@@ -59,7 +37,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk
 public class TermsChunkExecutorTest extends EDSDatabaseHandler {
 
 	@Autowired
-	private TermsChunkExecutor executor; 
+	private TermsExecutor executor;
 	
 	@Autowired
 	private MockExecutor mockExecutor; 

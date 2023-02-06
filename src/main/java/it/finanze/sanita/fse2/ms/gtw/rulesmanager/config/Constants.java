@@ -79,6 +79,7 @@ public final class Constants {
 		public static final String FHIR_TRANSFORM = "transform";
 		
 		public static final String DICTIONARY = "dictionary";
+		public static final String ENGINE = "engine";
 
 		private Collections() {
 

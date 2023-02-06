@@ -3,14 +3,14 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.DictionaryCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.EngineCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.utils.EmptySetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IEngineSRV;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,12 +22,12 @@ import static java.lang.String.format;
 
 @Slf4j
 @Component
-public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
+public class EnginesExecutor extends ExecutorEDS<EmptySetDTO> {
 
     @Autowired
-    private ICodeSystemVersionSRV csv;
+    private IEngineSRV engine;
 
-    protected DictionaryExecutor(DictionaryCFG config, BridgeEDS bridge) {
+    protected EnginesExecutor(EngineCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
 
@@ -63,8 +63,8 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
     protected ActionRes onStaging() {
         // Working var
         ActionRes res;
-        // Create empty staging
-        res = createStaging();
+        // Create staging
+        res = super.onStaging();
         // Go on only if staging was created
         if(res == OK) {
             // Create backup from production
@@ -81,13 +81,13 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
         log.debug("[{}] Start processing data on staging", getConfig().getTitle());
         try {
             // Sync
-            int docs = csv.syncCodeSystemVersions(
+            boolean created = engine.synthesize(
                 getConfig().getParent().getStaging(),
                 getCollection()
             );
             // Emptiness check
-            if(docs == 0) {
-                log.debug("[{}] Skipping processing because no dictionaries were found", getConfig().getTitle());
+            if(!created) {
+                log.debug("[{}] Skipping processing because no structures were found", getConfig().getTitle());
             } else {
                 log.debug("[{}] Operations have been applied on staging", getConfig().getTitle());
             }
@@ -126,8 +126,8 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
     }
 
     @Override
-    public DictionaryCFG getConfig() {
-        return (DictionaryCFG) super.getConfig();
+    public EngineCFG getConfig() {
+        return (EngineCFG) super.getConfig();
     }
 
     @Override
@@ -159,25 +159,6 @@ public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
                 ex
             );
         }
-        return res;
-    }
-    protected ActionRes createStaging() {
-        // Working var
-        ActionRes res = KO;
-        log.debug("[{}] Creating an empty new staging collection", getConfig().getTitle());
-        try {
-            // Assign the collection
-            setCollection(getBridge().getRepository().create(getConfig().getStaging()));
-            // Set the flag
-            res = OK;
-            log.debug("[{}] Staging branch ready", getConfig().getTitle());
-        } catch (EdsDbException ex) {
-            log.error(
-                format("[%s] Unable to create staging branch", getConfig().getTitle()),
-                ex
-            );
-        }
-        // Bye
         return res;
     }
 

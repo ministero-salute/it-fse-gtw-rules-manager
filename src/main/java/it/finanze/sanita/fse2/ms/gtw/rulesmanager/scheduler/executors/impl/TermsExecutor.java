@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
@@ -13,7 +13,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.Terminolog
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionCallbackEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
@@ -21,7 +20,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util.Process
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.TerminologyQuery;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.chunk.base.EmptySetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.utils.EmptySetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +36,6 @@ import java.util.Optional;
 
 import static com.mongodb.client.model.Updates.set;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
 import static java.lang.String.format;
 
@@ -46,7 +44,7 @@ import static java.lang.String.format;
 @Component
 @Setter
 @Getter
-public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshotHandlerEDS {
+public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshotHandlerEDS {
 
     @Autowired
     private TerminologyQuery query;
@@ -56,12 +54,7 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
 
     private ChangeSetChunkDTO snapshot;
 
-    private IActionCallbackEDS onBeforeSwap;
-
-    private IActionCallbackEDS onSuccessSwap;
-    private IActionCallbackEDS onFailedSwap;
-
-    protected TermsChunkExecutor(TerminologyChunkedCFG config, BridgeEDS bridge) {
+    protected TermsExecutor(TerminologyChunkedCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
 
@@ -283,60 +276,6 @@ public class TermsChunkExecutor extends ExecutorEDS<EmptySetDTO> implements ISna
         setCollection(null);
         setOperations(null);
         return ActionRes.OK;
-    }
-    @Override
-    protected ActionRes onSwap() {
-        // Working var
-        ActionRes res = KO;
-        // Verify pre-callback has been provided
-        if(onBeforeSwap != null) {
-            // Log me
-            log.debug("[{}] Executing pre-swap operation", getConfig().getTitle());
-            // Execute callback
-            CallbackRes cb = onBeforeSwap.execute();
-            // Check if we can keep going
-            if(cb == CB_OK) {
-                // Log me
-                log.debug("[{}] Pre-swap operation success", getConfig().getTitle());
-                // Execute swapping
-                res = super.onSwap();
-            } else {
-                // Log me
-                log.debug("[{}] Pre-swap operation failure", getConfig().getTitle());
-                // Remove staging
-                onClean();
-            }
-        }else{
-            res = super.onSwap();
-        }
-        // Verify post-callback has been provided
-        if(onFailedSwap != null && res == KO) {
-            // Log me
-            log.debug("[{}] Executing on-fail-swap to recover data", getConfig().getTitle());
-            // Execute recovery procedure
-            CallbackRes cb = onFailedSwap.execute();
-            // Check
-            if(cb == CB_OK) {
-                log.debug("[{}] Data successfully reverted", getConfig().getTitle());
-            } else {
-                log.debug("[{}] Unable to recover data", getConfig().getTitle());
-                log.error("[{}][FATAL] Unable to recover data, integrity is compromised!", getConfig().getTitle());
-            }
-        }
-        // Verify success callback has been provided
-        if(onSuccessSwap != null && res == OK) {
-            // Log me
-            log.debug("[{}] Executing on-success-swap operation", getConfig().getTitle());
-            // Execute recovery procedure
-            CallbackRes cb = onSuccessSwap.execute();
-            // Check
-            if(cb == CB_OK) {
-                log.debug("[{}] Post-swap operation success", getConfig().getTitle());
-            } else {
-                log.debug("[{}] Post-swap operation failure", getConfig().getTitle());
-            }
-        }
-        return res;
     }
 
     @Override
