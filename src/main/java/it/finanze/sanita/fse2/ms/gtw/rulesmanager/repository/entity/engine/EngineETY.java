@@ -33,16 +33,13 @@ public class EngineETY {
     private Date lastSync;
     @Field(FIELD_AVAILABLE)
     private boolean available;
-    @Field(FIELD_EXPIRED)
-    private boolean expired;
 
     public static org.bson.Document from(List<ObjectId> ids, List<EngineMap> roots, Date lastSync) {
         return new org.bson.Document()
             .append(FIELD_ROOTS, EngineMap.from(roots))
             .append(FIELD_FILES, ids)
             .append(FIELD_LAST_SYNC, lastSync)
-            .append(FIELD_AVAILABLE, false)
-            .append(FIELD_EXPIRED, false);
+            .append(FIELD_AVAILABLE, false);
     }
 
 }
