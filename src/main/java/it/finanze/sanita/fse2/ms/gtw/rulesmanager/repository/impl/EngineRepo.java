@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.structures.TransformETY.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TransformETY.*;
 
 @Repository
 public class EngineRepo implements IEngineRepo {
@@ -53,7 +53,7 @@ public class EngineRepo implements IEngineRepo {
                 new EngineMap(
                     doc.getObjectId(FIELD_ID),
                     doc.getString(FIELD_TEMPLATE_ID_ROOT),
-                    doc.getString(FIELD_ROOT_MAP),
+                    doc.getString(FIELD_URI),
                     doc.getString(FIELD_VERSION)
                 )
             );

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Model to save fhir documents
@@ -27,54 +26,23 @@ public class FhirStructuresDTO {
     @Data
     public static class Transform {
         @JsonProperty
-        private List<FhirStructures> maps;
-        @JsonProperty
-        private List<Definition> definitions;
-        @JsonProperty
-        private List<Valueset> valuesets;
-        @JsonProperty
         private String id;
         @JsonProperty
-        private Date lastUpdateDate;
+        private String uri;
         @JsonProperty
         private String version;
         @JsonProperty
         private String templateIdRoot;
         @JsonProperty
-        private String rootMap;
+        private String content;
+        @JsonProperty
+        private String filename;
+        @JsonProperty
+        private String type;
+        @JsonProperty
+        private Date lastUpdateDate;
         @JsonProperty
         private Boolean deleted;
 
-    }
-
-    @Data
-    public static class Valueset {
-        @JsonProperty
-        private String filenameValueset;
-        @JsonProperty
-        private String nameValueset;
-        @JsonProperty
-        private String contentValueset;
-    }
-
-    @Data
-    public static class Definition {
-        @JsonProperty
-        private String filenameDefinition;
-        @JsonProperty
-        private String nameDefinition;
-        @JsonProperty
-        private String contentDefinition;
-    }
-
-    @Data
-    public static class FhirStructures {
-        @JsonProperty
-        private String filenameMap;
-        @JsonProperty
-        private String contentMap;
-        @JsonProperty
-        private String nameMap;
-        
     }
 }
