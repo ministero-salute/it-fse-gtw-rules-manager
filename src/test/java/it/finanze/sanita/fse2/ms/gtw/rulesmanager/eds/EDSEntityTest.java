@@ -4,11 +4,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.Definition;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.FhirStructures;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.Transform;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO.Valueset;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
@@ -28,9 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -193,52 +186,5 @@ public class EDSEntityTest {
 		assertDoesNotThrow(() -> terminologyQuery.getComparatorQuery(documentDto)); 
 		
 	
-	} 
-	
-	@Test
-	void getUpsertQuerySchemaFhirStructureTest() {
-		FhirStructuresDTO dto = new FhirStructuresDTO(); 
-		Transform fhir = new Transform(); 
-		
-		FhirStructures fhirStructure = new FhirStructures(); 
-		fhirStructure.setNameMap("name"); 
-		fhirStructure.setContentMap("content"); 
-		fhirStructure.setFilenameMap("filename"); 
-		
-		Definition def = new Definition(); 
-		def.setNameDefinition("defName");
-		def.setContentDefinition("defContent"); 
-		def.setFilenameDefinition("defFilename"); 
-		
-		Valueset val = new Valueset(); 
-		val.setNameValueset("valName");
-		val.setContentValueset("valContent");
-		val.setFilenameValueset("valFilename");
-		
-		List<FhirStructures> map = new ArrayList<FhirStructures>(); 
-		List<Definition> defMap = new ArrayList<Definition>(); 
-		List<Valueset> valMap = new ArrayList<Valueset>(); 
-
-
-		map.add(fhirStructure); 
-		defMap.add(def); 
-		valMap.add(val); 
-		
-		fhir.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		fhir.setTemplateIdRoot("templateIdRoot"); 
-
-		dto.setSpanID("spanID");
-		dto.setTraceID("traceID"); 
-		dto.setDocument(fhir);
-		
-		Document documentDto = fhirQuery.getUpsertQuery(dto); 
-		
-		assertDoesNotThrow(() -> fhirQuery.getComparatorQuery(documentDto)); 
-		assertDoesNotThrow(() -> fhirQuery.getFilterQuery("6332f5bbacf1522dbb24883f")); 
-		assertDoesNotThrow(() -> fhirQuery.getDeleteQuery("6332f5bbacf1522dbb24883f")); 
-		assertDoesNotThrow(() -> fhirQuery.buildMapDocuments(map)); 
-		assertDoesNotThrow(() -> fhirQuery.buildDefinitionDocuments(defMap)); 
-		assertDoesNotThrow(() -> fhirQuery.buildValuesetDocuments(valMap)); 
-
 	}
 }
