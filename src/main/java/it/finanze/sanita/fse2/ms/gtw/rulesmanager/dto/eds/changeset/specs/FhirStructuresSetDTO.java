@@ -5,8 +5,10 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class FhirStructuresSetDTO {
-	String templateIdRoot;
+	List<String> templateIdRoot;
 	String version;
 }

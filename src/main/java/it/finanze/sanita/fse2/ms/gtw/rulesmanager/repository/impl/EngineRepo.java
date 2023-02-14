@@ -52,7 +52,7 @@ public class EngineRepo implements IEngineRepo {
             maps.add(
                 new EngineMap(
                     doc.getObjectId(FIELD_ID),
-                    doc.getString(FIELD_TEMPLATE_ID_ROOT),
+                    doc.getList(FIELD_TEMPLATE_ID_ROOT, String.class),
                     doc.getString(FIELD_URI),
                     doc.getString(FIELD_VERSION)
                 )

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Model to save fhir documents
@@ -32,7 +33,7 @@ public class FhirStructuresDTO {
         @JsonProperty
         private String version;
         @JsonProperty
-        private String templateIdRoot;
+        private List<String> templateIdRoot;
         @JsonProperty
         private String content;
         @JsonProperty

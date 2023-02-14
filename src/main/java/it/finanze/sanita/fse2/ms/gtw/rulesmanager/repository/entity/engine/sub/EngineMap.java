@@ -25,7 +25,7 @@ public class EngineMap {
     private ObjectId oid;
 
     @Field(FIELD_ROOT)
-    private String root;
+    private List<String> root;
 
     @Field(FIELD_URI)
     private String uri;
