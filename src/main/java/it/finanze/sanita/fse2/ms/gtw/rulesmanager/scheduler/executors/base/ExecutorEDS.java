@@ -180,7 +180,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
 
     // === STEPS ===
-    public IActionFnEDS<Date> onLastUpdateProd() {
+    protected IActionFnEDS<Date> onLastUpdateProd() {
         return () -> bridge.getRepository().getLastSync(config.getProduction());
     }
     protected IActionFnEDS<Date> onLastUpdateStaging() {
