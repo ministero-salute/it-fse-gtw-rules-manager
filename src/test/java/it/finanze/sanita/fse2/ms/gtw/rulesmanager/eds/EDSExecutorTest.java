@@ -21,15 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.util.Date;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
@@ -43,12 +40,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
-@ComponentScans( value = {
-	    @ComponentScan(CONFIG_MONGO),
-	    @ComponentScan(REPOSITORY),
-	    @ComponentScan(SCHEDULER_QUERIES),
-	    @ComponentScan(UTILITY)
-	})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EDSExecutorTest {
 
@@ -62,6 +53,14 @@ public class EDSExecutorTest {
     private IExecutorRepo repository;
     @Autowired
     private EDSSchemaDB db;
+
+    @BeforeAll
+    public void init() { resetDB(); }
+
+    @AfterEach
+    public void reset() {
+        resetDB();
+    }
 
     @Test
     void clean() {
@@ -85,35 +84,25 @@ public class EDSExecutorTest {
     void changeset() throws EdsClientException {
         // Setup production
         setupProduction();
-
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
         when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangeset());
-        
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-        
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(10, 1, 10));
-
-
         // Changeset is not empty, it should be OK
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-        
-        
         when(client.getStatus(any(), any(), any())).thenReturn(createChangeset(0,0,0));
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenThrow(
             new EdsClientException("Test error", new IOException("Test error"))
         );
         // Get status errored, it should be KO
         assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
-        
         // Verify production integrity
         verifyProductionIntegrity();
-        
     }
 
 
@@ -149,11 +138,8 @@ public class EDSExecutorTest {
         setupProduction();
         // Setup changeset
         executor.setChangeset(MockExecutor.createChangeset(10, 1, 9));
-
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
-        
-
         // Now check size
         assertEquals(10, executor.getOperations().getInsertions());
         assertEquals(1, executor.getOperations().getDeletions());
@@ -174,10 +160,8 @@ public class EDSExecutorTest {
         setupProduction();
         // Setup changeset
         executor.setChangeset(emptyChangeset());
-
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
-        
         // Verify production integrity
         verifyProductionIntegrity();
     }
@@ -291,14 +275,6 @@ public class EDSExecutorTest {
 
     private void verifyProductionIntegrity() {
         assertTrue(compareDeeply(db.handler().getEntitiesAsDocuments(), getProduction()));
-    }
-
-    @BeforeAll
-    public void init() { resetDB(); }
-
-    @AfterEach
-    public void teardown() {
-        resetDB();
     }
 
     private void resetDB() {
