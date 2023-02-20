@@ -24,7 +24,7 @@ public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
     );
 
     @Override
-    protected TerminologyETY asInitEntity(Path path) throws Exception {
+    protected TerminologyETY asInitEntity(Path path) {
         return TerminologyETY.fromPath(path, "system", "version", "code", "description");
     }
 
