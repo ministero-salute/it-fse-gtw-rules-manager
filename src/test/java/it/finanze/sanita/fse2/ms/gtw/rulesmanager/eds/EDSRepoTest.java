@@ -6,7 +6,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSDatabaseHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
@@ -16,33 +16,24 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.util.Date;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.ComponentScan.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSSchemaHandler.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 
 
-@DataMongoTest
-@ComponentScans( value = {
-    @ComponentScan(CONFIG_MONGO),
-    @ComponentScan(REPOSITORY),
-    @ComponentScan(SCHEDULER_QUERIES),
-    @ComponentScan(UTILITY)
-})
+@SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EDSRepoTest extends EDSDatabaseHandler {
+public class EDSRepoTest {
 
     @SpyBean
     private MongoTemplate mongo;
@@ -50,10 +41,12 @@ public class EDSRepoTest extends EDSDatabaseHandler {
     private IExecutorRepo repository;
     @Autowired
     private SchemaQuery query;
+    @Autowired
+    private EDSSchemaDB db;
 
     @BeforeAll
-    public void setup() throws IOException {
-        this.setupTestRepository(TEST_BASE_COLLECTION);
+    public void setup() throws Exception {
+        db.setupTestRepository(TEST_BASE_COLLECTION);
     }
 
     @Test
@@ -168,6 +161,6 @@ public class EDSRepoTest extends EDSDatabaseHandler {
 
     @AfterAll
     public void teardown() {
-        this.clearTestRepository(TEST_BASE_COLLECTION);
+        db.clearTestRepository(TEST_BASE_COLLECTION);
     }
 }

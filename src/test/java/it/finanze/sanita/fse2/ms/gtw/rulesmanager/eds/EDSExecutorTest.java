@@ -7,13 +7,11 @@ import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSDatabaseHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TermsExecutor;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,7 +50,7 @@ import static org.mockito.Mockito.when;
 	    @ComponentScan(UTILITY)
 	})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EDSExecutorTest extends EDSDatabaseHandler {
+public class EDSExecutorTest {
 
     @SpyBean
     private MongoTemplate mongo;
@@ -60,10 +58,10 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     private IEDSClient client;
     @Autowired
     private MockExecutor executor;
-    @Autowired
-    private TermsExecutor chunkExecutor;
     @SpyBean
     private IExecutorRepo repository;
+    @Autowired
+    private EDSSchemaDB db;
 
     @Test
     void clean() {
@@ -80,8 +78,6 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         assertEquals(OK, executor.onClean());
         // Verify production integrity
         verifyProductionIntegrity();
-        
-        chunkExecutor.onChunkDeletions(); 
     }
 
 
@@ -211,11 +207,11 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     }
 
     @Test
-    void swap() throws IOException, EdsDbException {
+    void swap() throws Exception {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        this.setupTestRepository(executor.getConfig().getStaging());
+        db.setupTestRepository(executor.getConfig().getStaging());
         // Call swap with staging instance
         assertEquals(OK, executor.onSwap(
             mongo.getCollection(executor.getConfig().getStaging())
@@ -228,11 +224,11 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     }
 
     @Test
-    void sync() throws IOException, EdsDbException {
+    void sync() throws Exception {
         // Setup production
         setupProduction();
         // Setup repository with document
-        this.setupTestRepository(executor.getConfig().getStaging());
+        db.setupTestRepository(executor.getConfig().getStaging());
         // Create
         ChangeSetDTO<MockData> changeset = createChangeset(10, 1, 9);
         // Setup changeset
@@ -282,11 +278,11 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
         // Setup production
         setupProduction();
         // Use modified entities list to create a mismatch
-        assertFalse(compareDeeply(getModifiedEntitiesAsDocuments(), getProduction()));
+        assertFalse(compareDeeply(db.handler().getModifiedEntitiesAsDocuments(), getProduction()));
     }
 
     private void setupProduction() {
-        assertDoesNotThrow(() -> this.setupTestRepository(executor.getConfig().getProduction()));
+        assertDoesNotThrow(() -> db.setupTestRepository(executor.getConfig().getProduction()));
     }
 
     private MongoCollection<Document> getProduction() {
@@ -294,7 +290,7 @@ public class EDSExecutorTest extends EDSDatabaseHandler {
     }
 
     private void verifyProductionIntegrity() {
-        assertTrue(compareDeeply(this.getEntitiesAsDocuments(), getProduction()));
+        assertTrue(compareDeeply(db.handler().getEntitiesAsDocuments(), getProduction()));
     }
 
     @BeforeAll

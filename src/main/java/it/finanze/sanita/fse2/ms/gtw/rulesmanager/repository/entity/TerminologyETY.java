@@ -5,11 +5,11 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Date;
 
@@ -83,11 +83,9 @@ public class TerminologyETY {
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		result = prime * result + ((system == null) ? 0 : system.hashCode());
 		return result;
-	} 
+	}
 	
-	
-    public static TerminologyETY fromPath(Path path, String system, String version,
-    		String code, String description) throws IOException {
+    public static TerminologyETY fromPath(Path path, String system, String version, String code, String description) {
     	TerminologyETY entity = new TerminologyETY();
         entity.setSystem(system); 
         entity.setVersion(version); 
@@ -97,4 +95,16 @@ public class TerminologyETY {
         entity.setLastSync(new Date());
         return entity;
     }
+
+	public org.bson.Document toDocument() {
+		return new org.bson.Document()
+			.append(FIELD_ID, new ObjectId(this.getId()))
+			.append(FIELD_SYSTEM, this.getSystem())
+			.append(FIELD_VERSION, this.getVersion())
+			.append(FIELD_CODE, this.getCode())
+			.append(FIELD_DESCRIPTION, this.getDescription())
+			.append(FIELD_RELEASE_DATE, this.getReleaseDate())
+			.append(FIELD_LAST_UPDATE, this.getLastUpdateDate())
+			.append(FIELD_DELETED, false);
+	}
 }
