@@ -54,7 +54,12 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
 
     private ChangeSetChunkDTO snapshot;
 
+    @Autowired
     protected TermsExecutor(TerminologyChunkedCFG config, BridgeEDS bridge) {
+        super(config, bridge);
+    }
+
+    protected TermsExecutor(ChunkChangesetCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
 
