@@ -1,7 +1,12 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db;
 
+import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class AbstractSchemaDB<T> {
 
@@ -46,5 +51,9 @@ public abstract class AbstractSchemaDB<T> {
 
     public AbstractEntityHandler<T> handler() {
         return hnd;
+    }
+
+    public void verifyIntegrity(MongoCollection<Document> target) {
+        assertTrue(compareDeeply(hnd.getEntitiesAsDocuments(), target));
     }
 }
