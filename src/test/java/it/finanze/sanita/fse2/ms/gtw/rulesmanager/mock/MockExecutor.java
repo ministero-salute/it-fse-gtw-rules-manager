@@ -5,14 +5,13 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.base.ChunkStatsDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.base.ChunksDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.base.BaseSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import org.bson.Document;
@@ -29,7 +28,7 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Component
-public class MockExecutor extends ExecutorEDS<MockData> {
+public class MockExecutor extends ExecutorEDS<MockData> implements ISnapshotHandlerEDS {
 
     public static final String EMPTY_STEP = "EMPTY_STEP";
 
@@ -104,41 +103,15 @@ public class MockExecutor extends ExecutorEDS<MockData> {
         return (staging, info) -> verify ? OK : KO;
     }
 
-    public static ChangeSetDTO<MockData> emptyChangeset() {
-        return new ChangeSetDTO<>(
-            "",
-            "",
-            new Date(),
-            new Date(),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            0,
-            0
-        );
+    @Override
+    public IChunkHandlerEDS onChunkInsertion() {
+        return (staging, snapshot, chunk, max) -> new SimpleImmutableEntry<>(verify ? OK : KO, 0);
     }
-    
-    public static ChangeSetChunkDTO emptyChangesetChunk() {
-    	ChangeSetChunkDTO chunk = new ChangeSetChunkDTO();
-    	ChunksDTO chunks = new ChunksDTO(); 
 
-    	chunk.setTraceID("");
-    	chunk.setSpanID("");
-    	chunk.setChunks(chunks); 
-        return chunk; 
+    @Override
+    public IChunkHandlerEDS onChunkDeletions() {
+        return (staging, snapshot, chunk, max) -> new SimpleImmutableEntry<>(verify ? OK : KO, 0);
     }
-    
-    public static ChangeSetChunkDTO createChangesetChunk() {
-    	ChangeSetChunkDTO chunk = new ChangeSetChunkDTO();
-    	ChunksDTO chunks = new ChunksDTO(); 
-    	chunks.setInsertions(new ChunkStatsDTO()); 
-    	chunks.setDeletions(new ChunkStatsDTO()); 
-
-    	chunk.setTraceID("trace");
-    	chunk.setSpanID("span");
-    	chunk.setTimestamp(new Date()); 
-    	chunk.setChunks(chunks); 
-        return chunk; 
-    } 
 
     public static ChangeSetDTO<MockData> createChangeset(int insert, int delete, long size) {
 
@@ -163,28 +136,17 @@ public class MockExecutor extends ExecutorEDS<MockData> {
             size
         );
     }
-    
-    public static ChangeSetDTO<MockData> createChunks(int insert, int delete, long size) {
 
-        List<BaseSetDTO<MockData>> insertions = new ArrayList<>();
-        List<BaseSetDTO<MockData>> deletions = new ArrayList<>();
-
-        for(int i = 0; i < insert; ++i) {
-            insertions.add(new BaseSetDTO<>("testId", new MockData("insert - " + i)));
-        }
-        for(int i = 0; i < delete; ++i) {
-            deletions.add(new BaseSetDTO<>("testId", new MockData("delete - " + i)));
-        }
-
+    public static ChangeSetDTO<MockData> emptyChangeset() {
         return new ChangeSetDTO<>(
-            "randomTraceId",
-            "randomSpanId",
+            "",
+            "",
             new Date(),
             new Date(),
-            insertions,
-            deletions,
-            insert + delete,
-            size
+            new ArrayList<>(),
+            new ArrayList<>(),
+            0,
+            0
         );
     }
 
