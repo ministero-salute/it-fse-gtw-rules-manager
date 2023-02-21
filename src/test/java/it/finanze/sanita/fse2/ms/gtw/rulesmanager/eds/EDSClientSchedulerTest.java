@@ -37,7 +37,7 @@ public class EDSClientSchedulerTest {
 	{
 		scheduler.action(); 
 		try{
-			schedulerCtl.runScheduler(null); 
+			schedulerCtl.run();
 		} 
 		catch(Exception e) {
 			e.printStackTrace();

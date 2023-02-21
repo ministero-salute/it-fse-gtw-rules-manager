@@ -14,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Controller test.
  */
@@ -31,6 +29,6 @@ public interface ISchedulerCTL {
         @ApiResponse(responseCode = "423", description = "Richiesta update rigettata", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE)),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE))
     })
-    RunSchedulerDTO runScheduler(HttpServletRequest request);
+    RunSchedulerDTO run();
     
 }
