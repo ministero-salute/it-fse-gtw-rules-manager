@@ -50,7 +50,7 @@ public class InvokeEDSClientScheduler {
 	@Autowired
 	private DictionaryExecutor dictionary;
 
-	private boolean running;
+	private volatile boolean running;
 
 
 	@Async
