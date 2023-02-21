@@ -30,8 +30,7 @@ import java.util.Date;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -107,6 +106,29 @@ public class EDSExecutorTest {
         verifyProductionIntegrity();
     }
 
+    @Test
+    void changesetEmpty() throws Exception {
+        // Get loaded entities
+        db.handler().initTestEntities();
+        int size = db.handler().getEntities().size();
+        // Mock to trigger empty changeset check
+        executor.setChangeset(createChangeset(0, 0, size));
+        // Setup production
+        setupProduction();
+        // Verify size
+        assertEquals(EXIT, executor.onChangesetEmpty());
+    }
+
+    @Test
+    void changesetNotEmpty() throws Exception {
+        // Get loaded entities
+        db.handler().initTestEntities();
+        int size = db.handler().getEntities().size();
+        // Mock to trigger empty changeset check
+        executor.setChangeset(createChangeset(10, 0, size));
+        // Verify size
+        assertEquals(OK, executor.onChangesetEmpty());
+    }
 
     
     @Test
@@ -337,6 +359,32 @@ public class EDSExecutorTest {
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
         verifyProductionIntegrity();
+    }
+
+    @Test
+    void size() throws Exception {
+        // Get loaded entities
+        db.handler().initTestEntities();
+        int size = db.handler().getEntities().size();
+        // Mock due to stats printing on log
+        executor.setChangeset(createChangeset(size, 0, size));
+        // Setup production
+        setupProduction();
+        // Verify size
+        assertEquals(EXIT, executor.onVerifyProductionSize());
+    }
+
+    @Test
+    void sizeMismatch() throws Exception {
+        // Get loaded entities
+        db.handler().initTestEntities();
+        int size = db.handler().getEntities().size();
+        // Mock due to stats printing on log
+        executor.setChangeset(createChangeset(size, 0, size + 2));
+        // Setup production
+        setupProduction();
+        // Verify size
+        assertEquals(KO, executor.onVerifyProductionSize());
     }
 
     @Test

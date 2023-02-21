@@ -104,6 +104,11 @@ public class MockExecutor extends ExecutorEDS<MockData> implements ISnapshotHand
     }
 
     @Override
+    public ActionRes onVerifyProductionSize() {
+        return super.onVerifyProductionSize();
+    }
+
+    @Override
     public IChunkHandlerEDS onChunkInsertion() {
         return (staging, snapshot, chunk, max) -> new SimpleImmutableEntry<>(verify ? OK : KO, 0);
     }
