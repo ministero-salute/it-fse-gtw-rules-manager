@@ -10,8 +10,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import org.bson.Document;
@@ -28,7 +26,7 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Component
-public class MockExecutor extends ExecutorEDS<MockData> implements ISnapshotHandlerEDS {
+public class MockExecutor extends ExecutorEDS<MockData> {
 
     public static final String EMPTY_STEP = "EMPTY_STEP";
 
@@ -106,16 +104,6 @@ public class MockExecutor extends ExecutorEDS<MockData> implements ISnapshotHand
     @Override
     public ActionRes onVerifyProductionSize() {
         return super.onVerifyProductionSize();
-    }
-
-    @Override
-    public IChunkHandlerEDS onChunkInsertion() {
-        return (staging, snapshot, chunk, max) -> new SimpleImmutableEntry<>(verify ? OK : KO, 0);
-    }
-
-    @Override
-    public IChunkHandlerEDS onChunkDeletions() {
-        return (staging, snapshot, chunk, max) -> new SimpleImmutableEntry<>(verify ? OK : KO, 0);
     }
 
     public static ChangeSetDTO<MockData> createChangeset(int insert, int delete, long size) {
