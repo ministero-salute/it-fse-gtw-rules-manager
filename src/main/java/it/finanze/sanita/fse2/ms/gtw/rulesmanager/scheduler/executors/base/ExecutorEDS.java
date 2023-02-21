@@ -325,6 +325,9 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             }
         }
         // Verify success callback has been provided
+        // This listener is supposed to be side effect free and idempotent
+        // If it fails but onBeforeSwap() or swap() returned OK we are not
+        // modifying the operation result
         if(onSuccessSwap != null && res == OK) {
             // Log me
             log.debug("[{}] Executing on-success-swap operation", getConfig().getTitle());

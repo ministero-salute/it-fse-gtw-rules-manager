@@ -28,10 +28,11 @@ import java.io.IOException;
 import java.util.Date;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.createChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.emptyChangeset;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -60,6 +61,7 @@ public class EDSExecutorTest {
     @AfterEach
     public void reset() {
         resetDB();
+        resetListeners();
     }
 
     @Test
@@ -137,7 +139,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup changeset
-        executor.setChangeset(MockExecutor.createChangeset(10, 1, 9));
+        executor.setChangeset(createChangeset(10, 1, 9));
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         // Now check size
@@ -179,7 +181,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup changeset
-        executor.setChangeset(MockExecutor.createChangeset(10,1, size));
+        executor.setChangeset(createChangeset(10,1, size));
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         assertEquals(OK, executor.onVerify());
@@ -196,6 +198,136 @@ public class EDSExecutorTest {
         setupProduction();
         // Setup repositories with documents
         db.setupTestRepository(executor.getConfig().getStaging());
+        // Call swap with staging instance
+        assertEquals(OK, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onBeforeSwapOK() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_OK);
+        // Call swap with staging instance
+        assertEquals(OK, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onBeforeSwapKO() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_KO);
+        // Call swap with staging instance
+        assertEquals(KO, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onFailedSwapOK() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_KO);
+        executor.setOnFailedSwap(() -> CB_OK);
+        // Call swap with staging instance
+        assertEquals(KO, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onFailedSwapKO() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_KO);
+        executor.setOnFailedSwap(() -> CB_KO);
+        // Call swap with staging instance
+        assertEquals(KO, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onSuccessSwapOK() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_OK);
+        executor.setOnSuccessSwap(() -> CB_OK);
+        // Call swap with staging instance
+        assertEquals(OK, executor.onSwap(
+            mongo.getCollection(executor.getConfig().getStaging())
+        ));
+        // Staging is removed, production is kept
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
+        // Verify production integrity
+        verifyProductionIntegrity();
+    }
+
+    @Test
+    void onSuccessSwapKO() throws Exception {
+        // Mock due to stats printing on log
+        executor.setChangeset(emptyChangeset());
+        // Setup production
+        setupProduction();
+        // Setup repositories with documents
+        db.setupTestRepository(executor.getConfig().getStaging());
+        // Setup listener
+        executor.setOnBeforeSwap(() -> CB_OK);
+        executor.setOnSuccessSwap(() -> CB_KO);
         // Call swap with staging instance
         assertEquals(OK, executor.onSwap(
             mongo.getCollection(executor.getConfig().getStaging())
@@ -253,7 +385,7 @@ public class EDSExecutorTest {
         executor.registerAdditionalHandlers();
         // Check if mapping key is available
         assertTrue(
-            executor.getMappers().containsKey(MockExecutor.EMPTY_STEP)
+            executor.getMappers().containsKey(EMPTY_STEP)
         );
     }
 
@@ -267,6 +399,12 @@ public class EDSExecutorTest {
 
     private void setupProduction() {
         assertDoesNotThrow(() -> db.setupTestRepository(executor.getConfig().getProduction()));
+    }
+
+    private void resetListeners() {
+        executor.setOnBeforeSwap(null);
+        executor.setOnFailedSwap(null);
+        executor.setOnSuccessSwap(null);
     }
 
     private MongoCollection<Document> getProduction() {
