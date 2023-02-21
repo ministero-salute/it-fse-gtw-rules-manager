@@ -27,6 +27,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.AbstractMap;
@@ -42,6 +43,7 @@ import static java.lang.String.format;
 
 @Slf4j
 @Component
+@Primary
 @Setter
 @Getter
 public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshotHandlerEDS {
