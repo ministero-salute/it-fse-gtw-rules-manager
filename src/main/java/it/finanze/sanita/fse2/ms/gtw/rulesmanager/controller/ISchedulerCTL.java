@@ -12,17 +12,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.tools.RunSchedulerDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.RouteUtility.API_RUN_SCHEDULER_FULL;
 
 /**
  * Controller test.
  */
-@RequestMapping(path = "/v1")
 @Tag(name = "Servizio di test")
 public interface ISchedulerCTL {
-  
-    
-    @PostMapping("/run-scheduler")
+
+    @PostMapping(API_RUN_SCHEDULER_FULL)
     @Operation(summary = "Run cfg items scheduler", description = "Run cft items scheduler.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Richiesta update in coda", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RunSchedulerDTO.class))),
