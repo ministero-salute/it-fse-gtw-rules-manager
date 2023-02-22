@@ -88,7 +88,6 @@ public class EDSExecutorTest {
         setupProduction();
         // Provide knowledge
         when(client.getStatus(any(), any(), any())).thenReturn(emptyChangeset());
-        when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangeset());
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
