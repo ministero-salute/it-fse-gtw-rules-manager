@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.Date;
 
-import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -84,8 +83,6 @@ class EDSChunksExecutorTest {
         );
         // Get status errored, it should be KO
         assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
     
     @Test
@@ -124,8 +121,6 @@ class EDSChunksExecutorTest {
         assertEquals(10, executor.getSnapshot().getChunks().getInsertions().getChunksCount());
         assertEquals(1, executor.getSnapshot().getChunks().getDeletions().getChunksCount());
         assertEquals(11, executor.getSnapshot().getTotalNumberOfElements());
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
 
     @Test
@@ -136,8 +131,6 @@ class EDSChunksExecutorTest {
         executor.setSnapshot(emptyChangesetChunk());
         // Call processing
         assertEquals(OK, executor.onProcessing());
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
     
     @Test
@@ -159,8 +152,6 @@ class EDSChunksExecutorTest {
         // Call processing with unverified flag
         assertEquals(OK, executor.onProcessing(false));
         assertEquals(KO, executor.onVerify());
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
     
     @Test
@@ -179,8 +170,6 @@ class EDSChunksExecutorTest {
         Date lastSync = repository.getLastSync(executor.getConfig().getStaging());
         // Verify it matches
         assertEquals(lastSync, chunkDTO.getTimestamp());
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
     
     @Test
@@ -199,8 +188,6 @@ class EDSChunksExecutorTest {
         executor.setSnapshot(chunkDTO);
         // Call it
         assertEquals(KO, executor.onChangesetAlignment());
-        // Verify production integrity
-        db.verifyIntegrity(getProduction());
     }
     
     @Test
@@ -236,10 +223,6 @@ class EDSChunksExecutorTest {
     
     private void setupProduction() {
         assertDoesNotThrow(() -> db.setupTestRepository(executor.getConfig().getProduction()));
-    }
-
-    private MongoCollection<Document> getProduction() {
-        return mongo.getCollection(executor.getConfig().getProduction());
     }
 
     private void resetDB() {

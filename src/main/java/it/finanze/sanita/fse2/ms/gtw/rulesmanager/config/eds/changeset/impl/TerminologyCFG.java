@@ -3,18 +3,19 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.CollectionNaming;
+import lombok.Getter;
 
 @Configuration
 @Getter
 public class TerminologyCFG extends ChunkChangesetCFG {
 
-    private static final String SCHEMA = "terminology";
-
     protected TerminologyCFG(
+    	CollectionNaming naming,
         @Value("${eds.changeset.terminology.chunks.status}")
         String status,
         @Value("${eds.changeset.terminology.chunks.ins}")
@@ -22,6 +23,6 @@ public class TerminologyCFG extends ChunkChangesetCFG {
         @Value("${eds.changeset.terminology.chunks.del}")
         String delete
     ) {
-        super(status, insert, delete, SCHEMA);
+        super(status, insert, delete, naming.getTerminologyCollection());
     }
 }

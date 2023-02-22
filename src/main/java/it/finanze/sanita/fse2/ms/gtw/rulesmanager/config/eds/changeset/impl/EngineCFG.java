@@ -3,18 +3,19 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
-import lombok.Getter;
 import org.springframework.context.annotation.Configuration;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.CollectionNaming;
+import lombok.Getter;
 
 @Configuration
 @Getter
 public class EngineCFG extends ChangesetCFG {
-    private static final String SCHEMA = "engines";
     private final String backup;
 
-    protected EngineCFG(FhirStructuresCFG parent) {
-        super(null, null, SCHEMA, parent);
-        this.backup = SCHEMA + BACKUP_QUALIFIER;
+    protected EngineCFG(CollectionNaming naming, FhirStructuresCFG parent) {
+        super(null, null, naming.getEngineCollection(), parent);
+        this.backup = naming.getEngineCollection() + BACKUP_QUALIFIER;
     }
 }
