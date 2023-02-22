@@ -4,7 +4,6 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
 import lombok.Getter;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +13,7 @@ public class DictionaryCFG extends ChangesetCFG {
     private static final String SCHEMA = "dictionary";
     private final String backup;
 
-    protected DictionaryCFG(TerminologyChunkedCFG parent) {
+    protected DictionaryCFG(TerminologyCFG parent) {
         super(null, null, SCHEMA, parent);
         this.backup = SCHEMA + BACKUP_QUALIFIER;
     }

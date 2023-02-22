@@ -3,7 +3,7 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.EngineCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.EngineCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;

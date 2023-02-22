@@ -7,7 +7,7 @@ import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.chunk.TerminologyChunkedCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.TerminologyCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkDelDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
@@ -57,7 +57,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     private ChangeSetChunkDTO snapshot;
 
     @Autowired
-    protected TermsExecutor(TerminologyChunkedCFG config, BridgeEDS bridge) {
+    protected TermsExecutor(TerminologyCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
 
