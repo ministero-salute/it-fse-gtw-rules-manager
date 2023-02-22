@@ -3,64 +3,66 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Collections.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST_PREFIX;
+
 @Configuration
 public class CollectionNaming {
 
     @Autowired
-    private ProfileUtility profileUtility;
+    private ProfileUtility profiles;
 
     @Bean("schemaBean")
     public String getSchemaCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.SCHEMA;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + SCHEMA;
         }
-        return Constants.Collections.SCHEMA;
+        return SCHEMA;
     }
 
     @Bean("schematronBean")
     public String getSchematronCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.SCHEMATRON;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + SCHEMATRON;
         }
-        return Constants.Collections.SCHEMATRON;
+        return SCHEMATRON;
     }
 
     @Bean("terminologyBean")
     public String getTerminologyCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.TERMINOLOGY;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + TERMINOLOGY;
         }
-        return Constants.Collections.TERMINOLOGY;
+        return TERMINOLOGY;
     }
 
     @Bean("structuresBean")
     public String getStructuresCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.FHIR_TRANSFORM;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + FHIR_TRANSFORM;
         }
-        return Constants.Collections.FHIR_TRANSFORM;
+        return FHIR_TRANSFORM;
     }
 
     @Bean("dictionaryBean")
     public String getDictionaryCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.DICTIONARY;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + DICTIONARY;
         }
-        return Constants.Collections.DICTIONARY;
+        return DICTIONARY;
     }
 
     @Bean("engineBean")
     public String getEngineCollection() {
-        if (profileUtility.isTestProfile()) {
-            return Constants.Profile.TEST_PREFIX + Constants.Collections.ENGINE;
+        if (profiles.isTestProfile()) {
+            return TEST_PREFIX + ENGINES;
         }
-        return Constants.Collections.ENGINE;
+        return ENGINES;
     }
 
 }
