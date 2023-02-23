@@ -3,15 +3,15 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.nio.file.Path;
-import java.util.Date;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Model to save terminology.
@@ -84,17 +84,6 @@ public class TerminologyETY {
 		result = prime * result + ((system == null) ? 0 : system.hashCode());
 		return result;
 	}
-	
-    public static TerminologyETY fromPath(Path path, String system, String version, String code, String description) {
-    	TerminologyETY entity = new TerminologyETY();
-        entity.setSystem(system); 
-        entity.setVersion(version); 
-        entity.setCode(code); 
-        entity.setDescription(description); 
-        entity.setLastUpdateDate(new Date());
-        entity.setLastSync(new Date());
-        return entity;
-    }
 
 	public org.bson.Document toDocument() {
 		return new org.bson.Document()
@@ -106,5 +95,17 @@ public class TerminologyETY {
 			.append(FIELD_RELEASE_DATE, this.getReleaseDate())
 			.append(FIELD_LAST_UPDATE, this.getLastUpdateDate())
 			.append(FIELD_DELETED, false);
+	}
+	
+	public static TerminologyETY fromDocument(org.bson.Document doc) {
+		TerminologyETY entity = new TerminologyETY();
+		entity.setId(doc.getObjectId(FIELD_ID).toHexString());
+        entity.setSystem(doc.getString(FIELD_SYSTEM)); 
+        entity.setVersion(doc.getString(FIELD_VERSION)); 
+        entity.setCode(doc.getString(FIELD_CODE)); 
+        entity.setDescription(doc.getString(FIELD_DESCRIPTION)); 
+        entity.setLastUpdateDate(doc.getDate(FIELD_LAST_UPDATE));
+        entity.setLastSync(doc.getDate(FIELD_LAST_SYNC));
+        return entity;
 	}
 }

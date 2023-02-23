@@ -3,18 +3,16 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
+
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Model to save schema documents
@@ -51,20 +49,17 @@ public class SchemaETY {
 	@Field(name = FIELD_DELETED)
     private Boolean deleted;
 
-    public void setContentSchemaFromPath(Path path) throws IOException {
-        this.contentSchema = new Binary(Files.readAllBytes(path));
-    }
-
-    public static SchemaETY fromPath(Path path, String extension, boolean root) throws IOException {
-        SchemaETY entity = new SchemaETY();
-        entity.setNameSchema(path.getFileName().toString());
-        entity.setContentSchemaFromPath(path);
-        entity.setTypeIdExtension(extension);
-        entity.setRootSchema(root);
-        entity.setLastUpdateDate(new Date());
-        entity.setLastSync(new Date());
-        entity.setDeleted(false);
-        return entity;
+    public static SchemaETY fromDocument(org.bson.Document doc) {
+    	SchemaETY entity = new SchemaETY();
+    	entity.setId(doc.getObjectId(FIELD_ID).toHexString());
+        entity.setNameSchema(doc.getString(FIELD_FILENAME));
+        entity.setContentSchema(doc.get(FIELD_CONTENT, Binary.class));
+        entity.setTypeIdExtension(doc.getString(FIELD_TYPE_ID_EXT));
+        entity.setRootSchema(doc.getBoolean(FIELD_ROOT_SCHEMA));
+        entity.setLastUpdateDate(doc.getDate(FIELD_LAST_UPDATE));
+        entity.setLastSync(doc.getDate(FIELD_LAST_SYNC));
+        entity.setDeleted(doc.getBoolean(FIELD_DELETED));
+		return entity;
     }
 
     public static org.bson.Document toDocument(SchemaETY entity) {

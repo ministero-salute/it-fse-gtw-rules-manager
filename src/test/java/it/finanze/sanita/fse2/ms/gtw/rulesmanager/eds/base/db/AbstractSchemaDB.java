@@ -3,60 +3,103 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db;
 
-import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
-import org.bson.Document;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
 
 public abstract class AbstractSchemaDB<T> {
+	
+	public static String TEST_BASE_COLLECTION = "eds-test-x";
 
     private final MongoTemplate mongo;
     private final AbstractEntityHandler<T> hnd;
+    private final ChangesetCFG config;
 
-    public AbstractSchemaDB(MongoTemplate mongo, AbstractEntityHandler<T> hnd) {
+    public AbstractSchemaDB(MongoTemplate mongo, AbstractEntityHandler<T> hnd, ChangesetCFG config) {
         this.mongo = mongo;
         this.hnd = hnd;
+        this.config = config;
+    }
+    
+    public void setupTest() throws Exception {
+    	setupRepository(TEST_BASE_COLLECTION);
+    }
+    
+    public void setupProduction() throws Exception {
+    	setupRepository(config.getProduction());
+    }
+    
+    public void setupStaging() throws Exception {
+    	setupRepository(config.getStaging());
     }
 
-    public void setupTestRepository(String name) throws Exception {
+    private void setupRepository(String name) throws Exception {
         // Verify if previous test database exists
-        if (isTestSchemaAvailable(name)) {
+        if (isSchemaAvailable(name)) {
             // Drop it, we are going to create a new one
             mongo.dropCollection(name);
         }
         // Make test collection
-        createTestSchema(name);
+        createEmptySchema(name);
         // Init entities
         hnd.initTestEntities();
         // Add to collection
-        addTestEntityToSchema(name);
+        addEntityToSchema(name);
+    }  
+    
+    public void clearTest() {
+    	clearRepository(TEST_BASE_COLLECTION);
+    }
+    
+    public void clearProduction() {
+    	clearRepository(config.getProduction());
+    }
+    
+    public void clearStaging() {
+    	clearRepository(config.getStaging());
     }
 
-    public void clearTestRepository(String name) {
+    private void clearRepository(String name) {
         mongo.dropCollection(name);
         hnd.clearTestEntities();
     }
 
-    private void createTestSchema(String name) {
+    private void createEmptySchema(String name) {
         mongo.createCollection(name);
     }
 
-    private void addTestEntityToSchema(String name) {
+    private void addEntityToSchema(String name) {
         mongo.insert(hnd.getEntities(), name);
     }
+    
+    public boolean isProductionAvailable() {
+    	return isSchemaAvailable(config.getProduction());
+    }
+    
+    public boolean isStagingAvailable() {
+    	return isSchemaAvailable(config.getStaging());
+    }
 
-    private boolean isTestSchemaAvailable(String name) {
+    private boolean isSchemaAvailable(String name) {
         return mongo.getCollectionNames().contains(name);
     }
 
     public AbstractEntityHandler<T> handler() {
         return hnd;
     }
+    
+    public boolean verifyIntegrityProduction() {
+    	return verifyIntegrity(config.getProduction());
+    }
+    
+    public boolean verifyIntegrityStaging() {
+    	return verifyIntegrity(config.getStaging());
+    }
 
-    public void verifyIntegrity(MongoCollection<Document> target) {
-        assertTrue(compareDeeply(hnd.getEntitiesAsDocuments(), target));
+    private boolean verifyIntegrity(String name) {
+        return compareDeeply(hnd.getDocuments(), mongo.getCollection(name));
     }
 }

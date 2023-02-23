@@ -3,15 +3,29 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
-import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import org.bson.Document;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.EXIT;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.EMPTY_STEP;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.createChangeset;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.emptyChangeset;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.Date;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,21 +37,15 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
-import java.util.Date;
+import com.mongodb.client.MongoCollection;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -78,7 +86,7 @@ public class EDSExecutorTest {
         // No collection exists, call executor without collection
         assertEquals(OK, executor.onClean());
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
 
@@ -103,7 +111,7 @@ public class EDSExecutorTest {
         // Get status errored, it should be KO
         assertEquals(KO, executor.onChangeset(executor.onLastUpdateProd()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -144,7 +152,7 @@ public class EDSExecutorTest {
         assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
         assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
         // Emptying database
         resetDB();
         // Case #2 - Production not exists
@@ -175,7 +183,7 @@ public class EDSExecutorTest {
         assertEquals(0, executor.getOperations().getDeletions());
         assertEquals(0, executor.getOperations().getOperations());
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     } 
     
     @Test
@@ -187,7 +195,7 @@ public class EDSExecutorTest {
         // Call processing with verified flag
         assertEquals(OK, executor.onProcessing(true));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
 
@@ -211,7 +219,7 @@ public class EDSExecutorTest {
         assertEquals(OK, executor.onProcessing(false));
         assertEquals(KO, executor.onVerify());
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -219,7 +227,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Call swap with staging instance
         assertEquals(OK, executor.onSwap(
             mongo.getCollection(executor.getConfig().getStaging())
@@ -228,7 +236,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -238,7 +246,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_OK);
         // Call swap with staging instance
@@ -249,7 +257,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -259,7 +267,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_KO);
         // Call swap with staging instance
@@ -270,7 +278,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -280,7 +288,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_KO);
         executor.setOnFailedSwap(() -> CB_OK);
@@ -292,7 +300,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -302,7 +310,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_KO);
         executor.setOnFailedSwap(() -> CB_KO);
@@ -314,7 +322,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -324,7 +332,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_OK);
         executor.setOnSuccessSwap(() -> CB_OK);
@@ -336,7 +344,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -346,7 +354,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repositories with documents
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Setup listener
         executor.setOnBeforeSwap(() -> CB_OK);
         executor.setOnSuccessSwap(() -> CB_KO);
@@ -358,7 +366,7 @@ public class EDSExecutorTest {
         assertTrue(repository.exists(executor.getConfig().getProduction()));
         assertFalse(repository.exists(executor.getConfig().getStaging()));
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -392,7 +400,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Setup repository with document
-        db.setupTestRepository(executor.getConfig().getStaging());
+        db.setupStaging();
         // Create
         ChangeSetDTO<SchemaSetDTO> changeset = createChangeset(10, 1, 9);
         // Setup changeset
@@ -404,7 +412,7 @@ public class EDSExecutorTest {
         // Verify it matches
         assertEquals(lastSync, changeset.getTimestamp());
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -424,7 +432,7 @@ public class EDSExecutorTest {
         // Call it
         assertEquals(KO, executor.onChangesetAlignment());
         // Verify production integrity
-        db.verifyIntegrity(getProduction());
+        db.verifyIntegrityProduction();
     }
 
     @Test
@@ -442,21 +450,17 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Use modified entities list to create a mismatch
-        assertFalse(compareDeeply(db.handler().getModifiedEntitiesAsDocuments(), getProduction()));
+        assertFalse(compareDeeply(db.handler().getModifiedEntitiesAsDocuments(), mongo.getCollection(executor.getConfig().getProduction())));
     }
 
     private void setupProduction() {
-        assertDoesNotThrow(() -> db.setupTestRepository(executor.getConfig().getProduction()));
+        assertDoesNotThrow(() -> db.setupProduction());
     }
 
     private void resetListeners() {
         executor.setOnBeforeSwap(null);
         executor.setOnFailedSwap(null);
         executor.setOnSuccessSwap(null);
-    }
-
-    private MongoCollection<Document> getProduction() {
-        return mongo.getCollection(executor.getConfig().getProduction());
     }
 
     private void resetDB() {

@@ -3,30 +3,17 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import java.util.function.Function;
+
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.function.Function;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.raw.Fixtures;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 
 @Component
 public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
-
-    public static final Path VOCAB_SAMPLE_FILES = Paths.get(
-        "src",
-        "test",
-        "resources",
-        "Files",
-        "vocabulary"
-    );
-
-    @Override
-    protected TerminologyETY asInitEntity(Path path) {
-        return TerminologyETY.fromPath(path, "system", "version", "code", "description");
-    }
 
     @Override
     protected Function<TerminologyETY, TerminologyETY> asModifiedEntity() {
@@ -34,12 +21,17 @@ public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
     }
 
     @Override
-    protected Function<TerminologyETY, Document> asDocument() {
+    protected Function<TerminologyETY, Document> toDocument() {
         return TerminologyETY::toDocument;
     }
 
-    @Override
-    protected Path getResourceDir() {
-        return VOCAB_SAMPLE_FILES;
-    }
+	@Override
+	protected Fixtures getFixtures() {
+		return Fixtures.TERMINOLOGY;
+	}
+
+	@Override
+	protected Function<Document, TerminologyETY> toEntity() {
+		return TerminologyETY::fromDocument;
+	}
 }

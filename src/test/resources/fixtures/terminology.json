@@ -1,0 +1,201 @@
+[{
+  "_id": {
+    "$oid": "63da3876e187330b275a000f"
+  },
+  "system": "1.2.840.10008.2.16.4",
+  "version": "01",
+  "code": "ARCHIVE",
+  "description": "Archive",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245686383"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da3876e187330b275a0010"
+  },
+  "system": "1.2.840.10008.2.16.4",
+  "version": "01",
+  "code": "AR",
+  "description": "Autorefraction",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245686383"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da3876e187330b275a0011"
+  },
+  "system": "1.2.840.10008.2.16.4",
+  "version": "01",
+  "code": "AS",
+  "description": "Angioscopy",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245686383"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da3876e187330b275a0012"
+  },
+  "system": "1.2.840.10008.2.16.4",
+  "version": "01",
+  "code": "AU",
+  "description": "Audio",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245686383"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da3876e187330b275a0013"
+  },
+  "system": "1.2.840.10008.2.16.4",
+  "version": "01",
+  "code": "BDUS",
+  "description": "Ultrasound Bone Densitometry",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245686383"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da38d0e187330b275b05a6"
+  },
+  "system": "2.16.840.1.113883.6.73",
+  "version": null,
+  "code": "S01ED05",
+  "description": "CARTEOLOLO",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245776641"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da38d0e187330b275b05a7"
+  },
+  "system": "2.16.840.1.113883.6.73",
+  "version": null,
+  "code": "S01ED06",
+  "description": "BEFUNOLOLO",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245776641"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da38d0e187330b275b05a8"
+  },
+  "system": "2.16.840.1.113883.6.73",
+  "version": null,
+  "code": "S01ED51",
+  "description": "TIMOLOLO, ASSOCIAZIONI",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245776641"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da38d0e187330b275b05a9"
+  },
+  "system": "2.16.840.1.113883.6.73",
+  "version": null,
+  "code": "S01ED52",
+  "description": "BETAXOLOLO, ASSOCIAZIONI",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245776641"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "63da38d0e187330b275b05aa"
+  },
+  "system": "2.16.840.1.113883.6.73",
+  "version": null,
+  "code": "S01ED54",
+  "description": "METIPRANOLOLO, ASSOCIAZIONI",
+  "release_date": null,
+  "last_update_date": {
+    "$date": {
+      "$numberLong": "1675245776641"
+    }
+  },
+  "deleted": false,
+  "last_sync": {
+    "$date": {
+      "$numberLong": "1676383424747"
+    }
+  }
+}]

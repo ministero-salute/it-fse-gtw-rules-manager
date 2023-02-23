@@ -3,13 +3,19 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.AbstractSchemaDB.TEST_BASE_COLLECTION;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSSchemaHandler.SCHEMA_TEST_SIZE;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+
+import java.util.Date;
+
 import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,19 +27,23 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Date;
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSSchemaHandler.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.SchemaQuery;
 
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EDSRepoTest {
+class EDSRepoTest {
+	
+	public static String TEST_COLL_A = "eds-test-0";
+    public static String TEST_COLL_B = "eds-test-1";
 
     @SpyBean
     private MongoTemplate mongo;
@@ -46,7 +56,7 @@ public class EDSRepoTest {
 
     @BeforeAll
     public void setup() throws Exception {
-        db.setupTestRepository(TEST_BASE_COLLECTION);
+        db.setupTest();
     }
 
     @Test
@@ -161,6 +171,6 @@ public class EDSRepoTest {
 
     @AfterAll
     public void teardown() {
-        db.clearTestRepository(TEST_BASE_COLLECTION);
+        db.clearTest();
     }
 }

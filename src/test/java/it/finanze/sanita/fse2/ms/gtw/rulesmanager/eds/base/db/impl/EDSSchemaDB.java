@@ -3,16 +3,17 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.AbstractSchemaDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSSchemaHandler;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.SchemaCFG;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.AbstractSchemaDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSSchemaHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
+
 @Component
 public class EDSSchemaDB extends AbstractSchemaDB<SchemaETY> {
-    public EDSSchemaDB(@Autowired MongoTemplate mongo, @Autowired EDSSchemaHandler hnd) {
-        super(mongo, hnd);
+    public EDSSchemaDB(MongoTemplate mongo, EDSSchemaHandler hnd, SchemaCFG config) {
+        super(mongo, hnd, config);
     }
 }

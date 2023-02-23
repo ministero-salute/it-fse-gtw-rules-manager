@@ -3,63 +3,57 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities;
 
-import org.bson.Document;
-import org.springframework.stereotype.Component;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import org.bson.Document;
+import org.springframework.stereotype.Component;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.raw.Fixtures;
 
 @Component
 public abstract class AbstractEntityHandler<T> {
-    public static String TEST_COLL_A = "eds-test-0";
-    public static String TEST_COLL_B = "eds-test-1";
-    public static String TEST_BASE_COLLECTION = "eds-test-2";
 
     private final List<T> entities;
+    private final List<Document> documents;
 
     public AbstractEntityHandler() {
         this.entities = new ArrayList<>();
+        this.documents = new ArrayList<>();
     }
 
     public void initTestEntities() throws Exception {
         // Consistency check
         if(entities.isEmpty()) {
-            // List of all files inside the sample modified directory
-            try (Stream<Path> files = Files.list(getResourceDir())) {
-                // Convert to list
-                List<Path> samples = files.collect(Collectors.toList());
-                // Add to each map and convert
-                for (Path path : samples) {
-                    this.entities.add(asInitEntity(path));
-                }
-            }
+        	this.documents.addAll(getFixtures().asDocuments());
+            this.entities.addAll(
+            		documents.stream().map(toEntity()).collect(Collectors.toList())
+            	);
         }
     }
 
     public void clearTestEntities() {
         this.entities.clear();
+        this.documents.clear();
     }
 
     public List<T> getEntities() {
         return new ArrayList<>(entities);
     }
 
-    public List<Document> getEntitiesAsDocuments() {
-        return new ArrayList<>(entities).stream().map(asDocument()).collect(Collectors.toList());
+    public List<Document> getDocuments() {
+        return new ArrayList<>(documents);
     }
 
     public List<Document> getModifiedEntitiesAsDocuments() {
-        return entities.stream().map(asModifiedEntity()).map(asDocument()).collect(Collectors.toList());
+        return entities.stream().map(asModifiedEntity()).map(toDocument()).collect(Collectors.toList());
     }
 
-    protected abstract T asInitEntity(Path path) throws Exception;
     protected abstract Function<T, T> asModifiedEntity();
-    protected abstract Function<T, Document> asDocument();
-    protected abstract Path getResourceDir();
+    protected abstract Function<T, Document> toDocument();
+    protected abstract Fixtures getFixtures();
+    protected abstract Function<Document, T> toEntity();
 
 }
