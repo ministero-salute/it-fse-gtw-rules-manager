@@ -6,10 +6,10 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockData;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +31,7 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.c
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockExecutor.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +49,7 @@ public class EDSExecutorTest {
     @MockBean
     private IEDSClient client;
     @Autowired
-    private MockExecutor executor;
+    private MockSchemaExecutor executor;
     @SpyBean
     private IExecutorRepo repository;
     @Autowired
@@ -394,7 +394,7 @@ public class EDSExecutorTest {
         // Setup repository with document
         db.setupTestRepository(executor.getConfig().getStaging());
         // Create
-        ChangeSetDTO<MockData> changeset = createChangeset(10, 1, 9);
+        ChangeSetDTO<SchemaSetDTO> changeset = createChangeset(10, 1, 9);
         // Setup changeset
         executor.setChangeset(changeset);
         // Call it
@@ -412,7 +412,7 @@ public class EDSExecutorTest {
         // Setup production
         setupProduction();
         // Create empty changeset
-        ChangeSetDTO<MockData> changeset = createChangeset(0,0, 0);
+        ChangeSetDTO<SchemaSetDTO> changeset = createChangeset(0,0, 0);
         // Set
         executor.setChangeset(changeset);
         // Call it

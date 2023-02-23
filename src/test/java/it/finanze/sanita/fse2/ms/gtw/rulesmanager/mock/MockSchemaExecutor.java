@@ -4,17 +4,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
 
 import com.mongodb.client.MongoCollection;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.SchemaCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.base.BaseSetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.cfg.MockConfig;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionStepEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.SchemaExecutor;
 import org.bson.Document;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -27,19 +27,14 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Component
-public class MockExecutor extends ExecutorEDS<MockData> {
+public class MockSchemaExecutor extends SchemaExecutor {
 
     public static final String EMPTY_STEP = "EMPTY_STEP";
 
     private boolean verify;
 
-    protected MockExecutor(MockConfig cfg, BridgeEDS bridge) {
-        super(cfg, bridge);
-    }
-
-    @Override
-    protected ParameterizedTypeReference<ChangeSetDTO<MockData>> getType() {
-        return new ParameterizedTypeReference<ChangeSetDTO<MockData>>() {};
+    protected MockSchemaExecutor(SchemaCFG config, BridgeEDS bridge) {
+        super(config, bridge);
     }
 
     public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
@@ -93,12 +88,12 @@ public class MockExecutor extends ExecutorEDS<MockData> {
     }
 
     @Override
-    public IActionHandlerEDS<MockData> onInsertion() {
+    public IActionHandlerEDS<SchemaSetDTO> onInsertion() {
         return (staging, info) -> verify ? OK : KO;
     }
 
     @Override
-    public IActionHandlerEDS<MockData> onDeletions() {
+    public IActionHandlerEDS<SchemaSetDTO> onDeletions() {
         return (staging, info) -> verify ? OK : KO;
     }
 
@@ -107,16 +102,16 @@ public class MockExecutor extends ExecutorEDS<MockData> {
         return super.onVerifyProductionSize();
     }
 
-    public static ChangeSetDTO<MockData> createChangeset(int insert, int delete, long size) {
+    public static ChangeSetDTO<SchemaSetDTO> createChangeset(int insert, int delete, long size) {
 
-        List<BaseSetDTO<MockData>> insertions = new ArrayList<>();
-        List<BaseSetDTO<MockData>> deletions = new ArrayList<>();
+        List<BaseSetDTO<SchemaSetDTO>> insertions = new ArrayList<>();
+        List<BaseSetDTO<SchemaSetDTO>> deletions = new ArrayList<>();
 
         for(int i = 0; i < insert; ++i) {
-            insertions.add(new BaseSetDTO<>("testId", new MockData("insert - " + i)));
+            insertions.add(new BaseSetDTO<>("testId", new SchemaSetDTO()));
         }
         for(int i = 0; i < delete; ++i) {
-            deletions.add(new BaseSetDTO<>("testId", new MockData("delete - " + i)));
+            deletions.add(new BaseSetDTO<>("testId", new SchemaSetDTO()));
         }
 
         return new ChangeSetDTO<>(
@@ -131,7 +126,7 @@ public class MockExecutor extends ExecutorEDS<MockData> {
         );
     }
 
-    public static ChangeSetDTO<MockData> emptyChangeset() {
+    public static ChangeSetDTO<SchemaSetDTO> emptyChangeset() {
         return new ChangeSetDTO<>(
             "",
             "",

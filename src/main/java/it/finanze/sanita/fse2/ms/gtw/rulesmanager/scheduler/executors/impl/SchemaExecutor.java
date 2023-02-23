@@ -14,11 +14,13 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.HandlerEDS
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 
 @Slf4j
+@Primary
 @Component
 public class SchemaExecutor extends ExecutorEDS<SchemaSetDTO> {
 

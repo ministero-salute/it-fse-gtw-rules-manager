@@ -1,35 +1,34 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.impl;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Date;
-
-import org.springframework.stereotype.Component;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.TerminologyCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.base.ChunkStatsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.base.ChunksDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.cfg.MockChunksConfig;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl.TermsExecutor;
+import org.springframework.stereotype.Component;
+
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Date;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Component
-public class MockChunksExecutor extends TermsExecutor {
+public class MockTermsExecutor extends TermsExecutor {
 	
 	private boolean verify;
-	
-    protected MockChunksExecutor(MockChunksConfig config, BridgeEDS bridge) {
+
+    protected MockTermsExecutor(TerminologyCFG config, BridgeEDS bridge) {
         super(config, bridge);
     }
-    
+
     public IActionFnEDS<Date> onLastUpdateProd() {
         return super.onLastUpdateProd();
     }
