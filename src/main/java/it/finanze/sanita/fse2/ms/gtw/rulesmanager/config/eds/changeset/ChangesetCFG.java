@@ -35,11 +35,13 @@ public abstract class ChangesetCFG {
     private final String statusURL;
     private final String dataURL;
     private final ChangesetCFG parent;
+    private final String backup;
 
     protected ChangesetCFG(String status, String data, String production) {
         this.title = capitalize(production);
         this.production = production;
         this.staging = production + STAGING_QUALIFIER;
+        this.backup = production + BACKUP_QUALIFIER;
         this.statusURL = status;
         this.dataURL = data;
         this.parent = null;
@@ -49,6 +51,7 @@ public abstract class ChangesetCFG {
         this.title = String.format("%s %s %s", parent.getTitle(), PARENT_SEPARATOR, capitalize(production));
         this.production = production;
         this.staging = production + STAGING_QUALIFIER;
+        this.backup = production + BACKUP_QUALIFIER;
         this.statusURL = status;
         this.dataURL = data;
         this.parent = parent;
