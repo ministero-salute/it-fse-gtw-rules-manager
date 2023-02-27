@@ -1,31 +1,20 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.EXIT;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.EMPTY_STEP;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.createChangeset;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.emptyChangeset;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.Date;
-
+import com.mongodb.client.MongoCollection;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,26 +26,34 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.mongodb.client.MongoCollection;
+import java.io.IOException;
+import java.util.Date;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.SchemaSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.EDSTestUtils.compareDeeply;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryExecutorOnException;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryRecoveryOnException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
 @TestInstance(PER_CLASS)
-public class EDSExecutorTest {
+@Slf4j
+public class ExecutorTest {
 
     @SpyBean
     private MongoTemplate mongo;
     @MockBean
     private IEDSClient client;
-    @Autowired
+    @SpyBean
     private MockSchemaExecutor executor;
     @SpyBean
     private IExecutorRepo repository;
@@ -70,6 +67,32 @@ public class EDSExecutorTest {
     public void reset() {
         resetDB();
         resetListeners();
+    }
+
+    @Test
+    void execute() {
+        // Mock an executor that simply reset
+        doReturn(FAKE_STEPS).when(executor).getSteps();
+        assertEquals(OK, executor.execute());
+        // Mock a runtime error then call real method after test
+        doThrow(new RuntimeException("Test error")).doCallRealMethod().when(executor).startup(any(String[].class));
+        assertEquals(KO, executor.execute());
+        // Mock an erroneous step pattern
+        doReturn(ERR_FAKE_STEPS).when(executor).getSteps();
+        assertEquals(KO, executor.execute());
+    }
+
+    @Test
+    void recovery() {
+        // Mock an executor that simply reset
+        doReturn(FAKE_STEPS).when(executor).getRecoverySteps();
+        assertEquals(OK, executor.recovery());
+        // Mock a runtime error then call real method after test
+        doThrow(new RuntimeException("Test error")).doCallRealMethod().when(executor).startup(any(String[].class));
+        assertEquals(KO, executor.recovery());
+        // Mock an erroneous step pattern
+        doReturn(ERR_FAKE_STEPS).when(executor).getRecoverySteps();
+        assertEquals(KO, executor.recovery());
     }
 
     @Test
@@ -185,7 +208,33 @@ public class EDSExecutorTest {
         // Verify production integrity
         db.verifyIntegrityProduction();
     } 
-    
+
+    @Test
+    void processingWithDb() throws EdsClientException {
+        // Setup production
+        setupProduction();
+        // It emulates an empty collection
+        mongo.dropCollection(executor.getConfig().getStaging());
+        executor.setCollection(mongo.getCollection(executor.getConfig().getStaging()));
+        // Set changeset for one insertion and one delete
+        executor.setChangeset(createChangeset(1, 1, 1));
+        // Prepare one mock document for insertion
+        SchemaDTO in = new SchemaDTO();
+        Schema schema = new Schema();
+        schema.setId(new ObjectId().toHexString());
+        schema.setContentSchema("dGVzdA==");
+        in.setDocument(schema);
+        // Call processing with super flag
+        when(client.getDocument(any(), anyString(), any())).thenReturn(in);
+        assertEquals(OK, executor.onProcessing(null));
+        // Now check size
+        assertEquals(1, executor.getOperations().getInsertions());
+        assertEquals(1, executor.getOperations().getDeletions());
+        assertEquals(2, executor.getOperations().getOperations());
+        // Verify production integrity
+        db.verifyIntegrityProduction();
+    }
+
     @Test
     void processingEmptyChangeset() {
         // Setup production
@@ -451,6 +500,18 @@ public class EDSExecutorTest {
         setupProduction();
         // Use modified entities list to create a mismatch
         assertFalse(compareDeeply(db.handler().getModifiedEntitiesAsDocuments(), mongo.getCollection(executor.getConfig().getProduction())));
+    }
+
+    @Test
+    void retries() {
+        // Executor mode
+        assertEquals(OK, retryExecutorOnException(() -> OK, log));
+        assertEquals(OK, retryExecutorOnException(() -> OK, log, 5));
+        assertEquals(KO, retryExecutorOnException(() -> KO, log, 5));
+        // Recovery mode
+        assertEquals(OK, retryRecoveryOnException(() -> OK, log));
+        assertEquals(OK, retryRecoveryOnException(() -> OK, log, 5));
+        assertEquals(KO, retryRecoveryOnException(() -> KO, log, 5));
     }
 
     private void setupProduction() {

@@ -3,15 +3,15 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-
-import org.bson.Document;
-import org.springframework.stereotype.Component;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.ConverterETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.raw.Fixtures;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
+import org.bson.Document;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 @Component
 public class EDSSchemaHandler extends AbstractEntityHandler<SchemaETY> {
@@ -38,7 +38,7 @@ public class EDSSchemaHandler extends AbstractEntityHandler<SchemaETY> {
 
     @Override
     protected Function<SchemaETY, Document> toDocument() {
-        return SchemaETY::toDocument;
+        return ConverterETY::fromSchemaToDoc;
     }
 
     @Override
@@ -48,6 +48,6 @@ public class EDSSchemaHandler extends AbstractEntityHandler<SchemaETY> {
 
 	@Override
 	protected Function<Document, SchemaETY> toEntity() {
-		return SchemaETY::fromDocument;
+		return ConverterETY::docToSchema;
 	}
 }

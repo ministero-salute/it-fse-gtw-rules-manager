@@ -1,14 +1,9 @@
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,16 +15,16 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
 @TestInstance(PER_CLASS)
-class EDSDictionaryExecutorTest {
+class DictExecutorTest {
 	
 	@SpyBean
     private MongoTemplate mongo;
@@ -53,7 +48,7 @@ class EDSDictionaryExecutorTest {
     }
     
     @Test
-    void cleanBackup() throws EdsDbException {
+    void cleanBackup() {
     	// Call createBackup
     	assertEquals(OK, executor.createBackup());
     	assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
@@ -104,8 +99,7 @@ class EDSDictionaryExecutorTest {
     private void resetDB() {
         mongo.dropCollection(executor.getConfig().getProduction());
         mongo.dropCollection(executor.getConfig().getStaging());
-        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+        mongo.dropCollection(executor.getConfig().getBackup());
     }
     
 }

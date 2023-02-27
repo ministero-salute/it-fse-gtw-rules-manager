@@ -3,14 +3,14 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl;
 
-import java.util.function.Function;
-
-import org.bson.Document;
-import org.springframework.stereotype.Component;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.ConverterETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.raw.Fixtures;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import org.bson.Document;
+import org.springframework.stereotype.Component;
+
+import java.util.function.Function;
 
 @Component
 public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
@@ -22,7 +22,7 @@ public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
 
     @Override
     protected Function<TerminologyETY, Document> toDocument() {
-        return TerminologyETY::toDocument;
+        return ConverterETY::fromTermsToDoc;
     }
 
 	@Override
@@ -32,6 +32,6 @@ public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
 
 	@Override
 	protected Function<Document, TerminologyETY> toEntity() {
-		return TerminologyETY::fromDocument;
+		return ConverterETY::docToTerms;
 	}
 }

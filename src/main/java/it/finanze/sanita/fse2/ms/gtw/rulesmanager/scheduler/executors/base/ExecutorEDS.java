@@ -105,7 +105,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         return res;
     }
 
-    private ActionRes startup(String[] steps) {
+    protected ActionRes startup(String[] steps) {
         Date timestamp = new Date();
         // Register additional handlers if necessary
         if(!getCustomSteps().isEmpty()) registerAdditionalHandlers();
@@ -127,14 +127,14 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     }
 
     // === LISTENERS ===
-    private OnStepListener onStepFailure(Date timestamp) {
+    protected OnStepListener onStepFailure(Date timestamp) {
         return (name, status) -> {
             if (status == ActionRes.KO)  {
                 bridge.getLogger().error(LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
             }
         };
     }
-    private OnPlanListener onPlanSuccess(Date timestamp) {
+    protected OnPlanListener onPlanSuccess(Date timestamp) {
         return (status) -> {
             if (status == ActionRes.OK)  {
                 bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);

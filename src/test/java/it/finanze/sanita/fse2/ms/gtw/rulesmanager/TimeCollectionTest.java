@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ComponentScan(basePackages = {Constants.ComponentScan.BASE})
 @ActiveProfiles(Constants.Profile.TEST)
-class TimeCollectionTest extends AbstractTest {
+class TimeCollectionTest {
 	
 	static final String START_NAME = "test_schema";
 	static final String END_NAME = "CollectionProduction";

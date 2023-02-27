@@ -75,7 +75,7 @@ public class FhirStructuresQuery implements IQueryEDS<FhirStructuresDTO> {
             .append(FIELD_ID, doc.getObjectId(FIELD_ID))
             .append(FIELD_URI, doc.getString(FIELD_URI))
             .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
-            .append(FIELD_TEMPLATE_ID_ROOT, doc.getString(FIELD_TEMPLATE_ID_ROOT))
+            .append(FIELD_TEMPLATE_ID_ROOT, doc.getList(FIELD_TEMPLATE_ID_ROOT, String.class))
             .append(FIELD_CONTENT, doc.get(FIELD_CONTENT, Binary.class))
 			.append(FIELD_FILENAME, doc.getString(FIELD_FILENAME))
             .append(FIELD_TYPE, doc.getString(FIELD_TYPE))

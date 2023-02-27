@@ -21,7 +21,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.Terminol
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.utils.EmptySetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IDictionarySRV;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     private TerminologyQuery query;
 
     @Autowired
-    private ICodeSystemVersionSRV csv;
+    private IDictionarySRV csv;
 
     private ChangeSetChunkDTO snapshot;
 

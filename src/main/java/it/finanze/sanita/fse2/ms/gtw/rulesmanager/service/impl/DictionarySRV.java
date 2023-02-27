@@ -3,24 +3,22 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IDictionarySRV;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
-public class CodeSystemVersionSRV implements ICodeSystemVersionSRV {
+public class DictionarySRV implements IDictionarySRV {
 	
 	@Autowired
 	private ITerminologyRepo repository;

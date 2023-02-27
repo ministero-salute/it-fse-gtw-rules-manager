@@ -10,9 +10,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Date;
 
 /**
@@ -48,10 +45,4 @@ public class SchematronETY {
     private Date lastSync;
 	@Field(name = FIELD_DELETED)
     private Boolean deleted;
-
-	public void setContentSchemaFromPath(Path path) throws IOException {
-        this.contentSchematron = new Binary(Files.readAllBytes(path));
-    }
-
-	 
 }

@@ -10,7 +10,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.Derived
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.utils.EmptySetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ICodeSystemVersionSRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IDictionarySRV;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ import static java.lang.String.format;
 public class DictionaryExecutor extends ExecutorEDS<EmptySetDTO> {
 
     @Autowired
-    private ICodeSystemVersionSRV csv;
+    private IDictionarySRV csv;
 
     protected DictionaryExecutor(DictionaryCFG config, BridgeEDS bridge) {
         super(config, bridge);

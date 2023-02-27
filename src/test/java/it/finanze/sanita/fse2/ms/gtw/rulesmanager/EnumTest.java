@@ -3,22 +3,21 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ComponentScan
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles(Constants.Profile.TEST)
-class EnumTest extends AbstractTest {
+class EnumTest {
 	
 	@Test
 	void resultLogEnumTest() {

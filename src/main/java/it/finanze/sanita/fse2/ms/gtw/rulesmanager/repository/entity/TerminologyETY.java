@@ -3,15 +3,13 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import java.util.Date;
-
-import org.bson.types.ObjectId;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
 
 /**
  * Model to save terminology.
@@ -52,60 +50,4 @@ public class TerminologyETY {
     private Date lastSync;
     @Field(name = FIELD_DELETED)
     private Boolean deleted;
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TerminologyETY other = (TerminologyETY) obj;
-		if (code == null) {
-			if (other.code != null)
-				return false;
-		} else if (!code.equals(other.code))
-			return false;
-		if (system == null) {
-			if (other.system != null)
-				return false;
-		} else if (!system.equals(other.system))
-			return false;
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		result = prime * result + ((system == null) ? 0 : system.hashCode());
-		return result;
-	}
-
-	public org.bson.Document toDocument() {
-		return new org.bson.Document()
-			.append(FIELD_ID, new ObjectId(this.getId()))
-			.append(FIELD_SYSTEM, this.getSystem())
-			.append(FIELD_VERSION, this.getVersion())
-			.append(FIELD_CODE, this.getCode())
-			.append(FIELD_DESCRIPTION, this.getDescription())
-			.append(FIELD_RELEASE_DATE, this.getReleaseDate())
-			.append(FIELD_LAST_UPDATE, this.getLastUpdateDate())
-			.append(FIELD_DELETED, false);
-	}
-	
-	public static TerminologyETY fromDocument(org.bson.Document doc) {
-		TerminologyETY entity = new TerminologyETY();
-		entity.setId(doc.getObjectId(FIELD_ID).toHexString());
-        entity.setSystem(doc.getString(FIELD_SYSTEM)); 
-        entity.setVersion(doc.getString(FIELD_VERSION)); 
-        entity.setCode(doc.getString(FIELD_CODE)); 
-        entity.setDescription(doc.getString(FIELD_DESCRIPTION)); 
-        entity.setLastUpdateDate(doc.getDate(FIELD_LAST_UPDATE));
-        entity.setLastSync(doc.getDate(FIELD_LAST_SYNC));
-        return entity;
-	}
 }
