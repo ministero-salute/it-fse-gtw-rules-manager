@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles(TEST)
 @TestInstance(PER_CLASS)
 @Slf4j
-public class ExecutorTest {
+class ExecutorTest {
 
     @SpyBean
     private MongoTemplate mongo;

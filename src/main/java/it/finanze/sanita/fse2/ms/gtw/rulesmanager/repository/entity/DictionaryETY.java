@@ -3,14 +3,15 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Model to save terminology.
@@ -40,9 +41,9 @@ public class DictionaryETY {
     @Field(name = FIELD_RELEASE_DATE)
     private Date releaseDate;
     @Field(name = FIELD_WHITELIST)
-    private boolean whiteList;
+    private Boolean whiteList;
     @Field(name = FIELD_DELETED)
-    private boolean deleted;
+    private Boolean deleted;
 
     public static org.bson.Document fromMap(TerminologyMapDTO map) {
         org.bson.Document entity = new org.bson.Document();
@@ -51,7 +52,7 @@ public class DictionaryETY {
         entity.put(FIELD_CREATION_DATE, map.getCreationDate());
         entity.put(FIELD_RELEASE_DATE, map.getReleaseDate());
         entity.put(FIELD_WHITELIST, map.isWhiteList());
-        entity.put(FIELD_DELETED, map.isDeleted());
+        entity.put(FIELD_DELETED, map.getDeleted());
         return entity;
     }
 

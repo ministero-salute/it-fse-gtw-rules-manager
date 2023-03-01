@@ -26,7 +26,7 @@ public class TerminologyMapDTO {
 	private String code;
 	private Date releaseDate;
 	private Date creationDate;
-	private boolean deleted;
+	private Boolean deleted;
 
 	public boolean isWhiteList() {
 		return code != null && code.equals(WHITELIST_FLAG);

@@ -1,9 +1,15 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,13 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.DictionarySRV;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -32,8 +39,10 @@ class DictExecutorTest {
     private IEDSClient client;
     @Autowired
     private MockDictionaryExecutor executor;
+    @Autowired
+    private EDSTermsDB db;
     @SpyBean
-    private IExecutorRepo repository;
+    private DictionarySRV dictionary;
     
     @BeforeAll
     public void init() { resetDB(); }
@@ -60,11 +69,15 @@ class DictExecutorTest {
     
     @Test
     void processing() {
-    	// Setup staging
-    	assertEquals(OK, executor.createStaging());
-    	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
-        // Call processing
-        assertEquals(OK, executor.onProcessing());
+    	assertDoesNotThrow(() -> {
+    		// Setup staging
+        	assertEquals(OK, executor.createStaging());
+        	db.setupStaging();
+        	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+            // Call processing
+            assertEquals(OK, executor.onProcessing());
+            assertEquals(EXPECTED_DICTIONARIES, mongo.count(new Query(), executor.getConfig().getStaging()));
+    	});
     }
     
     @Test

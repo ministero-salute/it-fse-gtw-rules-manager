@@ -24,7 +24,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
-public class EDSClientTest {
+class EDSClientTest {
 
     @Autowired
     private SchemaCFG configuration;

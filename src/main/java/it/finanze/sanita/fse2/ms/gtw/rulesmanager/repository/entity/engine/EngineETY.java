@@ -3,16 +3,17 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.engine;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.engine.sub.EngineMap;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
-import java.util.List;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.engine.sub.EngineMap;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Document(collection = "#{@engineBean}")
 @Data
@@ -35,7 +36,7 @@ public class EngineETY {
     @Field(FIELD_LAST_SYNC)
     private Date lastSync;
     @Field(FIELD_AVAILABLE)
-    private boolean available;
+    private Boolean available;
 
     public static org.bson.Document from(List<ObjectId> ids, List<EngineMap> roots, Date lastSync) {
         return new org.bson.Document()

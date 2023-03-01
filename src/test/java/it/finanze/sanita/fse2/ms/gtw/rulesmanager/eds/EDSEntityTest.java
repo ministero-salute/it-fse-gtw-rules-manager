@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles(Constants.Profile.TEST)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EDSEntityTest {
+class EDSEntityTest {
 	
 	private final String TEST_SYSTEM = "testSystem"; 
 	private final String TEST_CODE = "Code"; 

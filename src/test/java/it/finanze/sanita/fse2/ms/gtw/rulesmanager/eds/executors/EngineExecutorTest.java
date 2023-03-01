@@ -1,28 +1,34 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockEnginesExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.EngineSRV;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.Mockito.*;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockEnginesExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.EngineSRV;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -35,7 +41,7 @@ class EngineExecutorTest {
     private MockEnginesExecutor executor;
     @SpyBean
     private IExecutorRepo repository;
-    @MockBean
+    @SpyBean
     private EngineSRV engines;
     
     @BeforeAll
