@@ -17,6 +17,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyE
 public class EDSTermsHandler extends AbstractEntityHandler<TerminologyETY> {
 	
 	public static final int EXPECTED_DICTIONARIES = 2;
+	public static final String[] EXPECTED_SYSTEMS = {"1.2.840.10008.2.16.4", "2.16.840.1.113883.6.73"};
 
     @Override
     protected Function<TerminologyETY, TerminologyETY> asModifiedEntity() {

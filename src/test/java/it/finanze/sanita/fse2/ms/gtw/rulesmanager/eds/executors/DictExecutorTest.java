@@ -2,6 +2,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_SYSTEMS;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -9,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,12 +23,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.DictionarySRV;
 
@@ -76,7 +80,12 @@ class DictExecutorTest {
         	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
             // Call processing
             assertEquals(OK, executor.onProcessing());
-            assertEquals(EXPECTED_DICTIONARIES, mongo.count(new Query(), executor.getConfig().getStaging()));
+            List<TerminologyETY> terminologies = mongo.findAll(TerminologyETY.class, executor.getConfig().getStaging());
+            assertEquals(EXPECTED_DICTIONARIES, terminologies.size());
+            // Integrity check
+            for (TerminologyETY terminology : terminologies) {
+            	assertTrue(Arrays.stream(EXPECTED_SYSTEMS).anyMatch((x) -> terminology.getSystem().equals(x)));
+			}
     	});
     }
     

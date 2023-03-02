@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public enum Fixtures {
     BASE_PATH(Paths.get("src", "test", "resources", "fixtures")),
     SCHEMA(Paths.get(BASE_PATH.toString(), "schema.json")),
-    TERMINOLOGY(Paths.get(BASE_PATH.toString(), "terminology.json"));
+    TERMINOLOGY(Paths.get(BASE_PATH.toString(), "terminology.json")),
+	TRANSFORM(Paths.get(BASE_PATH.toString(), "transform.json"));
 
     private final Path path;
 

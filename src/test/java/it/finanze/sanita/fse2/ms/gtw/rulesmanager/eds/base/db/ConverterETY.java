@@ -1,10 +1,12 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import org.bson.Document;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TransformETY;
 
 public final class ConverterETY {
     public static Document fromSchemaToDoc(SchemaETY entity) {
@@ -54,4 +56,32 @@ public final class ConverterETY {
         entity.setLastSync(doc.getDate(TerminologyETY.FIELD_LAST_SYNC));
         return entity;
     }
+    
+    public static Document fromTransformToDoc(TransformETY entity) {
+        return new Document()
+            .append(TransformETY.FIELD_ID, new ObjectId(entity.getId()))
+            .append(TransformETY.FIELD_VERSION, entity.getVersion())
+            .append(TransformETY.FIELD_FILENAME, entity.getFilename())
+            .append(TransformETY.FIELD_CONTENT, entity.getContent())
+            .append(TransformETY.FIELD_TYPE, entity.getType())
+            .append(TransformETY.FIELD_TEMPLATE_ID_ROOT, entity.getTemplateIdRoot())
+            .append(TransformETY.FIELD_LAST_UPDATE, entity.getLastUpdateDate())
+            .append(TransformETY.FIELD_LAST_SYNC, entity.getLastSync())
+            .append(TransformETY.FIELD_DELETED, entity.getDeleted() != null && entity.getDeleted());
+    }
+
+    public static TransformETY docToTransform(Document doc) {
+    	TransformETY entity = new TransformETY();
+        entity.setId(doc.getObjectId(TransformETY.FIELD_ID).toHexString());
+        entity.setVersion(doc.getString(TransformETY.FIELD_VERSION));
+        entity.setFilename(doc.getString(TransformETY.FIELD_FILENAME));
+        entity.setContent(doc.get(TransformETY.FIELD_CONTENT, Binary.class));
+        entity.setType(doc.getString(TransformETY.FIELD_TYPE));
+        entity.setTemplateIdRoot(doc.getList(TransformETY.FIELD_TEMPLATE_ID_ROOT, String.class));
+        entity.setLastUpdateDate(doc.getDate(TransformETY.FIELD_LAST_UPDATE));
+        entity.setLastSync(doc.getDate(TransformETY.FIELD_LAST_SYNC));
+        entity.setDeleted(doc.getBoolean(TransformETY.FIELD_DELETED));
+        return entity;
+    }
+    
 }
