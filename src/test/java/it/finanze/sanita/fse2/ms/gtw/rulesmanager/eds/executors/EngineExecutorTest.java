@@ -1,22 +1,14 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler.EXPECTED_ENGINE_FILES;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler.EXPECTED_ENGINE_ROOTS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-
-import java.util.List;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTransformDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockEnginesExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TransformETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.engine.EngineETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,13 +19,18 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTransformDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockEnginesExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.engine.EngineETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import java.util.List;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler.EXPECTED_ENGINE_FILES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTransformHandler.EXPECTED_ENGINE_ROOTS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_KO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -91,8 +88,8 @@ class EngineExecutorTest {
         	assertEquals(EXPECTED_ENGINE_FILES, engines.get(0).getFiles().size());
         	assertEquals(EXPECTED_ENGINE_ROOTS, engines.get(0).getRoots().size());
         	// Integrity check
-        	String[] id = engines.get(0).getFiles().stream().map((x) -> x.toHexString()).toArray(String[]::new);
-        	String[] fixtures = handler.getEntities().stream().map((x) -> x.getId()).toArray(String[]::new);
+        	String[] id = engines.get(0).getFiles().stream().map(ObjectId::toHexString).toArray(String[]::new);
+        	String[] fixtures = handler.getEntities().stream().map(TransformETY::getId).toArray(String[]::new);
         	assertArrayEquals(id, fixtures);
         });
     }
@@ -115,15 +112,7 @@ class EngineExecutorTest {
 
     @Test
     void getSteps() {
-    	// Steps expected
-    	String[] stepsExpected = DerivedActionEDS.defaults();
-    	String[] stepsResult = executor.getSteps();
-    	
-    	assertEquals(stepsExpected.length, stepsResult.length);
-    	
-    	for(int i=0; i < stepsResult.length; i++) {
-    		assertEquals(stepsExpected[i], stepsResult[i]);
-    	}
+    	assertArrayEquals(DerivedActionEDS.defaults(), executor.getSteps());
     }
     
     private void resetDB() {

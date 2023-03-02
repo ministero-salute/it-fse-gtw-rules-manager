@@ -1,36 +1,28 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_SYSTEMS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-
-import java.util.Arrays;
-import java.util.List;
-
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.DictionarySRV;
+import java.util.List;
+
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_SYSTEMS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -39,14 +31,10 @@ class DictExecutorTest {
 	
 	@SpyBean
     private MongoTemplate mongo;
-    @MockBean
-    private IEDSClient client;
     @Autowired
     private MockDictionaryExecutor executor;
     @Autowired
     private EDSTermsDB db;
-    @SpyBean
-    private DictionarySRV dictionary;
     
     @BeforeAll
     public void init() { resetDB(); }
@@ -82,10 +70,10 @@ class DictExecutorTest {
             assertEquals(OK, executor.onProcessing());
             List<TerminologyETY> terminologies = mongo.findAll(TerminologyETY.class, executor.getConfig().getStaging());
             assertEquals(EXPECTED_DICTIONARIES, terminologies.size());
-            // Integrity check
-            for (TerminologyETY terminology : terminologies) {
-            	assertTrue(Arrays.stream(EXPECTED_SYSTEMS).anyMatch((x) -> terminology.getSystem().equals(x)));
-			}
+            // If this return false, at least one element has a different system from the one declared
+            assertTrue(
+                terminologies.stream().map(TerminologyETY::getSystem).allMatch(EXPECTED_SYSTEMS::contains)
+            );
     	});
     }
     
@@ -107,15 +95,7 @@ class DictExecutorTest {
     
     @Test
     void getSteps() {
-    	// Steps expected
-    	String[] stepsExpected = DerivedActionEDS.defaults();
-    	String[] stepsResult = executor.getSteps();
-    	
-    	assertEquals(stepsExpected.length, stepsResult.length);
-    	
-    	for(int i=0; i < stepsResult.length; i++) {
-    		assertEquals(stepsExpected[i], stepsResult[i]);
-    	}
+        assertArrayEquals(DerivedActionEDS.defaults(), executor.getSteps());
     }
     
     private void resetDB() {
