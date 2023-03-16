@@ -24,7 +24,8 @@ public class SchematronETY {
     public static final String FIELD_FILENAME = "name_schematron";
     public static final String FIELD_CONTENT = "content_schematron";
     public static final String FIELD_VERSION = "version";
-    public static final String FIELD_ROOT = "template_id_root";
+	public static final String FIELD_SYSTEM = "system";
+	public static final String FIELD_ROOT = "template_id_root";
     public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
     public static final String FIELD_DELETED = "deleted";
@@ -39,6 +40,8 @@ public class SchematronETY {
 	private String templateIdRoot;
 	@Field(name = FIELD_VERSION)
 	private String version;
+	@Field(name = FIELD_SYSTEM)
+	private String system;
 	@Field(name = FIELD_LAST_UPDATE)
 	private Date lastUpdateDate;
 	@Field(name = FIELD_LAST_SYNC)
