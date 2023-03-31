@@ -3,52 +3,53 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
-
-import java.util.List;
-
+import com.mongodb.MongoException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.MongoException;
+import java.util.List;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.*;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 @Repository
 public class TerminologyRepo implements ITerminologyRepo {
-	
+
 	@Autowired
 	private MongoTemplate mongo;
-	
+
 	@Override
 	public List<TerminologyMapDTO> getAllCodeSystemVersions(String collection) throws EdsDbException {
 
 		List<TerminologyMapDTO> res;
-		
+
 		try {
 			// Define group operation
 			GroupOperation group = Aggregation
 				.group(
-					TerminologyETY.FIELD_SYSTEM, 
-					TerminologyETY.FIELD_VERSION,
-					TerminologyETY.FIELD_DELETED
+					FIELD_SYSTEM,
+					FIELD_VERSION,
+					FIELD_DELETED
 				)
-				.first(TerminologyETY.FIELD_CODE).as(TerminologyMapDTO.FIELD_CODE)
-				.first(TerminologyETY.FIELD_LAST_UPDATE).as(TerminologyMapDTO.FIELD_CREATION_DATE)
-				.first(TerminologyETY.FIELD_RELEASE_DATE).as(TerminologyMapDTO.FIELD_RELEASE_DATE)
-				.first(TerminologyETY.FIELD_DELETED).as(TerminologyMapDTO.FIELD_DELETED);
+				.first(FIELD_CODE).as(TerminologyMapDTO.FIELD_CODE)
+				.first(FIELD_LAST_UPDATE).as(TerminologyMapDTO.FIELD_CREATION_DATE)
+				.first(FIELD_RELEASE_DATE).as(TerminologyMapDTO.FIELD_RELEASE_DATE)
+				.first(FIELD_DELETED).as(TerminologyMapDTO.FIELD_DELETED);
 			// Init aggregation pipeline
 			AggregationOperation project = project(
-				TerminologyETY.FIELD_SYSTEM_ID_REF, 
-				TerminologyETY.FIELD_VERSION_ID_REF,
-				TerminologyETY.FIELD_DELETED,
+				FIELD_SYSTEM_ID_REF,
+				FIELD_VERSION_ID_REF,
+				FIELD_DELETED,
 				TerminologyMapDTO.FIELD_CODE,
 				TerminologyMapDTO.FIELD_CREATION_DATE,
 				TerminologyMapDTO.FIELD_RELEASE_DATE
@@ -60,8 +61,27 @@ public class TerminologyRepo implements ITerminologyRepo {
 		} catch(MongoException ex) {
 			throw new EdsDbException("Unable to aggregate code-system versions", ex);
 		}
-		
+
 		return res;
+	}
+
+	@Override
+	public void applyIndexes(String collection) throws EdsDbException {
+		// Retrieve index op instance
+		IndexOperations op = mongo.indexOps(collection);
+		// Build index definition
+		Index idx = new Index()
+			.on(FIELD_SYSTEM, ASC)
+			.on(FIELD_CODE, ASC)
+			.on(FIELD_DELETED, ASC)
+			.on(FIELD_VERSION, ASC)
+			.background();
+		// Execute
+		try {
+			op.ensureIndex(idx);
+		}catch (MongoException e) {
+			throw new EdsDbException("Unable to apply indexes on terminology", e);
+		}
 	}
 
 }

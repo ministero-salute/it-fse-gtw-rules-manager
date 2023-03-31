@@ -3,32 +3,9 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl;
 
-import static com.mongodb.client.model.Updates.set;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.EXIT;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
-import static java.lang.String.format;
-
-import java.util.AbstractMap;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.Index;
-import org.springframework.data.mongodb.core.index.IndexOperations;
-import org.springframework.stereotype.Component;
-
-import com.mongodb.MongoCommandException;
 import com.mongodb.MongoException;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
-
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.TerminologyCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
@@ -36,7 +13,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.Terminolog
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.ISnapshotHandlerEDS;
@@ -46,9 +22,24 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.BridgeEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.base.ExecutorEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.utils.EmptySetDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IDictionarySRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+import java.util.AbstractMap;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static com.mongodb.client.model.Updates.set;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.*;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionRetryEDS.retryOnException;
+import static java.lang.String.format;
 
 
 @Slf4j
@@ -58,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshotHandlerEDS {
 
-	
+
     @Autowired
     private TerminologyQuery query;
 
@@ -66,7 +57,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     private IDictionarySRV csv;
     
     @Autowired
-	private MongoTemplate mongoTemplate;
+    private ITerminologySRV service;
 
     private ChangeSetChunkDTO snapshot;
 
@@ -79,7 +70,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     }
 
     @Override
-	public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
+    public ActionRes onChangeset(IActionFnEDS<Date> hnd) {
         Optional<ChangeSetChunkDTO> data;
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
@@ -135,10 +126,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
                 // Expected deletions
                 getSnapshot().getChunks().getDeletions().getChunksItems()
             ));
-            
-            ensureIndexes();
             res = OK;
-            
             log.debug("[{}] Operations have been applied on staging", getConfig().getTitle());
         }catch (Exception ex){
             log.error(
@@ -148,8 +136,23 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         }
         return res;
     }
-
-    
+    @Override
+    protected ActionRes onIndexing() {
+        ActionRes res = KO;
+        log.debug("[{}] Applying indexes on staging", getConfig().getTitle());
+        try {
+            // Execute
+            service.applyIndexes(getConfig().getStaging());
+            // Set flag
+            res = OK;
+        } catch (EdsDbException e) {
+            log.error(
+                format("[%s] Unable to apply indexes on staging", getConfig().getTitle()),
+                e
+            );
+        }
+        return res;
+    }
     @Override
     public IChunkHandlerEDS onChunkInsertion() {
         return (staging, snapshot, chunk, max) -> {
@@ -380,21 +383,4 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
             log.info("[{}][Stats][Ops] No operations to apply", getConfig().getTitle());
         }
     }
-    
-    
-    private void ensureIndexes() {
-    	IndexOperations indexOps = mongoTemplate.indexOps(getConfig().getStaging());
-
-    	Index index = new Index()
-    	        .on(TerminologyETY.FIELD_SYSTEM, Direction.ASC)
-    	        .on(TerminologyETY.FIELD_CODE, Direction.ASC)
-    	        .on(TerminologyETY.FIELD_DELETED, Direction.ASC)
-    	        .on(TerminologyETY.FIELD_VERSION, Direction.ASC).background();
-    	try {
-    	    indexOps.ensureIndex(index);
-    	} catch (MongoCommandException e) {
-    		log.warn("[{}] Index error: {}", getConfig().getTitle(), e.getMessage());
-    	}
-	}
-
 }

@@ -55,7 +55,7 @@ public class InvokeEDSClientScheduler {
 
 	@Async
 	@EventListener(ApplicationStartedEvent.class)
-	void initialize() {
+	public void initialize() {
 		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
 			log.debug("[EDS] Executing post construct");
 			action();

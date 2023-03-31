@@ -155,6 +155,7 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
         mapper.put(STAGING, this::onStaging);
         mapper.put(STAGING_RECOVERY, this::onStagingRecovery);
         mapper.put(PROCESSING, this::onProcessing);
+        mapper.put(INDEXING, this::onIndexing);
         mapper.put(VERIFY, this::onVerify);
         mapper.put(SYNC, this::onSync);
         mapper.put(CHANGESET_STAGING, this::onChangesetStaging);
@@ -271,6 +272,10 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
             );
         }
         return res;
+    }
+    protected ActionRes onIndexing() {
+        log.debug("[{}] No indexes to apply on staging", config.getTitle());
+        return OK;
     }
     protected ActionRes onVerify() {
         log.debug("[{}] Verifying staging matches checksum", config.getTitle());

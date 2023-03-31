@@ -36,6 +36,10 @@ public final class ActionEDS {
      */
     public static final String PROCESSING = "PROCESSING";
     /**
+     * Applies indexes on staging if necessary
+     */
+    public static final String INDEXING = "INDEXING";
+    /**
      * Verify the pending operations have been fully processed
      */
     public static final String VERIFY = "VERIFY";
@@ -60,6 +64,7 @@ public final class ActionEDS {
             CHANGESET_EMPTY,
             STAGING,
             PROCESSING,
+            INDEXING,
             VERIFY,
             SYNC,
             CHANGESET_STAGING,
@@ -87,6 +92,7 @@ public final class ActionEDS {
             CHANGESET_RECOVERY,
             STAGING_RECOVERY,
             PROCESSING,
+            INDEXING,
             VERIFY,
             SYNC,
             CHANGESET_STAGING,

@@ -11,5 +11,7 @@ import java.util.List;
 public interface ITerminologyRepo {
 
 	List<TerminologyMapDTO> getAllCodeSystemVersions(String collection) throws EdsDbException;
-	
+
+	void applyIndexes(String collection) throws EdsDbException;
+
 }
