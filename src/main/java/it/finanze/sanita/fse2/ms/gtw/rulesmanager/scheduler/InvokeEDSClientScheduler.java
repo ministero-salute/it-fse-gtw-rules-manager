@@ -86,7 +86,7 @@ public class InvokeEDSClientScheduler {
 		// Setup executors
 		setup();
 		// Run executors
-		start(schema, schematron, terminology, fhir);
+		start(terminology);
 		// Log me
 		log.info("[EDS] Updating process completed");
 		// Reset run flag
