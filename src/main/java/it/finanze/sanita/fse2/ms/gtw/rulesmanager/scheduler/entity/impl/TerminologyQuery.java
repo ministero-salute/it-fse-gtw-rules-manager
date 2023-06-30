@@ -11,92 +11,79 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl;
 
-import com.mongodb.client.model.Filters;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.IQueryEDS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO.HistoryDeleteDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.TerminologyDTO;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.TerminologyDTO.ResourceMetaDTO;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.TerminologyDTO.TerminologyItemDTO;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.*;
+import static java.lang.Integer.parseInt;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
-public class TerminologyQuery implements IQueryEDS<TerminologyDTO> {
-    /**
-     * Used by the executor to upsert the dto instance
-     *
-     * @param dto The retrieved dto from {@code client.getDocument()}
-     * @return The query to upsert the given dto
-     */
-    @Override
-    public Document getUpsertQuery(TerminologyDTO dto) {
-        return getUpsertQuery(dto.getDocument());
-    }
+public class TerminologyQuery {
 
-    public Document getUpsertQuery(Terminology terminology) {
-        // Create
+    private Document getUpsertWhitelistItem(String resource, String version, ResourceMetaDTO meta) {
         return new org.bson.Document()
-            .append(FIELD_ID, new ObjectId(terminology.getId()))
-            .append(FIELD_SYSTEM, terminology.getSystem())
-            .append(FIELD_VERSION, terminology.getVersion())
-            .append(FIELD_CODE, terminology.getCode())
-            .append(FIELD_DESCRIPTION, terminology.getDescription())
-            .append(FIELD_RELEASE_DATE, terminology.getReleaseDate())
-            .append(FIELD_LAST_UPDATE, terminology.getLastUpdateDate())
-            .append(FIELD_DELETED, false);
+            .append(FIELD_SYSTEM, meta.getOid())
+            .append(FIELD_VERSION, meta.getVersion())
+            .append(FIELD_RELEASE_DATE, meta.getReleased())
+            .append(FIELD_REF,
+                new Document()
+                    .append(Reference.FIELD_VERSION, parseInt(version))
+                    .append(Reference.FIELD_ID, resource)
+            )
+            .append(FIELD_WHITELIST, true);
     }
 
-    public List<Document> getUpsertQueries(List<Terminology> dto) {
-        return dto.stream().map(this::getUpsertQuery).collect(Collectors.toList());
-    }
-
-    /**
-     * Used by the executor to find a given dto
-     *
-     * @param id The retrieved id from {@code client.getDocument()}
-     * @return The query to find a given dto
-     */
-    @Override
-    public Document getFilterQuery(String id) {
-        return new org.bson.Document().append(FIELD_ID, new ObjectId(id));
-    }
-
-    /**
-     * Used by the executor to find and delete a given dto
-     *
-     * @param id The retrieved id from {@code client.getDocument()}
-     * @return The query to find and delete a given dto
-     */
-    @Override
-    public Document getDeleteQuery(String id) {
-        return getFilterQuery(id);
-    }
-
-    public Bson getDeleteQueries(List<String> ids) {
-        return Filters.in(FIELD_ID, ids.stream().map(ObjectId::new).collect(Collectors.toList()));
-    }
-
-    /**
-     * Used mainly for testing purpose to deep compare documents among cloned collections
-     *
-     * @param doc The document retrieved from the collection
-     * @return The query to deeply compare a given document into another collection
-     */
-    @Override
-    public Document getComparatorQuery(Document doc) {
+    private Document getUpsertQueryItem(String resource, String version, ResourceMetaDTO meta, TerminologyItemDTO item) {
         return new org.bson.Document()
-            .append(FIELD_ID, doc.getObjectId(FIELD_ID))
-            .append(FIELD_SYSTEM, doc.getString(FIELD_SYSTEM))
-            .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
-            .append(FIELD_CODE, doc.getString(FIELD_CODE))
-            .append(FIELD_DESCRIPTION, doc.getString(FIELD_DESCRIPTION))
-            .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
-            .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
-            .append(FIELD_DELETED, doc.getBoolean(FIELD_DELETED));
+            .append(FIELD_SYSTEM, meta.getOid())
+            .append(FIELD_VERSION, meta.getVersion())
+            .append(FIELD_CODE, item.getCode())
+            .append(FIELD_DESCRIPTION, item.getDisplay())
+            .append(FIELD_RELEASE_DATE, meta.getReleased())
+            .append(FIELD_REF,
+                new Document()
+                    .append(Reference.FIELD_VERSION, parseInt(version))
+                    .append(Reference.FIELD_ID, resource)
+            )
+            .append(FIELD_WHITELIST, false);
+    }
+
+    private List<Document> getUpsertQueryList(String resource, String version, TerminologyDTO dto) {
+        List<Document> docs = new ArrayList<>();
+        for (TerminologyItemDTO item : dto.getItems()) {
+            docs.add(getUpsertQueryItem(resource, version, dto.getMeta(), item));
+        }
+        return docs;
+    }
+
+    public List<Document> getUpsertQuery(TerminologyDTO dto) {
+        List<Document> docs = new ArrayList<>();
+        ResourceMetaDTO meta = dto.getMeta();
+        if(meta.isWhitelist()) {
+            docs.add(getUpsertWhitelistItem(dto.getResourceId(), dto.getVersionId(), meta));
+        } else {
+            docs = getUpsertQueryList(dto.getResourceId(), dto.getVersionId(), dto);
+        }
+        return docs;
+    }
+
+    public Bson getDeleteQuery(HistoryDeleteDTO data) {
+        Query query = new Query(where(FIELD_REF_ID).is(data.getId()));
+        if(data.getOmit() != null) {
+            query.addCriteria(
+                where(FIELD_REF_VERSION).lt(parseInt(data.getOmit()))
+            );
+        }
+        return query.getQueryObject();
     }
 }

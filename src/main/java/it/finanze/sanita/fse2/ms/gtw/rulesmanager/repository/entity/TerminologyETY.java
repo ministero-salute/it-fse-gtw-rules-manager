@@ -35,9 +35,13 @@ public class TerminologyETY {
 	public static final String FIELD_CODE = "code";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RELEASE_DATE = "release_date";
-    public static final String FIELD_LAST_UPDATE = "last_update_date";
     public static final String FIELD_LAST_SYNC = "last_sync";
-    public static final String FIELD_DELETED = "deleted";
+	public static final String FIELD_WHITELIST = "whitelist";
+	public static final String FIELD_DELETED = "deleted";
+	public static final String FIELD_REF = "ref";
+
+	public static final String FIELD_REF_ID = FIELD_REF + "." + Reference.FIELD_ID;
+	public static final String FIELD_REF_VERSION = FIELD_REF + "." + Reference.FIELD_VERSION;
 
 
 	@Id
@@ -52,10 +56,23 @@ public class TerminologyETY {
 	private String description;
 	@Field(name = FIELD_RELEASE_DATE)
     private Date releaseDate;
-	@Field(name = FIELD_LAST_UPDATE)
-    private Date lastUpdateDate;
     @Field(name = FIELD_LAST_SYNC)
     private Date lastSync;
-    @Field(name = FIELD_DELETED)
-    private Boolean deleted;
+	@Field(name = FIELD_REF)
+	private Reference ref;
+	@Field(name = FIELD_WHITELIST)
+	private boolean whitelist;
+	@Field(name = FIELD_DELETED)
+	private boolean deleted;
+
+	@Data
+	public static class Reference {
+		public static final String FIELD_ID = "res_id";
+		public static final String FIELD_VERSION = "res_version";
+		@Field(FIELD_ID)
+		private String resource;
+		@Field(FIELD_VERSION)
+		private String version;
+	}
+
 }

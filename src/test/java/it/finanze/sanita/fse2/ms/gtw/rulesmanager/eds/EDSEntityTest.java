@@ -18,8 +18,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchematronDTO.Schematron;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.TerminologyDTO.Terminology;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity.impl.FhirStructuresQuery;
@@ -48,8 +46,7 @@ class EDSEntityTest {
 	private final String TEST_SYSTEM = "testSystem"; 
 	private final String TEST_CODE = "Code"; 
 	private final String TEST_DESCRIPTION = "Description"; 
-	private final Date TEST_DATE = new Date(); 
-	
+
 	@Autowired
 	public SchematronQuery schematronQuery; 
 
@@ -71,12 +68,10 @@ class EDSEntityTest {
 		etyFirst.setSystem(TEST_SYSTEM);
 		etyFirst.setCode(TEST_CODE);
 		etyFirst.setDescription(TEST_DESCRIPTION); 
-		etyFirst.setLastUpdateDate(TEST_DATE); 
-		
+
 		etySecond.setSystem(TEST_SYSTEM);
 		etySecond.setCode(TEST_CODE);
 		etySecond.setDescription(TEST_DESCRIPTION); 
-		etySecond.setLastUpdateDate(TEST_DATE);
 
 		assertEquals(etyFirst, etySecond);
 
@@ -92,12 +87,10 @@ class EDSEntityTest {
 		etyFirst.setSystem(TEST_SYSTEM);
 		etyFirst.setCode(TEST_CODE);
 		etyFirst.setDescription(TEST_DESCRIPTION); 
-		etyFirst.setLastUpdateDate(TEST_DATE); 
-		
+
 		etySecond.setSystem("SystemNotEqual");
 		etySecond.setCode(TEST_CODE);
 		etySecond.setDescription(TEST_DESCRIPTION); 
-		etySecond.setLastUpdateDate(TEST_DATE);
 
 		assertNotEquals(etyFirst, etySecond);
 		assertEquals(etyFirstNull, etySecondNull);
@@ -111,18 +104,6 @@ class EDSEntityTest {
 
 		assertNotEquals(etyFirstNull, etySecondNull);
 
-
-	} 
-	
-	@Test
-	void terminologyEtyHashCodeTest() {
-		TerminologyETY ety = new TerminologyETY(); 
-		ety.setSystem(TEST_SYSTEM);
-		ety.setCode(TEST_CODE);
-		ety.setDescription(TEST_DESCRIPTION); 
-		ety.setLastUpdateDate(TEST_DATE); 
-		
-		assertDoesNotThrow(ety::hashCode);
 
 	}
 	
@@ -175,29 +156,6 @@ class EDSEntityTest {
 		assertDoesNotThrow(() -> schemaQuery.getComparatorQuery(documentDto)); 
 	
 	}
-	
-	@Test
-	void getUpsertQueryTerminologyTest() {
-		TerminologyDTO dto = new TerminologyDTO(); 
-		Terminology terminology = new Terminology(); 
-		terminology.setId(new ObjectId("6332f5bbacf1522dbb24883f").toString()); 
-		terminology.setCode("code"); 
-		terminology.setSystem("system"); 
-		terminology.setDescription("description");  
-		terminology.setLastUpdateDate(new Date()); 
-		
-		dto.setSpanID("spanID");
-		dto.setTraceID("traceID"); 
-		dto.setDocument(terminology); 
-		
-		Document documentDto = terminologyQuery.getUpsertQuery(dto); 
-		
-		assertEquals(Document.class, documentDto.getClass()); 
-		assertEquals(Document.class, terminologyQuery.getFilterQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		assertEquals(Document.class, terminologyQuery.getDeleteQuery("6332f5bbacf1522dbb24883f").getClass()); 
-		
-		assertDoesNotThrow(() -> terminologyQuery.getComparatorQuery(documentDto));
-	}
 
 	@Test
 	void getUpsertQueryFhirTest() {
@@ -232,7 +190,7 @@ class EDSEntityTest {
 			"version",
 			"code",
 			new Date(),
-			new Date(),
+			false,
 			false
 		);
 		Document doc = DictionaryETY.fromMap(map);

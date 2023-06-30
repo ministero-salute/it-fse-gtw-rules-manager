@@ -12,68 +12,79 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk;
 
 import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO.HistoryDeleteDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO.HistoryInsertDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
 import org.bson.Document;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.List;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 public interface ISnapshotHandlerEDS {
-     default IChunkHandlerEDS onChunkInsertion() {
+     default IChunkHandlerEDS<HistoryInsertDTO> onChunkInsertion() {
           throw new UnsupportedOperationException("onChunkInsertion() is not implemented!");
      }
-     default IChunkHandlerEDS onChunkDeletions() {
+     default IChunkHandlerEDS<HistoryDeleteDTO> onChunkDeletions() {
           throw new UnsupportedOperationException("onChunkDeletions() is not implemented!");
      }
 
-     default int onInsertionChunkProcessing(MongoCollection<Document> mongo, ChangeSetChunkDTO changeset) {
+     default int onResourceInsert(MongoCollection<Document> mongo, ChangeSetChunkDTO changeset) {
           // Working var
           SimpleImmutableEntry<ActionRes, Integer> res = new SimpleImmutableEntry<>(OK, 0);
           int process = 0;
-          String snapshot = changeset.getChunks().getSnapshotID();
+          List<HistoryInsertDTO> resources = changeset.getInsertions();
           // Create evaluator instance
-          IChunkHandlerEDS hnd = onChunkInsertion();
+          IChunkHandlerEDS<HistoryInsertDTO> hnd = onChunkInsertion();
           // Retrieve chunk offset
-          int chunks = changeset.getChunks().getInsertions().getChunksCount();
+          int size = changeset.getInsertions().size();
           // Process
-          for (int i = 0; i < chunks && res.getKey() == OK; i++) {
+          for (int i = 0; i < size && res.getKey() == OK; i++) {
                // Execute and get result
-               res = onEvaluator(mongo, hnd, snapshot, i, chunks);
+               res = onInsertEvaluator(mongo, hnd, resources.get(i));
                // Apply conversion logic
                if(res.getKey() == OK) process += res.getValue();
           }
           // Return dataset
           return process;
      }
-     default int onDeletionsChunkProcessing(MongoCollection<Document> mongo, ChangeSetChunkDTO changeset) {
+     default int onResourceDelete(MongoCollection<Document> mongo, ChangeSetChunkDTO changeset) {
           // Working var
           SimpleImmutableEntry<ActionRes, Integer> res = new SimpleImmutableEntry<>(OK, 0);
           int process = 0;
-          String snapshot = changeset.getChunks().getSnapshotID();
+          List<HistoryDeleteDTO> resources = changeset.getDeletions();
           // Create evaluator instance
-          IChunkHandlerEDS hnd = onChunkDeletions();
+          IChunkHandlerEDS<HistoryDeleteDTO> hnd = onChunkDeletions();
           // Retrieve chunk offset
-          int chunks = changeset.getChunks().getDeletions().getChunksCount();
+          int size = changeset.getDeletions().size();
           // Process
-          for (int i = 0; i < chunks && res.getKey() == OK; i++) {
+          for (int i = 0; i < size && res.getKey() == OK; i++) {
                // Execute and get result
-               res = onEvaluator(mongo, hnd, snapshot, i, chunks);
+               res = onDeleteEvaluator(mongo, hnd, resources.get(i));
                // Apply conversion logic
                if(res.getKey() == OK) process += res.getValue();
           }
           // Return dataset
           return process;
      }
-     default SimpleImmutableEntry<ActionRes, Integer> onEvaluator(
+
+     default SimpleImmutableEntry<ActionRes, Integer> onInsertEvaluator(
          MongoCollection<Document> mongo,
-         IChunkHandlerEDS hnd,
-         String snapshot,
-         int chunk,
-         int max
+         IChunkHandlerEDS<HistoryInsertDTO> hnd,
+         HistoryInsertDTO data
      ) {
           // Invoke handler
-          return hnd.handle(mongo, snapshot, chunk, max);
+          return hnd.handle(mongo, data);
+     }
+
+     default SimpleImmutableEntry<ActionRes, Integer> onDeleteEvaluator(
+         MongoCollection<Document> mongo,
+         IChunkHandlerEDS<HistoryDeleteDTO> hnd,
+         HistoryDeleteDTO data
+     ) {
+          // Invoke handler
+          return hnd.handle(mongo, data);
      }
 }

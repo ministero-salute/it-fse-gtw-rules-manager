@@ -22,4 +22,7 @@ public interface ITerminologyRepo {
 
 	void applyIndexes(String collection) throws EdsDbException;
 
+	boolean exists(String resource, String version, String collection) throws EdsDbException;
+
+	long countActiveResources(String collection) throws EdsDbException;
 }

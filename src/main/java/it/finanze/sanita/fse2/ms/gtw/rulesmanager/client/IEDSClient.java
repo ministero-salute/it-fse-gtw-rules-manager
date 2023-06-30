@@ -25,9 +25,11 @@ import java.util.Date;
 public interface IEDSClient {
     // Standard interface
     <T> T getStatus(ChangesetCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException;
+    <T> T getStatusByClass(ChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException;
     <T> T getDocument(ChangesetCFG spec, String id, Class<T> type) throws EdsClientException;
     // Chunk interface
-    <T> T getSnapshot(ChunkChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException;
-    <T> T getChunkIns(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException;
-    <T> T getChunkDel(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException;
+    <T> T getIntegrity(ChunkChangesetCFG spec, Class<T> type) throws EdsClientException;
+    <T> T getResource(ChunkChangesetCFG spec, String id, String version, Class<T> type) throws EdsClientException;
+    <T> T getNextResource(String uri, Class<T> type) throws EdsClientException;
+
 }

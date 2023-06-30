@@ -95,9 +95,9 @@ public class InvokeEDSClientScheduler {
 
 	private void setup() {
 		// Setup terminology <-> dictionary relationship
-		terminology.setOnBeforeSwap(() -> dictionary.execute().toCallback());
-		terminology.setOnFailedSwap(() -> dictionary.onRecovery());
-		terminology.setOnSuccessSwap(() -> dictionary.onCleanBackup().toCallback());
+		// terminology.setOnBeforeSwap(() -> dictionary.execute().toCallback());
+		// terminology.setOnFailedSwap(() -> dictionary.onRecovery());
+		// terminology.setOnSuccessSwap(() -> dictionary.onCleanBackup().toCallback());
 		// Setup fhir <-> engine relationship
 		fhir.setOnBeforeSwap(() -> engines.execute().toCallback());
 		fhir.setOnFailedSwap(() -> engines.onRecovery());

@@ -20,21 +20,21 @@ import java.net.URISyntaxException;
 @Getter
 public abstract class ChunkChangesetCFG extends ChangesetCFG {
 
-    private final String chunkInsert;
-    private final String chunkDelete;
+    private final String resource;
+    private final String integrity;
 
-    protected ChunkChangesetCFG(String status, String chunkInsert, String chunkDelete, String production) {
+    protected ChunkChangesetCFG(String status, String resource, String integrity, String production) {
         super(status, null, production);
-        this.chunkInsert = chunkInsert;
-        this.chunkDelete = chunkDelete;
+        this.resource = resource;
+        this.integrity = integrity;
     }
 
-    public URI getChunkIns(String id, int idx) throws URISyntaxException {
-        return new URI(chunkInsert + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+    public URI getResource(String id, String version) throws URISyntaxException {
+        return new URI(resource + new URIBuilder().setPathSegments(id, version).build());
     }
 
-    public URI getChunkDel(String id, int idx) throws URISyntaxException {
-        return new URI(chunkDelete + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+    public URI getIntegrity() throws URISyntaxException {
+        return new URI(integrity);
     }
 
 }

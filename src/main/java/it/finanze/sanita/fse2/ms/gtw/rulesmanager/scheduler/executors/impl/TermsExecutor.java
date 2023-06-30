@@ -12,14 +12,17 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors.impl;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.result.InsertManyResult;
-import com.mongodb.client.result.UpdateResult;
+import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChunkChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.TerminologyCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkDelDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.chunks.TerminologyChunkInsDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO.HistoryDeleteDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO.HistoryInsertDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityResultDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.TerminologyDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.base.IActionFnEDS;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.chunk.IChunkHandlerEDS;
@@ -39,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +86,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         // Log me
         log.debug("[{}] Retrieving changeset", getConfig().getTitle());
         // Retrieve HTTP request data
-        data = retryOnException(() -> getBridge().getClient().getSnapshot(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);        // Set the flag
+        data = retryOnException(() -> getBridge().getClient().getStatusByClass(getConfigAsChunked(), hnd.get(), ChangeSetChunkDTO.class), getConfig(), log);        // Set the flag
         ActionRes res = data.isPresent() ? OK : KO;
         if(data.isPresent()) {
             this.snapshot = data.get();
@@ -103,7 +106,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         // Print stats (collection size)
         statsSize(false);
         // Verify emptiness
-        if (this.snapshot.getTotalNumberOfElements() == 0) {
+        if (this.snapshot.isEmpty()) {
             // Log me
             log.debug("[{}] Changeset is empty", getConfig().getTitle());
             // Now check size
@@ -126,13 +129,13 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         try {
             setOperations(new ProcessResult(
                 // Execute insertions on staging
-                onInsertionChunkProcessing(getCollection(), snapshot),
+                onResourceInsert(getCollection(), snapshot),
                 // Execute deletions on staging
-                onDeletionsChunkProcessing(getCollection(), snapshot),
+                onResourceDelete(getCollection(), snapshot),
                 // Expected insertions
-                getSnapshot().getChunks().getInsertions().getChunksItems(),
+                getSnapshot().getInsertions().size(),
                 // Expected deletions
-                getSnapshot().getChunks().getDeletions().getChunksItems()
+                getSnapshot().getDeletions().size()
             ));
             res = OK;
             log.debug("[{}] Operations have been applied on staging", getConfig().getTitle());
@@ -162,20 +165,20 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         return res;
     }
     @Override
-    public IChunkHandlerEDS onChunkInsertion() {
-        return (staging, snapshot, chunk, max) -> {
+    public IChunkHandlerEDS<HistoryInsertDTO> onChunkInsertion() {
+        return (staging, data) -> {
             // Log me
-            log.debug("[{}][Insert] Retrieving chunk {}/{}", getConfig().getTitle(), chunk + 1, max);
+            log.debug("[{}][Insert] Retrieving resource {}", getConfig().getTitle(), data);
             // Working var
             int process = 0;
             // Working var
-            Optional<TerminologyChunkInsDTO> dto;
+            Optional<TerminologyDTO> dto;
             // Retrieve data
-            dto = retryOnException(() -> getBridge().getClient().getChunkIns(
+            dto = retryOnException(() -> getBridge().getClient().getResource(
                 getConfigAsChunked(),
-                snapshot,
-                chunk,
-                TerminologyChunkInsDTO.class
+                data.getId(),
+                data.getVersion(),
+                TerminologyDTO.class
                 ), getConfig(), log
             );
             // Verify
@@ -183,76 +186,42 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
             // Insert into db if request didn't fail
             if(res == OK) {
                 try {
-                    // Retrieve docs
-                    List<Document> docs = query.getUpsertQueries(dto.get().getDocuments());
-                    // Note: We need to check docs.size() because insertMany() does not allow empty lists
-                    if(!docs.isEmpty()) {
-                        // Insert
-                        InsertManyResult status = staging.insertMany(docs);
-                        // Calculate insertions
-                        process = status.getInsertedIds().size();
-                    } else {
-                        log.debug("[{}][Insert] Skipping empty chunk with index {}", getConfig().getTitle(), chunk);
-                    }
-                }catch (MongoException ex) {
+                    // Insert & Consume
+                    process = consume(staging, dto.get());
+                }catch (MongoException | EdsClientException ex) {
                     log.error(
-                        format("[EDS][%s] Unable to insert chunk documents", getConfig().getTitle()),
+                        format("[EDS][%s] Unable to insert chunked resource", getConfig().getTitle()),
                         ex
                     );
                     // Set flag
                     res = KO;
                 }
-            }else {
-                log.error("[EDS][{}] Unable to retrieve chunk document for insertion", getConfig().getTitle());
+            } else {
+                log.error("[EDS][{}] Unable to retrieve chunked resource for insertion", getConfig().getTitle());
             }
-            return new AbstractMap.SimpleImmutableEntry<>(res, process);
+            return new SimpleImmutableEntry<>(res, process);
         };
     }
     @Override
-    public IChunkHandlerEDS onChunkDeletions() {
-        return (staging, snapshot, chunk, max) -> {
-            // Log me
-            log.debug("[{}][Delete] Retrieving chunk {}/{}", getConfig().getTitle(), chunk + 1, max);
-            // Working var
+    public IChunkHandlerEDS<HistoryDeleteDTO> onChunkDeletions() {
+        return (staging, data) -> {
+            ActionRes res = OK;
             int process = 0;
-            // Working var
-            Optional<TerminologyChunkDelDTO> dto;
-            // Retrieve data
-            dto = retryOnException(() -> getBridge().getClient().getChunkDel(
-                    getConfigAsChunked(),
-                    snapshot,
-                    chunk,
-                    TerminologyChunkDelDTO.class
-                ), getConfig(), log
-            );
-            // Verify
-            ActionRes res = dto.isPresent() ? OK : KO;
-            // Delete docs if request didn't fail
-            if(res == OK) {
-                try {
-                    // Retrieve docs
-                    List<String> docs = dto.get().getDocuments();
-                    // Note: We check docs.size() just to be sure updateMany() is not going to be an empty stmt
-                    if(!docs.isEmpty()) {
-                        // Execute
-                        UpdateResult result = staging.updateMany(query.getDeleteQueries(docs), set("deleted", true));
-                        // Calculate deletions
-                        process = (int) result.getModifiedCount();
-                    } else {
-                        log.debug("[{}][Delete] Skipping empty chunk with index {}", getConfig().getTitle(), chunk);
-                    }
-                }catch (MongoException ex) {
-                    log.error(
-                        format("[EDS][%s] Unable to delete chunk documents", getConfig().getTitle()),
-                        ex
-                    );
-                    // Set flag
-                    res = KO;
-                }
-            }else {
-                log.error("[EDS][{}] Unable to retrieve chunk document for deletion", getConfig().getTitle());
+            log.debug("[{}][Delete] Deleting resource {}", getConfig().getTitle(), data);
+            try {
+                // Execute
+                staging.updateMany(query.getDeleteQuery(data), set("deleted", true));
+                // Update
+                process = 1;
+            }catch (MongoException ex) {
+                log.error(
+                    format("[EDS][%s] Unable to delete chunk documents", getConfig().getTitle()),
+                    ex
+                );
+                // Set flag
+                res = KO;
             }
-            return new AbstractMap.SimpleImmutableEntry<>(res, process);
+            return new SimpleImmutableEntry<>(res, process);
         };
     }
 
@@ -295,7 +264,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     protected ActionRes onChangesetAlignment() {
         ActionRes res = KO;
         // Verify return condition
-        if (getSnapshot().getTotalNumberOfElements() == 0) {
+        if (getSnapshot().isEmpty()) {
             res = OK;
             log.debug("[{}] Changeset is empty, data is aligned", getConfig().getTitle());
         }
@@ -314,20 +283,31 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         ActionRes res = KO;
         log.debug("[{}] Verifying staging matches size", getConfig().getTitle());
         try {
-            // Retrieve current size (after performing operations)
-            long size = getBridge().getRepository().countActiveDocuments(getCollection());
-            // Verify match
-            if(snapshot.getCollectionSize() == size) {
-                log.debug("[{}] Verification success", getConfig().getTitle());
-                // Set flag
-                res = OK;
-            }else {
-                log.warn("[{}] Verification failure", getConfig().getTitle());
+            Optional<IntegrityDTO> integrity = retryOnException(
+                () -> getBridge().getClient().getIntegrity(getConfigAsChunked(), IntegrityDTO.class),
+                getConfig(),
+                log
+            );
+            if(integrity.isPresent()) {
+                // Check if synced
+                IntegrityResultDTO matches = service.matches(integrity.get(), getConfig().getStaging());
+                // Verify match
+                if (matches.isSynced()) {
+                    log.debug("[{}] Verification success", getConfig().getTitle());
+                    // Set flag
+                    res = OK;
+                } else {
+                    log.warn("[{}] Verification failure", getConfig().getTitle());
+                }
+                matches.getMissing().forEach(
+                    raw -> log.debug("[{}] Missing resource from system: {}", getConfig().getTitle(), raw.info())
+                );
+            } else {
+                log.error("[{}] Unable to retrieve checksum from EDS", getConfig().getTitle());
             }
-            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-        }catch (EdsDbException ex) {
+        } catch (EdsDbException ex) {
             log.error(
-                format("[%s] Unable to verify collection size", getConfig().getTitle()),
+                format("[%s] Unable to verify if staging collection matches checksum", getConfig().getTitle()),
                 ex
             );
         }
@@ -336,24 +316,34 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
 
     @Override
     protected ActionRes onVerifyProductionSize() {
-        // Working var
         ActionRes res = KO;
+        log.debug("[{}] Verifying production matches size", getConfig().getTitle());
         try {
-            log.debug("[{}] Verifying production matches size", getConfig().getTitle());
-            // Retrieve current size
-            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
-            // Verify match
-            if(snapshot.getCollectionSize() == size) {
-                log.debug("[{}] Verification success", getConfig().getTitle());
-                // Set flag
-                res = EXIT;
-            }else {
-                log.warn("[{}] Verification failure", getConfig().getTitle());
+            Optional<IntegrityDTO> integrity = retryOnException(
+                () -> getBridge().getClient().getIntegrity(getConfigAsChunked(), IntegrityDTO.class),
+                getConfig(),
+                log
+            );
+            if(integrity.isPresent()) {
+                // Check if synced
+                IntegrityResultDTO matches = service.matches(integrity.get(), getConfig().getProduction());
+                // Verify match
+                if (matches.isSynced()) {
+                    log.debug("[{}] Verification success", getConfig().getTitle());
+                    // Set flag
+                    res = EXIT;
+                } else {
+                    log.warn("[{}] Verification failure", getConfig().getTitle());
+                }
+                matches.getMissing().forEach(
+                    raw -> log.debug("[{}] Missing resource from system: {}", getConfig().getTitle(), raw.info())
+                );
+            } else {
+                log.error("[{}] Unable to retrieve checksum from EDS", getConfig().getTitle());
             }
-            log.debug("[{}] Expecting {} | Got {}", getConfig().getTitle(), snapshot.getCollectionSize(), size);
-        }catch (EdsDbException ex) {
+        } catch (EdsDbException ex) {
             log.error(
-                format("[%s] Unable to verify if production matches expected size", getConfig().getTitle()),
+                format("[%s] Unable to verify if production collection matches checksum", getConfig().getTitle()),
                 ex
             );
         }
@@ -365,16 +355,13 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
     protected void statsSize(boolean synchronised) {
         try {
             // Retrieve current production collection size
-            long size = getBridge().getRepository().countActiveDocuments(getConfig().getProduction());
+            long size = service.countActiveResources(getConfig().getProduction());
             // Display current and remote collection size
             log.info("[{}][Stats] Displaying sizes {} elaboration",
                 getConfig().getTitle(),
                 synchronised ? "after": "before"
             );
-            log.info("[{}][Stats][Size] Local: {} | Remote: {}",
-                getConfig().getTitle(), size,
-                getSnapshot().getCollectionSize()
-            );
+            log.info("[{}][Stats][Size] Resources: {}", getConfig().getTitle(), size);
         } catch (EdsDbException e) {
             log.warn(
                 format("[%s] Unable to retrieve production size for inspection", getConfig().getTitle()),
@@ -390,5 +377,35 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
         } else {
             log.info("[{}][Stats][Ops] No operations to apply", getConfig().getTitle());
         }
+    }
+
+    private int consume(MongoCollection<Document> staging, TerminologyDTO term) throws EdsClientException {
+        while(term != null) {
+            // Retrieve docs
+            List<Document> docs = query.getUpsertQuery(term);
+            // Note: We need to check docs.size() because insertMany() does not allow empty lists
+            if (!docs.isEmpty()) {
+                staging.insertMany(docs);
+            } else {
+                log.debug("[{}][Insert] Skipping empty chunk for {}", getConfig().getTitle(), term.info());
+            }
+            // Retrieve next url
+            String next = term.getLinks().getNext();
+            // Check if we need to keep going
+            if(next != null) {
+                Optional<TerminologyDTO> nextTerm = retryOnException(
+                    () -> getBridge().getClient().getNextResource(next, TerminologyDTO.class),
+                    getConfig(), log
+                );
+                if(!nextTerm.isPresent()) {
+                    throw new EdsClientException("Unable to retrieve next chunk for " + term.info(), null);
+                } else {
+                    term = nextTerm.get();
+                }
+            } else {
+                term = null;
+            }
+        }
+        return 1;
     }
 }

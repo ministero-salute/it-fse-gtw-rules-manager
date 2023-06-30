@@ -47,11 +47,11 @@ public class EDSClient implements IEDSClient {
     }
 
     @Override
-    public <T> T getSnapshot(ChunkChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException {
+    public <T> T getIntegrity(ChunkChangesetCFG spec, Class<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {
-            response = client.getForEntity(spec.getStatusReq(lastUpdate), type);
+            response = client.getForEntity(spec.getIntegrity(), type);
         }catch (Exception e) {
             throw new EdsClientException("Error while executing the request", e);
         }
@@ -60,11 +60,11 @@ public class EDSClient implements IEDSClient {
     }
 
     @Override
-    public <T> T getChunkIns(ChunkChangesetCFG spec, String id, int idx,  Class<T> type) throws EdsClientException {
+    public <T> T getResource(ChunkChangesetCFG spec, String id, String version, Class<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {
-            response = client.getForEntity(spec.getChunkIns(id, idx), type);
+            response = client.getForEntity(spec.getResource(id, version), type);
         }catch (Exception e) {
             throw new EdsClientException("Error while executing the request", e);
         }
@@ -73,11 +73,11 @@ public class EDSClient implements IEDSClient {
     }
 
     @Override
-    public <T> T getChunkDel(ChunkChangesetCFG spec, String id, int idx, Class<T> type) throws EdsClientException {
+    public <T> T getNextResource(String uri, Class<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {
-            response = client.getForEntity(spec.getChunkDel(id, idx), type);
+            response = client.getForEntity(uri, type);
         }catch (Exception e) {
             throw new EdsClientException("Error while executing the request", e);
         }
@@ -87,6 +87,24 @@ public class EDSClient implements IEDSClient {
 
     @Override
     public <T> T getStatus(ChangesetCFG spec, Date lastUpdate, ParameterizedTypeReference<T> type) throws EdsClientException {
+        // Execute request
+        ResponseEntity<T> response;
+        try {
+            response = client.exchange(
+                spec.getStatusReq(lastUpdate),
+                HttpMethod.GET,
+                null,
+                type
+            );
+        }catch (Exception e) {
+            throw new EdsClientException("Error while executing the request", e);
+        }
+        // Return data
+        return response.getBody();
+    }
+
+    @Override
+    public <T> T getStatusByClass(ChangesetCFG spec, Date lastUpdate, Class<T> type) throws EdsClientException {
         // Execute request
         ResponseEntity<T> response;
         try {

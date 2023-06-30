@@ -14,7 +14,6 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.SchemaCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.impl.TerminologyCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +38,6 @@ class EDSClientTest {
 
     @Autowired
     private SchemaCFG configuration;
-    @Autowired
-    private TerminologyCFG chunks;
     @Autowired
     private IEDSClient client;
     @MockBean
@@ -87,65 +84,4 @@ class EDSClientTest {
         // Check exception
         assertThrows(EdsClientException.class, () -> client.getDocument(configuration, "id", Object.class));
     }
-
-    @Test
-    void snapshot() {
-        // Test OK
-        assertDoesNotThrow(() -> {
-            // Mock response
-            when(rest.getForEntity(any(), eq(Object.class))).thenReturn(
-                new ResponseEntity<>(new Object(), OK)
-            );
-            // Execute
-            Object res = client.getSnapshot(chunks, new Date(), Object.class);
-            // Verify response
-            assertNotNull(res);
-        });
-        // Test KO
-        // Mock error
-        when(rest.getForEntity(any(), eq(Object.class))).thenThrow(new RuntimeException("Test error"));
-        // Check exception
-        assertThrows(EdsClientException.class, () -> client.getSnapshot(chunks, new Date(), Object.class));
-    }
-
-    @Test
-    void chunkInsert() {
-        // Test OK
-        assertDoesNotThrow(() -> {
-            // Mock response
-            when(rest.getForEntity(any(), eq(Object.class))).thenReturn(
-                new ResponseEntity<>(new Object(), OK)
-            );
-            // Execute
-            Object res = client.getChunkIns(chunks, "id", 0, Object.class);
-            // Verify response
-            assertNotNull(res);
-        });
-        // Test KO
-        // Mock error
-        when(rest.getForEntity(any(), eq(Object.class))).thenThrow(new RuntimeException("Test error"));
-        // Check exception
-        assertThrows(EdsClientException.class, () -> client.getChunkIns(chunks, "id", 0, Object.class));
-    }
-
-    @Test
-    void chunkDelete() {
-        // Test OK
-        assertDoesNotThrow(() -> {
-            // Mock response
-            when(rest.getForEntity(any(), eq(Object.class))).thenReturn(
-                new ResponseEntity<>(new Object(), OK)
-            );
-            // Execute
-            Object res = client.getChunkDel(chunks, "id", 0, Object.class);
-            // Verify response
-            assertNotNull(res);
-        });
-        // Test KO
-        // Mock error
-        when(rest.getForEntity(any(), eq(Object.class))).thenThrow(new RuntimeException("Test error"));
-        // Check exception
-        assertThrows(EdsClientException.class, () -> client.getChunkDel(chunks, "id", 0, Object.class));
-    }
-
 }

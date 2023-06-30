@@ -11,8 +11,8 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.util;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import lombok.Getter;
 
 import static java.lang.String.format;
@@ -71,8 +71,8 @@ public final class ProcessResult {
     public static String info(ChangeSetChunkDTO snapshot) {
         return format(
             "[ Insertions: %d | Deletions: %d ]",
-            snapshot.getChunks().getInsertions().getChunksItems(),
-            snapshot.getChunks().getDeletions().getChunksItems()
+            snapshot.getInsertions().size(),
+            snapshot.getDeletions().size()
         );
     }
 

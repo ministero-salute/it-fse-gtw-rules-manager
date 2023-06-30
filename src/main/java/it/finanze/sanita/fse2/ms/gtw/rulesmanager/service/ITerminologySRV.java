@@ -11,8 +11,12 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service;
 
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityResultDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 
 public interface ITerminologySRV {
     void applyIndexes(String collection) throws EdsDbException;
+    IntegrityResultDTO matches(IntegrityDTO integrity, String collection) throws EdsDbException;
+    long countActiveResources(String collection) throws EdsDbException;
 }

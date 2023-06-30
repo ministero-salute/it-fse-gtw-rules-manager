@@ -13,7 +13,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
 import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.impl.MockTermsExecutor;
@@ -70,17 +70,17 @@ class TermsExecutorTest {
         // Setup production
         setupProduction();
         // Provide knowledge
-        when(client.getSnapshot(any(), any(), any())).thenReturn(emptyChangesetChunk());
+        when(client.getStatus(any(), any(), any())).thenReturn(emptyChangesetChunk());
         // Changeset should be retrieved correctly
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
-        when(client.getSnapshot(any(), any(), any())).thenReturn(createChangesetChunk(10, 1, 10));
+        when(client.getStatus(any(), any(), any())).thenReturn(createChangesetChunk(10, 1));
         // Changeset is not empty, it should be OK
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
-        when(client.getSnapshot(any(), any(), any())).thenReturn(createChangesetChunk(0,0,0));
+        when(client.getStatus(any(), any(), any())).thenReturn(createChangesetChunk(0,0));
         assertEquals(OK, executor.onChangeset(executor.onLastUpdateProd()));
         // Provide knowledge
-        when(client.getSnapshot(any(), any(), any())).thenThrow(
+        when(client.getStatus(any(), any(), any())).thenThrow(
             new EdsClientException("Test error", new IOException("Test error"))
         );
         // Get status errored, it should be KO
@@ -120,8 +120,8 @@ class TermsExecutorTest {
         // Call processing
         assertEquals(OK, executor.onProcessing());
         // Now check size
-        assertEquals(10, executor.getSnapshot().getChunks().getInsertions().getChunksCount());
-        assertEquals(1, executor.getSnapshot().getChunks().getDeletions().getChunksCount());
+        assertEquals(10, executor.getSnapshot().getInsertions().size());
+        assertEquals(1, executor.getSnapshot().getDeletions().size());
         assertEquals(11, executor.getSnapshot().getTotalNumberOfElements());
     }
 

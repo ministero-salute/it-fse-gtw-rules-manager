@@ -18,6 +18,6 @@ import org.bson.Document;
 import java.util.AbstractMap.SimpleImmutableEntry;
 
 @FunctionalInterface
-public interface IChunkHandlerEDS {
-    SimpleImmutableEntry<ActionRes, Integer> handle(MongoCollection<Document> staging, String snapshot, int chunk, int max);
+public interface IChunkHandlerEDS<T> {
+    SimpleImmutableEntry<ActionRes, Integer> handle(MongoCollection<Document> staging, T info);
 }
