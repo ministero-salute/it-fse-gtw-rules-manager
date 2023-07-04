@@ -20,6 +20,8 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+
 @Service
 public class TerminologySRV implements ITerminologySRV {
 
@@ -34,9 +36,10 @@ public class TerminologySRV implements ITerminologySRV {
     @Override
     public IntegrityResultDTO matches(IntegrityDTO integrity, String collection) throws EdsDbException {
         IntegrityResultDTO res = new IntegrityResultDTO();
-        for (Resources resource : integrity.getResources()) {
-            boolean exists = repository.exists(resource.getId(), resource.getVersion(), collection);
-            if(!exists) res.getMissing().add(resource);
+        if(integrity.isEmpty()) {
+            verifyResourcesCount(res, collection);
+        } else {
+            verifyResources(integrity, collection, res);
         }
         return res;
     }
@@ -44,5 +47,19 @@ public class TerminologySRV implements ITerminologySRV {
     @Override
     public long countActiveResources(String collection) throws EdsDbException {
         return repository.countActiveResources(collection);
+    }
+
+    private void verifyResourcesCount(IntegrityResultDTO res, String collection) throws EdsDbException {
+        if(countActiveResources(collection) == 0) {
+            res.setSynced(OK);
+        }
+    }
+
+    private void verifyResources(IntegrityDTO integrity, String collection, IntegrityResultDTO res) throws EdsDbException {
+        for (Resources resource : integrity.getResources()) {
+            boolean exists = repository.exists(resource.getId(), resource.getVersion(), collection);
+            if(!exists) res.getMissing().add(resource);
+        }
+        if(res.noMissingResources()) res.setSynced(OK);
     }
 }

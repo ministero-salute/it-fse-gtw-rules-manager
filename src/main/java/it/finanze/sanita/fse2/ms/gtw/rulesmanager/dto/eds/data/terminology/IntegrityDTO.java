@@ -33,4 +33,9 @@ public class IntegrityDTO {
             return String.format("%s|%s/%s", type.substring(0, 3), id, version);
         }
     }
+
+    public boolean isEmpty() {
+        return resources.isEmpty();
+    }
+
 }

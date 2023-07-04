@@ -1,22 +1,34 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology;
 
-import lombok.Value;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityDTO.Resources;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 
-@Value
+@Getter
 public class IntegrityResultDTO {
 
-    List<Resources> missing;
+    private final List<Resources> missing;
+    private ActionRes synced;
 
     public IntegrityResultDTO() {
         this.missing = new ArrayList<>();
+        this.synced = KO;
     }
 
-    public boolean isSynced() {
+    public ActionRes isSynced() {
+        return synced;
+    }
+
+    public void setSynced(ActionRes synced) {
+        this.synced = synced;
+    }
+
+    public boolean noMissingResources() {
         return missing.isEmpty();
     }
 }

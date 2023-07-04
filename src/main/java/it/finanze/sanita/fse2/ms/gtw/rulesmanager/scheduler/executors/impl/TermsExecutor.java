@@ -292,7 +292,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
                 // Check if synced
                 IntegrityResultDTO matches = service.matches(integrity.get(), getConfig().getStaging());
                 // Verify match
-                if (matches.isSynced()) {
+                if (matches.isSynced() == OK) {
                     log.debug("[{}] Verification success", getConfig().getTitle());
                     // Set flag
                     res = OK;
@@ -328,7 +328,7 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
                 // Check if synced
                 IntegrityResultDTO matches = service.matches(integrity.get(), getConfig().getProduction());
                 // Verify match
-                if (matches.isSynced()) {
+                if (matches.isSynced() == OK) {
                     log.debug("[{}] Verification success", getConfig().getTitle());
                     // Set flag
                     res = EXIT;
