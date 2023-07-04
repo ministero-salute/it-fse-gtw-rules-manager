@@ -11,12 +11,10 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Date;
 
-@AllArgsConstructor
 @Data
 public class TerminologyMapDTO {
 
@@ -32,6 +30,14 @@ public class TerminologyMapDTO {
 	private String code;
 	private Date releaseDate;
 	private boolean whitelist;
-	private Boolean deleted;
+	private boolean deleted;
 
+	public TerminologyMapDTO(String system, String version, String code, Date releaseDate, Boolean whitelist, Boolean deleted) {
+		this.system = system;
+		this.version = version;
+		this.code = code;
+		this.releaseDate = releaseDate;
+		this.whitelist = whitelist != null && whitelist;
+		this.deleted = deleted != null && deleted;
+	}
 }

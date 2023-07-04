@@ -55,7 +55,7 @@ public class DictionaryETY {
         entity.put(FIELD_VERSION, map.getVersion());
         entity.put(FIELD_RELEASE_DATE, map.getReleaseDate());
         entity.put(FIELD_WHITELIST, map.isWhitelist());
-        entity.put(FIELD_DELETED, map.getDeleted());
+        entity.put(FIELD_DELETED, map.isDeleted());
         return entity;
     }
 
