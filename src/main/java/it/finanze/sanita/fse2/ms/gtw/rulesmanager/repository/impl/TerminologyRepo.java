@@ -48,27 +48,20 @@ public class TerminologyRepo implements ITerminologyRepo {
 
 		try {
 			// Define group operation
-			GroupOperation group = Aggregation
-				.group(
-					FIELD_SYSTEM,
-					FIELD_VERSION,
-					FIELD_RELEASE_DATE,
-					FIELD_WHITELIST,
-					FIELD_DELETED
-				)
-				.first(FIELD_CODE).as(TerminologyMapDTO.FIELD_CODE)
-				.first(FIELD_RELEASE_DATE).as(TerminologyMapDTO.FIELD_RELEASE_DATE)
-				.first(FIELD_DELETED).as(TerminologyMapDTO.FIELD_DELETED)
-				.first(FIELD_WHITELIST).as(TerminologyMapDTO.FIELD_WHITELIST);
+			GroupOperation group = Aggregation.group(
+				FIELD_SYSTEM,
+				FIELD_VERSION,
+				FIELD_RELEASE_DATE,
+				FIELD_WHITELIST,
+				FIELD_DELETED
+			);
 			// Init aggregation pipeline
 			AggregationOperation project = project(
 				FIELD_SYSTEM_ID_REF,
 				FIELD_VERSION_ID_REF,
-				FIELD_DELETED,
 				FIELD_RELEASE_DATE,
 				FIELD_WHITELIST,
-				TerminologyMapDTO.FIELD_CODE,
-				TerminologyMapDTO.FIELD_RELEASE_DATE
+				FIELD_DELETED
 			);
 			// Create aggregation definition
 			Aggregation agg = Aggregation.newAggregation(group, project);

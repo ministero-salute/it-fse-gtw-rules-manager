@@ -20,24 +20,25 @@ public class TerminologyMapDTO {
 
 	public static final String FIELD_SYSTEM = "system";
 	public static final String FIELD_VERSION = "version";
-	public static final String FIELD_CODE = "code";
 	public static final String FIELD_RELEASE_DATE = "release_date";
 	public static final String FIELD_WHITELIST = "whitelist";
 	public static final String FIELD_DELETED = "deleted";
 
 	private String system;
 	private String version;
-	private String code;
-	private Date releaseDate;
+	private Date release_date;
 	private boolean whitelist;
 	private boolean deleted;
 
-	public TerminologyMapDTO(String system, String version, String code, Date releaseDate, Boolean whitelist, Boolean deleted) {
+	public TerminologyMapDTO(String system, String version, Date release_date, Boolean whitelist, Boolean deleted) {
 		this.system = system;
 		this.version = version;
-		this.code = code;
-		this.releaseDate = releaseDate;
+		this.release_date = release_date;
 		this.whitelist = whitelist != null && whitelist;
 		this.deleted = deleted != null && deleted;
+	}
+
+	public Date getReleaseDate() {
+		return release_date;
 	}
 }

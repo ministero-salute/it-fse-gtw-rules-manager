@@ -188,7 +188,6 @@ class EDSEntityTest {
 		TerminologyMapDTO map = new TerminologyMapDTO(
 			"system",
 			"version",
-			"code",
 			new Date(),
 			false,
 			false
