@@ -52,6 +52,7 @@ public class TerminologyRepo implements ITerminologyRepo {
 				.group(
 					FIELD_SYSTEM,
 					FIELD_VERSION,
+					FIELD_RELEASE_DATE,
 					FIELD_WHITELIST,
 					FIELD_DELETED
 				)
@@ -64,6 +65,7 @@ public class TerminologyRepo implements ITerminologyRepo {
 				FIELD_SYSTEM_ID_REF,
 				FIELD_VERSION_ID_REF,
 				FIELD_DELETED,
+				FIELD_RELEASE_DATE,
 				FIELD_WHITELIST,
 				TerminologyMapDTO.FIELD_CODE,
 				TerminologyMapDTO.FIELD_RELEASE_DATE
