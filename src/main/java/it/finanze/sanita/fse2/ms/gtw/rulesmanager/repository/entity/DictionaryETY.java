@@ -11,7 +11,7 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -34,7 +34,7 @@ public class DictionaryETY {
     public static final String FIELD_RELEASE_DATE = "release_date";
     public static final String FIELD_WHITELIST = "whitelist";
     public static final String FIELD_DELETED = "deleted";
-
+    public static final String FIELD_SOURCE = "source";
 
 	@Id
 	private String id;
@@ -49,13 +49,14 @@ public class DictionaryETY {
     @Field(name = FIELD_DELETED)
     private Boolean deleted;
 
-    public static org.bson.Document fromMap(TerminologyMapDTO map) {
+    public static org.bson.Document fromMap(DictionaryDTO map) {
         org.bson.Document entity = new org.bson.Document();
         entity.put(FIELD_SYSTEM, map.getSystem());
         entity.put(FIELD_VERSION, map.getVersion());
         entity.put(FIELD_RELEASE_DATE, map.getReleaseDate());
         entity.put(FIELD_WHITELIST, map.isWhitelist());
         entity.put(FIELD_DELETED, map.isDeleted());
+        entity.put(FIELD_SOURCE, map.getSource());
         return entity;
     }
 

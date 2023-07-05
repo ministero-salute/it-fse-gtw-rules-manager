@@ -11,14 +11,14 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 
 import java.util.List;
 
 public interface ITerminologyRepo {
 
-	List<TerminologyMapDTO> getAllCodeSystemVersions(String collection) throws EdsDbException;
+	List<DictionaryDTO> createDictionaries(String collection) throws EdsDbException;
 
 	void applyIndexes(String collection) throws EdsDbException;
 

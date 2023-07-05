@@ -13,15 +13,17 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,7 +34,8 @@ import java.util.List;
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.*;
 import static java.lang.Integer.parseInt;
 import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Repository
@@ -42,36 +45,46 @@ public class TerminologyRepo implements ITerminologyRepo {
 	private MongoTemplate mongo;
 
 	@Override
-	public List<TerminologyMapDTO> getAllCodeSystemVersions(String collection) throws EdsDbException {
+	public List<DictionaryDTO> createDictionaries(String collection) throws EdsDbException {
 
-		List<TerminologyMapDTO> res;
+		List<DictionaryDTO> resources;
+
+		// Sort the documents by their resource version
+		// So we can acquire the first (latest) document of a given system+version
+		SortOperation sort = sort(
+			Sort.by(DESC, FIELD_REF_VERSION)
+		);
+		// Retrieve each system+version in the database
+		GroupOperation group = group(
+			FIELD_SYSTEM,
+			FIELD_VERSION
+		)
+		// For each system+version, retrieve the value of the first document for each field
+		.first(FIELD_RELEASE_DATE).as(FIELD_RELEASE_DATE)
+		.first(FIELD_WHITELIST).as(FIELD_WHITELIST)
+		.first(FIELD_DELETED).as(FIELD_DELETED)
+		.first(FIELD_REF_VERSION).as(DictionaryDTO.FIELD_SOURCE);
+		// Now project to compose the final document
+		ProjectionOperation projection = project()
+			.and(FIELD_SYSTEM_ID_REF).as(FIELD_SYSTEM)
+			.and(FIELD_VERSION_ID_REF).as(FIELD_VERSION)
+			.andInclude(
+				FIELD_RELEASE_DATE,
+				FIELD_WHITELIST,
+				FIELD_DELETED,
+				DictionaryDTO.FIELD_SOURCE
+			);
 
 		try {
-			// Define group operation
-			GroupOperation group = Aggregation.group(
-				FIELD_SYSTEM,
-				FIELD_VERSION,
-				FIELD_RELEASE_DATE,
-				FIELD_WHITELIST,
-				FIELD_DELETED
-			);
-			// Init aggregation pipeline
-			AggregationOperation project = project(
-				FIELD_SYSTEM_ID_REF,
-				FIELD_VERSION_ID_REF,
-				FIELD_RELEASE_DATE,
-				FIELD_WHITELIST,
-				FIELD_DELETED
-			);
 			// Create aggregation definition
-			Aggregation agg = Aggregation.newAggregation(group, project);
+			Aggregation agg = newAggregation(sort, group, projection);
 			// Execute
-			res = mongo.aggregate(agg, collection, TerminologyMapDTO.class).getMappedResults();
+			resources = mongo.aggregate(agg, collection, DictionaryDTO.class).getMappedResults();
 		} catch(MongoException ex) {
 			throw new EdsDbException("Unable to aggregate code-system versions", ex);
 		}
 
-		return res;
+		return resources;
 	}
 
 	@Override

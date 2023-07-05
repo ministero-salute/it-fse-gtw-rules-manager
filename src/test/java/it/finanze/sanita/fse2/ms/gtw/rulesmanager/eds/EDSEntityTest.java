@@ -12,7 +12,7 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.TerminologyMapDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.FhirStructuresDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
@@ -185,12 +185,13 @@ class EDSEntityTest {
 
 	@Test
 	void fromMapToDoc() {
-		TerminologyMapDTO map = new TerminologyMapDTO(
+		DictionaryDTO map = new DictionaryDTO(
 			"system",
 			"version",
 			new Date(),
 			false,
-			false
+			false,
+			1
 		);
 		Document doc = DictionaryETY.fromMap(map);
 		assertNotNull(doc);

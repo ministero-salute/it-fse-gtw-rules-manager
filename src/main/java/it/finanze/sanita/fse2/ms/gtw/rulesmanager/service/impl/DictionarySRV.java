@@ -49,7 +49,7 @@ public class DictionarySRV implements IDictionarySRV {
 
 	private List<Document> getDictionaries(String repository) throws EdsDbException {
 		return this.repository
-				.getAllCodeSystemVersions(repository)
+				.createDictionaries(repository)
 				.stream()
 				.filter(Objects::nonNull)
 				.map(DictionaryETY::fromMap)
