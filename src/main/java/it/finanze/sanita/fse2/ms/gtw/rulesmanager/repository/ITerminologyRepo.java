@@ -25,4 +25,5 @@ public interface ITerminologyRepo {
 	boolean exists(String resource, String version, String collection) throws EdsDbException;
 
 	long countActiveResources(String collection) throws EdsDbException;
+	long countActiveResources(String resource, String version, String collection) throws EdsDbException;
 }

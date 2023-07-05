@@ -58,8 +58,29 @@ public class TerminologySRV implements ITerminologySRV {
     private void verifyResources(IntegrityDTO integrity, String collection, IntegrityResultDTO res) throws EdsDbException {
         for (Resources resource : integrity.getResources()) {
             boolean exists = repository.exists(resource.getId(), resource.getVersion(), collection);
-            if(!exists) res.getMissing().add(resource);
+            if(!exists) {
+                res.getMissing().add(resource);
+            } else {
+                verifyResourceSizeIfProvided(collection, res, resource);
+            }
         }
-        if(res.noMissingResources()) res.setSynced(OK);
+        if(res.noMissingResources() && res.noSizeMismatchResources()) res.setSynced(OK);
+    }
+
+    private void verifyResourceSizeIfProvided(String collection, IntegrityResultDTO res, Resources resource) throws EdsDbException {
+        if(resource.getSize().isPresent()) {
+            long current = repository.countActiveResources(
+                resource.getId(),
+                resource.getVersion(),
+                collection
+            );
+            long expected = resource.getSize().get();
+            // Adjust for whitelisted items
+            if(expected == 0) expected = 1;
+            // Now check
+            if(current != expected) {
+                res.getMismatch().add(resource);
+            }
+        }
     }
 }

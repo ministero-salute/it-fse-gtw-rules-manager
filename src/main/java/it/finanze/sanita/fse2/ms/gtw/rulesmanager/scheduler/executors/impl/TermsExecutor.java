@@ -302,6 +302,9 @@ public class TermsExecutor extends ExecutorEDS<EmptySetDTO> implements ISnapshot
                 matches.getMissing().forEach(
                     raw -> log.debug("[{}] Missing resource from system: {}", getConfig().getTitle(), raw.info())
                 );
+                matches.getMismatch().forEach(
+                    raw -> log.debug("[{}] Mismatch resource size from system: {}", getConfig().getTitle(), raw.info())
+                );
             } else {
                 log.error("[{}] Unable to retrieve checksum from EDS", getConfig().getTitle());
             }

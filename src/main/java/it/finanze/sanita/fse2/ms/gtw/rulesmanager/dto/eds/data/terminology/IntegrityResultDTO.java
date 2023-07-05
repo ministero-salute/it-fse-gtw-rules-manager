@@ -13,10 +13,12 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.KO;
 public class IntegrityResultDTO {
 
     private final List<Resources> missing;
+    private final List<Resources> mismatch;
     private ActionRes synced;
 
     public IntegrityResultDTO() {
         this.missing = new ArrayList<>();
+        this.mismatch = new ArrayList<>();
         this.synced = KO;
     }
 
@@ -30,5 +32,9 @@ public class IntegrityResultDTO {
 
     public boolean noMissingResources() {
         return missing.isEmpty();
+    }
+
+    public boolean noSizeMismatchResources() {
+        return mismatch.isEmpty();
     }
 }

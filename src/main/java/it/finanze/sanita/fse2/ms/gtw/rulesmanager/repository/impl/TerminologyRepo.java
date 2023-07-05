@@ -137,4 +137,20 @@ public class TerminologyRepo implements ITerminologyRepo {
 		return size;
 	}
 
+	@Override
+	public long countActiveResources(String resource, String version, String collection) throws EdsDbException {
+		long size;
+		Query q = new Query(
+			where(FIELD_REF_ID).is(resource)
+			.and(FIELD_REF_VERSION).is(parseInt(version))
+			.and(FIELD_DELETED).ne(true)
+		);
+		try {
+			size = mongo.count(q, collection);
+		}catch (MongoException e) {
+			throw new EdsDbException(String.format("Unable to count resource items on terminology for %s %s", resource, version), e);
+		}
+		return size;
+	}
+
 }
