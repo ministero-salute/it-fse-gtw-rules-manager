@@ -51,9 +51,9 @@ public class TerminologyRepo implements ITerminologyRepo {
 		List<DictionaryDTO> resources;
 
 		// Sort the documents by their deleted value and resource version
-		// So we can acquire the first (latest) not-deleted document of a given system+version
+		// So we can acquire the first (latest) document of a given system+version
 		SortOperation sort =
-			sort(Sort.by(ASC, FIELD_DELETED)).
+			sort(Sort.by(DESC, FIELD_REF_ID)).
 			and(Sort.by(DESC, FIELD_REF_VERSION));
 		// Retrieve each system+version in the database
 		GroupOperation group = group(
@@ -61,19 +61,19 @@ public class TerminologyRepo implements ITerminologyRepo {
 			FIELD_VERSION
 		)
 		// For each system+version, retrieve the value of the first document for each field
-		.first(FIELD_RELEASE_DATE).as(FIELD_RELEASE_DATE)
+		.first(FIELD_RELEASE_DATE).as(DictionaryDTO.FIELD_RELEASE_DATE)
 		.first(FIELD_WHITELIST).as(FIELD_WHITELIST)
 		.first(FIELD_DELETED).as(FIELD_DELETED)
-		.first(FIELD_REF_VERSION).as(DictionaryDTO.FIELD_SOURCE);
+		.first(FIELD_REF).as(FIELD_REF);
 		// Now project to compose the final document
 		ProjectionOperation projection = project()
 			.and(FIELD_SYSTEM_ID_REF).as(FIELD_SYSTEM)
 			.and(FIELD_VERSION_ID_REF).as(FIELD_VERSION)
 			.andInclude(
-				FIELD_RELEASE_DATE,
+				DictionaryDTO.FIELD_RELEASE_DATE,
 				FIELD_WHITELIST,
 				FIELD_DELETED,
-				DictionaryDTO.FIELD_SOURCE
+				FIELD_REF
 			);
 
 		try {
@@ -122,7 +122,7 @@ public class TerminologyRepo implements ITerminologyRepo {
 	public boolean exists(String resource, String version, String collection) throws EdsDbException {
 		boolean exist;
 		Query q = new Query(
-			where(FIELD_REF_ID).is(resource)
+			where(FIELD_REF_ID).is(parseInt(resource))
 			.and(FIELD_REF_VERSION).is(parseInt(version))
 			.and(FIELD_DELETED).ne(true)
 		);
@@ -153,7 +153,7 @@ public class TerminologyRepo implements ITerminologyRepo {
 	public long countActiveResources(String resource, String version, String collection) throws EdsDbException {
 		long size;
 		Query q = new Query(
-			where(FIELD_REF_ID).is(resource)
+			where(FIELD_REF_ID).is(parseInt(resource))
 			.and(FIELD_REF_VERSION).is(parseInt(version))
 			.and(FIELD_DELETED).ne(true)
 		);

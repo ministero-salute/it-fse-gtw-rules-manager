@@ -191,7 +191,7 @@ class EDSEntityTest {
 			new Date(),
 			false,
 			false,
-			1
+			new TerminologyETY.Reference(1, 1)
 		);
 		Document doc = DictionaryETY.fromMap(map);
 		assertNotNull(doc);

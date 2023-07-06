@@ -15,40 +15,37 @@ import lombok.Data;
 
 import java.util.Date;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.Reference;
+
 @Data
 public class DictionaryDTO {
 
 	public static final String FIELD_SYSTEM = "system";
 	public static final String FIELD_VERSION = "version";
-	public static final String FIELD_RELEASE_DATE = "release_date";
+	public static final String FIELD_RELEASE_DATE = "releaseDate";
 	public static final String FIELD_WHITELIST = "whitelist";
 	public static final String FIELD_DELETED = "deleted";
-	public static final String FIELD_SOURCE = "source";
 
 	private String system;
 	private String version;
-	private Date release_date;
+	private Date releaseDate;
 	private boolean whitelist;
 	private boolean deleted;
-	private int source;
+	private Reference ref;
 
 	public DictionaryDTO(
 		String system,
 		String version,
-		Date release_date,
+		Date releaseDate,
 		Boolean whitelist,
 		Boolean deleted,
-		int source
+		Reference ref
 	) {
 		this.system = system;
 		this.version = version;
-		this.release_date = release_date;
+		this.releaseDate = releaseDate;
 		this.whitelist = whitelist != null && whitelist;
 		this.deleted = deleted != null && deleted;
-		this.source = source;
-	}
-
-	public Date getReleaseDate() {
-		return release_date;
+		this.ref = ref;
 	}
 }

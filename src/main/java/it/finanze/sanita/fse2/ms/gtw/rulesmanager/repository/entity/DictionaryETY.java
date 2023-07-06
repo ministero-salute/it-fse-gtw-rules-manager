@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY.Reference;
+
 /**
  * Model to save terminology.
  */
@@ -36,7 +38,7 @@ public class DictionaryETY {
     public static final String FIELD_RELEASE_DATE = "release_date";
     public static final String FIELD_WHITELIST = "whitelist";
     public static final String FIELD_DELETED = "deleted";
-    public static final String FIELD_SOURCE = "source";
+    public static final String FIELD_REF = "ref";
 
 	@Id
 	private String id;
@@ -50,8 +52,8 @@ public class DictionaryETY {
     private Boolean whitelist;
     @Field(name = FIELD_DELETED)
     private Boolean deleted;
-    @Field(name = FIELD_SOURCE)
-    private Integer source;
+    @Field(name = FIELD_REF)
+    private Reference ref;
 
     public static org.bson.Document fromMap(DictionaryDTO map) {
         org.bson.Document entity = new org.bson.Document();
@@ -60,7 +62,11 @@ public class DictionaryETY {
         entity.put(FIELD_RELEASE_DATE, map.getReleaseDate());
         entity.put(FIELD_WHITELIST, map.isWhitelist());
         entity.put(FIELD_DELETED, map.isDeleted());
-        entity.put(FIELD_SOURCE, map.getSource());
+        entity.put(FIELD_REF,
+            new org.bson.Document()
+                .append(Reference.FIELD_ID, map.getRef().getResource())
+                .append(Reference.FIELD_VERSION, map.getRef().getVersion())
+        );
         return entity;
     }
 
@@ -74,7 +80,7 @@ public class DictionaryETY {
                     entity.releaseDate,
                     entity.whitelist,
                     entity.deleted,
-                    entity.source
+                    entity.ref
                 )
             );
         }

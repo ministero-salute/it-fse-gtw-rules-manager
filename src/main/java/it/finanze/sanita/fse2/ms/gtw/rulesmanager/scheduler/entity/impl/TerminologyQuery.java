@@ -37,8 +37,8 @@ public class TerminologyQuery {
             .append(FIELD_RELEASE_DATE, meta.getReleased())
             .append(FIELD_REF,
                 new Document()
+                    .append(Reference.FIELD_ID, parseInt(resource))
                     .append(Reference.FIELD_VERSION, parseInt(version))
-                    .append(Reference.FIELD_ID, resource)
             )
             .append(FIELD_WHITELIST, true);
     }
@@ -52,8 +52,8 @@ public class TerminologyQuery {
             .append(FIELD_RELEASE_DATE, meta.getReleased())
             .append(FIELD_REF,
                 new Document()
+                    .append(Reference.FIELD_ID, parseInt(resource))
                     .append(Reference.FIELD_VERSION, parseInt(version))
-                    .append(Reference.FIELD_ID, resource)
             )
             .append(FIELD_WHITELIST, false);
     }
@@ -78,7 +78,7 @@ public class TerminologyQuery {
     }
 
     public Bson getDeleteQuery(HistoryDeleteDTO data) {
-        Query query = new Query(where(FIELD_REF_ID).is(data.getId()));
+        Query query = new Query(where(FIELD_REF_ID).is(parseInt(data.getId())));
         if(data.getOmit() != null) {
             query.addCriteria(
                 where(FIELD_REF_VERSION).lt(parseInt(data.getOmit()))

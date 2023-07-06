@@ -11,6 +11,7 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -66,13 +67,14 @@ public class TerminologyETY {
 	private boolean deleted;
 
 	@Data
+	@AllArgsConstructor
 	public static class Reference {
 		public static final String FIELD_ID = "res_id";
 		public static final String FIELD_VERSION = "res_version";
 		@Field(FIELD_ID)
-		private String resource;
+		private int resource;
 		@Field(FIELD_VERSION)
-		private String version;
+		private int version;
 	}
 
 }
