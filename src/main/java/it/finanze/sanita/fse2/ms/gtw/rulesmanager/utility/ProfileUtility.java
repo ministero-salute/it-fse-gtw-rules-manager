@@ -22,6 +22,7 @@ import static java.util.Arrays.stream;
 
 @Component
 public class ProfileUtility {
+
     @Autowired
     private Environment environment;
 

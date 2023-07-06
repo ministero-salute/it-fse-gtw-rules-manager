@@ -16,6 +16,7 @@ import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -85,6 +86,17 @@ public class TerminologyRepo implements ITerminologyRepo {
 		}
 
 		return resources;
+	}
+
+	@Override
+	public List<DictionaryETY> getDictionaries() throws EdsDbException {
+		List<DictionaryETY> dictionaries;
+		try {
+			dictionaries = mongo.findAll(DictionaryETY.class);
+		}catch (MongoException ex) {
+			throw new EdsDbException("Unable to retrieve all available dictionaries", ex);
+		}
+		return dictionaries;
 	}
 
 	@Override

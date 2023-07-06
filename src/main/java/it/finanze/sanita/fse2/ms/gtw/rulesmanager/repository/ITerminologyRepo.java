@@ -13,17 +13,15 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.DictionaryDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.DictionaryETY;
 
 import java.util.List;
 
 public interface ITerminologyRepo {
-
 	List<DictionaryDTO> createDictionaries(String collection) throws EdsDbException;
-
+	List<DictionaryETY> getDictionaries() throws EdsDbException;
 	void applyIndexes(String collection) throws EdsDbException;
-
 	boolean exists(String resource, String version, String collection) throws EdsDbException;
-
 	long countActiveResources(String collection) throws EdsDbException;
 	long countActiveResources(String resource, String version, String collection) throws EdsDbException;
 }

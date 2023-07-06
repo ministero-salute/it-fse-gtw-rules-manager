@@ -17,7 +17,10 @@ public final class RouteUtility {
 
     public static final String API_VERSION = "v1";
     public static final String API_RUN_SCHEDULER = "run-scheduler";
+    public static final String API_STATUS = "status";
+    public static final String API_STATUS_MAPPER = "/" + API_VERSION + "/" + API_STATUS;
 
+    public static final String API_STATUS_DICTIONARY = "/dictionary";
     public static final String API_RUN_SCHEDULER_FULL = "/" + API_VERSION + "/" + API_RUN_SCHEDULER;
 
 }

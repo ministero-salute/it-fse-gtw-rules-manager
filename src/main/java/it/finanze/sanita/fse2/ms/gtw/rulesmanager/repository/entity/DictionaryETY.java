@@ -18,7 +18,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Model to save terminology.
@@ -45,9 +47,11 @@ public class DictionaryETY {
     @Field(name = FIELD_RELEASE_DATE)
     private Date releaseDate;
     @Field(name = FIELD_WHITELIST)
-    private Boolean whiteList;
+    private Boolean whitelist;
     @Field(name = FIELD_DELETED)
     private Boolean deleted;
+    @Field(name = FIELD_SOURCE)
+    private Integer source;
 
     public static org.bson.Document fromMap(DictionaryDTO map) {
         org.bson.Document entity = new org.bson.Document();
@@ -58,6 +62,23 @@ public class DictionaryETY {
         entity.put(FIELD_DELETED, map.isDeleted());
         entity.put(FIELD_SOURCE, map.getSource());
         return entity;
+    }
+
+    public static List<DictionaryDTO> toMap(List<DictionaryETY> entities) {
+        List<DictionaryDTO> dictionaries = new ArrayList<>();
+        for (DictionaryETY entity : entities) {
+            dictionaries.add(
+                new DictionaryDTO(
+                    entity.system,
+                    entity.version,
+                    entity.releaseDate,
+                    entity.whitelist,
+                    entity.deleted,
+                    entity.source
+                )
+            );
+        }
+        return dictionaries;
     }
 
 }
