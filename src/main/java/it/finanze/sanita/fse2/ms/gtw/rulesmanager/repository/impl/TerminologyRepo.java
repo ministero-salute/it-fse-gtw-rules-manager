@@ -50,11 +50,11 @@ public class TerminologyRepo implements ITerminologyRepo {
 
 		List<DictionaryDTO> resources;
 
-		// Sort the documents by their resource version
-		// So we can acquire the first (latest) document of a given system+version
-		SortOperation sort = sort(
-			Sort.by(DESC, FIELD_REF_VERSION)
-		);
+		// Sort the documents by their deleted value and resource version
+		// So we can acquire the first (latest) not-deleted document of a given system+version
+		SortOperation sort =
+			sort(Sort.by(ASC, FIELD_DELETED)).
+			and(Sort.by(DESC, FIELD_REF_VERSION));
 		// Retrieve each system+version in the database
 		GroupOperation group = group(
 			FIELD_SYSTEM,
