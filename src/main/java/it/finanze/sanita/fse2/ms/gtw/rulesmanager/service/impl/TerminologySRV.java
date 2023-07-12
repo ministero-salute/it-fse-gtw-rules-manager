@@ -11,16 +11,19 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityDTO.Resources;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.terminology.IntegrityResultDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.ITerminologyRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.ITerminologySRV;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
 
 @Service
 public class TerminologySRV implements ITerminologySRV {
@@ -68,13 +71,14 @@ public class TerminologySRV implements ITerminologySRV {
     }
 
     private void verifyResourceSizeIfProvided(String collection, IntegrityResultDTO res, Resources resource) throws EdsDbException {
-        if(resource.getSize().isPresent()) {
+        Optional<Long> size = resource.getSize();
+        if(size.isPresent()) {
+            long expected = size.get();
             long current = repository.countActiveResources(
                 resource.getId(),
                 resource.getVersion(),
                 collection
             );
-            long expected = resource.getSize().get();
             // Adjust for whitelisted items
             if(expected == 0) expected = 1;
             // Now check

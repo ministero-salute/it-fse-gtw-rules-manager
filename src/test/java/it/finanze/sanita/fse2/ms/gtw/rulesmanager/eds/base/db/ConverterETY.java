@@ -52,8 +52,8 @@ public final class ConverterETY {
             .append(TerminologyETY.FIELD_CODE, entity.getCode())
             .append(TerminologyETY.FIELD_DESCRIPTION, entity.getDescription())
             .append(TerminologyETY.FIELD_RELEASE_DATE, entity.getReleaseDate())
-            .append(TerminologyETY.FIELD_LAST_UPDATE, entity.getLastUpdateDate())
-            .append(TerminologyETY.FIELD_DELETED, entity.getDeleted() != null && entity.getDeleted());
+            .append(TerminologyETY.FIELD_LAST_SYNC, entity.getLastSync())
+            .append(TerminologyETY.FIELD_DELETED, entity.isDeleted());
     }
 
     public static TerminologyETY docToTerms(Document doc) {
@@ -63,7 +63,7 @@ public final class ConverterETY {
         entity.setVersion(doc.getString(TerminologyETY.FIELD_VERSION));
         entity.setCode(doc.getString(TerminologyETY.FIELD_CODE));
         entity.setDescription(doc.getString(TerminologyETY.FIELD_DESCRIPTION));
-        entity.setLastUpdateDate(doc.getDate(TerminologyETY.FIELD_LAST_UPDATE));
+        entity.setReleaseDate(doc.getDate(TerminologyETY.FIELD_RELEASE_DATE));
         entity.setLastSync(doc.getDate(TerminologyETY.FIELD_LAST_SYNC));
         return entity;
     }
