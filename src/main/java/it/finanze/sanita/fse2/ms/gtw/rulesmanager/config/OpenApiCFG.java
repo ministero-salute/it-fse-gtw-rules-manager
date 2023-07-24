@@ -32,18 +32,8 @@ import org.springframework.context.annotation.Configuration;
 			version = "1.0.0", 
 			description = "Feeds the Validator with configuration items",
 			termsOfService = "${docs.info.termsOfService}", 
-			contact = @Contact(name = "${docs.info.contact.name}", url = "${docs.info.contact.url}", email = "${docs.info.contact.mail}")),
-	servers = {
-		@Server(
-			description = "Gateway Rules Manager Development URL",
-			url = "http://localhost:8011",
-			extensions = {
-				@Extension(properties = {
-					@ExtensionProperty(name = "x-sandbox", parseValue = true, value = "true")
-				})
-			}
-		)
-	})
+			contact = @Contact(name = "${docs.info.contact.name}", url = "${docs.info.contact.url}", email = "${docs.info.contact.mail}"))
+	)
 public class OpenApiCFG {
 
   public OpenApiCFG() {
