@@ -42,6 +42,8 @@ public class SchematronDTO {
         @JsonProperty
         private String version;
         @JsonProperty
+        private String system;
+        @JsonProperty
         private String templateIdRoot;
         @JsonProperty
         private Date lastUpdateDate;
