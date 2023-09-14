@@ -14,6 +14,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.impl;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.WhoIsResponseDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.EdsStrategyEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -35,22 +36,22 @@ public class ConfigClient implements IConfigClient {
      * Config host.
      */
     @Value("${ms.url.gtw-config}")
-    private String configHost;
+    private String host;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestTemplate rest;
 
     @Autowired
-    private ProfileUtility profileUtility;
+    private ProfileUtility profile;
 
     @Override
     public String getGatewayName() {
         String gatewayName;
         try {
             log.debug("Config Client - Calling Config Client to get Gateway Name");
-            final String endpoint = configHost + "/v1/whois";
+            final String endpoint = host + "/v1/whois";
 
-            final boolean isTestEnvironment = profileUtility.isDevOrDockerProfile() || profileUtility.isTestProfile();
+            final boolean isTestEnvironment = profile.isDevOrDockerProfile() || profile.isTestProfile();
 
             // Check if the endpoint is reachable
             if (isTestEnvironment && !isReachable()) {
@@ -58,7 +59,7 @@ public class ConfigClient implements IConfigClient {
                 return Constants.AppConstants.MOCKED_GATEWAY_NAME;
             }
 
-            final ResponseEntity<WhoIsResponseDTO> response = restTemplate.getForEntity(endpoint, WhoIsResponseDTO.class);
+            final ResponseEntity<WhoIsResponseDTO> response = rest.getForEntity(endpoint, WhoIsResponseDTO.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
                 WhoIsResponseDTO body = response.getBody();
@@ -73,10 +74,20 @@ public class ConfigClient implements IConfigClient {
         return gatewayName;
     }
 
+    @Override
+    public String getEDSStrategy() {
+        String output = EdsStrategyEnum.NO_EDS.name();
+        if(isReachable()) {
+            String endpoint = host + "/v1/config-items/props?type=GENERIC&props=eds-strategy";
+            output = rest.getForObject(endpoint,String.class);
+        }
+        return output;
+    }
+
     private boolean isReachable() {
         try {
-            final String endpoint = configHost + "/status";
-            restTemplate.getForEntity(endpoint, String.class);
+            final String endpoint = host + "/status";
+            rest.getForEntity(endpoint, String.class);
             return true;
         } catch (ResourceAccessException clientException) {
             return false;

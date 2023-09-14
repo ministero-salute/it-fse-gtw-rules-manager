@@ -17,5 +17,5 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client;
 public interface IConfigClient {
 	
 	String getGatewayName();
-
+	String getEDSStrategy();
 }
