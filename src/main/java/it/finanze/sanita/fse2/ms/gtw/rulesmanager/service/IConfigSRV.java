@@ -7,4 +7,8 @@ public interface IConfigSRV {
 	boolean isNoEds();
 	
 	boolean isNoFhirEds();
+
+	boolean isNoEdsWithLogs();
+
+	boolean areLogsEnabled();
 }
