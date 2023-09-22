@@ -137,14 +137,14 @@ public abstract class ExecutorEDS<T> implements IDocumentHandlerEDS<T>, IExecuta
     // === LISTENERS ===
     protected OnStepListener onStepFailure(Date timestamp) {
         return (name, status) -> {
-            if (bridge.getConfig().areLogsEnabled() && status == ActionRes.KO)  {
+            if (bridge.getConfig().isNoEdsWithLogs() && status == ActionRes.KO)  {
                 bridge.getLogger().error(LOG_TYPE_CONTROL, "Error while updating GTW configuration items", config.getTitle() + " - " + name, ResultLogEnum.KO, timestamp);
             }
         };
     }
     protected OnPlanListener onPlanSuccess(Date timestamp) {
         return (status) -> {
-            if (bridge.getConfig().areLogsEnabled() && status == ActionRes.OK)  {
+            if (bridge.getConfig().isNoEdsWithLogs() && status == ActionRes.OK)  {
                 bridge.getLogger().info(LOG_TYPE_CONTROL, "Successfully updated configuration items", "Update" + " - " + config.getTitle(), ResultLogEnum.OK, timestamp);
             }
         };

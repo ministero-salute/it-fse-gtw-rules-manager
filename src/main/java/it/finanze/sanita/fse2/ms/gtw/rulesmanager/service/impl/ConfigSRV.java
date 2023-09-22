@@ -49,33 +49,13 @@ public class ConfigSRV implements IConfigSRV {
 		return edsStrategy;
 	}
 
-	@Override
-	public boolean isNoFhirEds() {
-		// Trigger refresh if necessary
-		String out = getEdsStrategy();
-		// Evaluate
-		return StringUtils.isNotBlank(out) && EdsStrategyEnum.NO_FHIR_EDS.name().equalsIgnoreCase(out);
-	}
 
 	@Override
 	public boolean isNoEdsWithLogs() {
 		// Trigger refresh if necessary
 		String out = getEdsStrategy();
 		// Evaluate
-		return StringUtils.isNotBlank(out) && EdsStrategyEnum.NO_EDS_WITH_LOG.name().equalsIgnoreCase(out);
+		return StringUtils.isNotBlank(out) || EdsStrategyEnum.NO_EDS_WITH_LOG.name().equalsIgnoreCase(out);
 	}
-
-	@Override
-	public boolean areLogsEnabled() {
-		return isNoEdsWithLogs() || isNoFhirEds();
-	}
-
-	//Se la strategy è null si setta come default no_eds (quindi non verranno emesse loggate)
-	@Override
-	public boolean isNoEds() {
-		// Trigger refresh if necessary
-		String out = getEdsStrategy();
-		// Evaluate
-		return StringUtils.isBlank(out) || EdsStrategyEnum.NO_EDS.name().equalsIgnoreCase(out);
-	}
+ 
 }
