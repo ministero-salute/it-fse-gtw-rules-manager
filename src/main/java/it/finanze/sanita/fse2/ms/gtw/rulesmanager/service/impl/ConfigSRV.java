@@ -4,6 +4,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.EdsStrategyEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
+@Slf4j
 public class ConfigSRV implements IConfigSRV {
 
 	private static final Long DELTA_MS = 300000L;
@@ -35,6 +37,7 @@ public class ConfigSRV implements IConfigSRV {
 		synchronized (this) {
 			edsStrategy = client.getEDSStrategy();
 			lastUpdate = new Date().getTime();
+			log.info("[EDS] Running with strategy: {}", edsStrategy);
 		}
 	}
 
