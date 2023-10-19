@@ -18,6 +18,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.EdsStrategyEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +81,8 @@ public class ConfigClient implements IConfigClient {
         if(isReachable()) {
             String endpoint = host + "/v1/config-items/props?type=GENERIC&props=eds-strategy";
             output = rest.getForObject(endpoint,String.class);
+            // If gtw-config answer but is not configured
+            if(StringUtils.isBlank(output)) output = EdsStrategyEnum.NO_EDS_WITH_LOG.name();
         }
         return output;
     }
