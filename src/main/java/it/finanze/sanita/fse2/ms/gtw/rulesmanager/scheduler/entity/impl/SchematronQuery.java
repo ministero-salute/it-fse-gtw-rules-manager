@@ -34,14 +34,19 @@ public class SchematronQuery implements IQueryEDS<SchematronDTO> {
         // Get data
         SchematronDTO.Schematron schematron = dto.getDocument();
         // Create
-        return new org.bson.Document()
+        Document doc = new Document()
             .append(FIELD_ID, new ObjectId(schematron.getId()))
             .append(FIELD_FILENAME, schematron.getName())
             .append(FIELD_CONTENT, new Binary(StringUtility.decodeBase64(schematron.getContent())))
             .append(FIELD_VERSION, schematron.getVersion())
+            .append(FIELD_SYSTEM, schematron.getSystem())
             .append(FIELD_ROOT, schematron.getTemplateIdRoot())
             .append(FIELD_LAST_UPDATE, schematron.getLastUpdateDate())
             .append(FIELD_DELETED, false);
+
+        if(schematron.getSystem() == null) doc.remove(FIELD_SYSTEM);
+
+        return doc;
     }
 
     /**
@@ -80,6 +85,7 @@ public class SchematronQuery implements IQueryEDS<SchematronDTO> {
             .append(FIELD_CONTENT, doc.get(FIELD_CONTENT, Binary.class))
             .append(FIELD_VERSION, doc.getString(FIELD_VERSION))
             .append(FIELD_ROOT, doc.getString(FIELD_ROOT))
+            .append(FIELD_SYSTEM, doc.getString(FIELD_SYSTEM))
             .append(FIELD_LAST_UPDATE, doc.getDate(FIELD_LAST_UPDATE))
             .append(FIELD_LAST_SYNC, doc.getDate(FIELD_LAST_SYNC))
             .append(FIELD_DELETED,  doc.getBoolean(FIELD_DELETED)); 
