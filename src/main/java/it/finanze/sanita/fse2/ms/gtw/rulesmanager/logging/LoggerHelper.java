@@ -11,20 +11,22 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
-import lombok.extern.slf4j.Slf4j;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -43,6 +45,9 @@ public class LoggerHelper {
 	@Value("${spring.application.name}")
 	private String msName;
 	
+	@Autowired
+    private IConfigSRV configSRV;
+	
 	/* 
 	 * Specify here the format for the dates 
 	 */
@@ -55,112 +60,125 @@ public class LoggerHelper {
 	public void trace(String logType, String message, String operation, 
 			   ResultLogEnum result, Date startDateOperation) {
 		
-		LogDTO logDTO = LogDTO.builder().
-				message(message).
-				operation(operation).
-				op_result(result.getCode()).
-				op_timestamp_start(dateFormat.format(startDateOperation)).
-				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(getGatewayName()).
-				microservice_name(msName).
-				log_type(logType).
-				build();
-		
-		final String logMessage = StringUtility.toJSON(logDTO);
-		log.trace(logMessage);
+		if(configSRV.isControlLogPersistenceEnable()) {
+			LogDTO logDTO = LogDTO.builder().
+					message(message).
+					operation(operation).
+					op_result(result.getCode()).
+					op_timestamp_start(dateFormat.format(startDateOperation)).
+					op_timestamp_end(dateFormat.format(new Date())).
+					gateway_name(getGatewayName()).
+					microservice_name(msName).
+					log_type(logType).
+					build();
+			
+			final String logMessage = StringUtility.toJSON(logDTO);
+			log.trace(logMessage);
 
-		if (Boolean.TRUE.equals(kafkaLogEnable)) {
-			kafkaLog.trace(logMessage);
+			if (Boolean.TRUE.equals(kafkaLogEnable)) {
+				kafkaLog.trace(logMessage);
+			}	
 		}
+		
 	} 
 	
 	public void debug(String logType, String message,  String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
 		
+		if(configSRV.isControlLogPersistenceEnable()) {
 			LogDTO logDTO = LogDTO.builder().
-				message(message).
-				operation(operation).
-				op_result(result.getCode()).
-				op_timestamp_start(dateFormat.format(startDateOperation)).
-				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(getGatewayName()).
-				microservice_name(msName).
-				log_type(logType).
-				build();
-		
-		final String logMessage = StringUtility.toJSON(logDTO);
-		log.debug(logMessage);
+					message(message).
+					operation(operation).
+					op_result(result.getCode()).
+					op_timestamp_start(dateFormat.format(startDateOperation)).
+					op_timestamp_end(dateFormat.format(new Date())).
+					gateway_name(getGatewayName()).
+					microservice_name(msName).
+					log_type(logType).
+					build();
+			
+			final String logMessage = StringUtility.toJSON(logDTO);
+			log.debug(logMessage);
 
-		if (Boolean.TRUE.equals(kafkaLogEnable)) {
-			kafkaLog.debug(logMessage);
+			if (Boolean.TRUE.equals(kafkaLogEnable)) {
+				kafkaLog.debug(logMessage);
+			}
 		}
+			
 	}
 
 	public void info(String logType, String message, String operation,  
 			ResultLogEnum result, Date startDateOperation) {
 		
+		if(configSRV.isControlLogPersistenceEnable()) {
 			LogDTO logDTO = LogDTO.builder().
-				message(message).
-				operation(operation).
-				op_result(result.getCode()).
-				op_timestamp_start(dateFormat.format(startDateOperation)).
-				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(getGatewayName()).
-				microservice_name(msName).
-				log_type(logType).
-				build();
-		
-		final String logMessage = StringUtility.toJSON(logDTO);
-		log.info(logMessage);
-		if (Boolean.TRUE.equals(kafkaLogEnable)) {
-			kafkaLog.info(logMessage);
+					message(message).
+					operation(operation).
+					op_result(result.getCode()).
+					op_timestamp_start(dateFormat.format(startDateOperation)).
+					op_timestamp_end(dateFormat.format(new Date())).
+					gateway_name(getGatewayName()).
+					microservice_name(msName).
+					log_type(logType).
+					build();
+			
+			final String logMessage = StringUtility.toJSON(logDTO);
+			log.info(logMessage);
+			if (Boolean.TRUE.equals(kafkaLogEnable)) {
+				kafkaLog.info(logMessage);
+			}
 		}
+			
 	} 
 	
 	public void warn(String logType, String message, String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
 		
-		LogDTO logDTO = LogDTO.builder().
-				message(message).
-				operation(operation).
-				op_result(result.getCode()).
-				op_timestamp_start(dateFormat.format(startDateOperation)).
-				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(getGatewayName()).
-				microservice_name(msName).
-				log_type(logType).
-				build();
-		
-		final String logMessage = StringUtility.toJSON(logDTO);
-		log.warn(logMessage);
- 
-		if (Boolean.TRUE.equals(kafkaLogEnable)) {
-			kafkaLog.warn(logMessage);
+		if(configSRV.isControlLogPersistenceEnable()) {
+			LogDTO logDTO = LogDTO.builder().
+					message(message).
+					operation(operation).
+					op_result(result.getCode()).
+					op_timestamp_start(dateFormat.format(startDateOperation)).
+					op_timestamp_end(dateFormat.format(new Date())).
+					gateway_name(getGatewayName()).
+					microservice_name(msName).
+					log_type(logType).
+					build();
+			
+			final String logMessage = StringUtility.toJSON(logDTO);
+			log.warn(logMessage);
+	 
+			if (Boolean.TRUE.equals(kafkaLogEnable)) {
+				kafkaLog.warn(logMessage);
+			}
 		}
+		
  
 	} 
 	
 	public void error(String logType,String message, String operation,  
 			   ResultLogEnum result, Date startDateOperation) {
-		
+		if(configSRV.isControlLogPersistenceEnable()) {
+			LogDTO logDTO = LogDTO.builder().
+					message(message).
+					operation(operation).
+					op_result(result.getCode()).
+					op_timestamp_start(dateFormat.format(startDateOperation)).
+					op_timestamp_end(dateFormat.format(new Date())).
+					gateway_name(getGatewayName()).
+					microservice_name(msName).
+					log_type(logType).
+					build();
+			
+			final String logMessage = StringUtility.toJSON(logDTO);
+			log.error(logMessage);
 
-		LogDTO logDTO = LogDTO.builder().
-				message(message).
-				operation(operation).
-				op_result(result.getCode()).
-				op_timestamp_start(dateFormat.format(startDateOperation)).
-				op_timestamp_end(dateFormat.format(new Date())).
-				gateway_name(getGatewayName()).
-				microservice_name(msName).
-				log_type(logType).
-				build();
-		
-		final String logMessage = StringUtility.toJSON(logDTO);
-		log.error(logMessage);
-
-		if (Boolean.TRUE.equals(kafkaLogEnable)) {
-			kafkaLog.error(logMessage);
+			if (Boolean.TRUE.equals(kafkaLogEnable)) {
+				kafkaLog.error(logMessage);
+			}
 		}
+
 		
 	}
 

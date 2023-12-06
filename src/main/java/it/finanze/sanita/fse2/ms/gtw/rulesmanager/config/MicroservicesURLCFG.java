@@ -9,19 +9,22 @@
  * 
  * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client;
+package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * Interface of gtw-config Client.
- */
-public interface IConfigClient {
-	
-	String getGatewayName();
+import lombok.Getter;
 
-	ConfigItemDTO getConfigurationItems(ConfigItemTypeEnum type);
+@Configuration
+@Getter
+public class MicroservicesURLCFG {
+ 
+	/**
+	 * Ms gtw-config host.
+	 */
+    @Value("${ms.url.gtw-config}")
+    private String configHost;
 
-	Object getProps(ConfigItemTypeEnum type, String props, Object previous);
+
 }
