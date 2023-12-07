@@ -11,31 +11,22 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes;
 
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.API_CONFIG_ITEMS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.API_PROPS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.API_STATUS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.API_WHOIS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.IDENTIFIER_MS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.IDENTIFIER;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.API_VERSION;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.QP_TYPE;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.QP_PROPS;
-import org.springframework.beans.factory.annotation.Autowired;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.MicroservicesURLCFG;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.*;
 
 
 @Component
 public final class ConfigClientRoutes {
 
-    @Autowired
-    private MicroservicesURLCFG msUrlCFG;
+    @Value("${ms.url.gtw-config}")
+    private String configHost;
 
     public UriComponentsBuilder base() {
-        return UriComponentsBuilder.fromHttpUrl(msUrlCFG.getConfigHost());
+        return UriComponentsBuilder.fromHttpUrl(configHost);
     }
 
     public String identifier() {
@@ -67,6 +58,14 @@ public final class ConfigClientRoutes {
             .queryParam(QP_PROPS, props)
             .build()
             .toUriString();
+    }
+
+    public String getConfigItems(ConfigItemTypeEnum type) {
+        return base()
+                .pathSegment(API_VERSION, API_CONFIG_ITEMS)
+                .queryParam(QP_TYPE, type.name())
+                .build()
+                .toUriString();
     }
 
 }
