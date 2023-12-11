@@ -48,6 +48,7 @@ public class ConfigSRV implements IConfigSRV {
                 });
             }
         }
+        integrity();
     }
 
     @Override
@@ -69,5 +70,15 @@ public class ConfigSRV implements IConfigSRV {
         String previous = props.getOrDefault(name, Pair.of(0L, null)).getValue();
         String prop = client.getProps(type, name, previous);
         props.put(name, Pair.of(new Date().getTime(), prop));
+    }
+
+    private void integrity() {
+        String err = "Missing props {} from rules-manager";
+        String[] out = new String[]{
+            PROPS_NAME_CONTROL_LOG_ENABLED,
+        };
+        for (String prop : out) {
+            if(!props.containsKey(prop)) throw new IllegalStateException(err.replace("{}", prop));
+        }
     }
 }
