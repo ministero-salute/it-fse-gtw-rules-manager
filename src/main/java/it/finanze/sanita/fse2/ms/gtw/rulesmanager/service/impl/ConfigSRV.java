@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.PROPS_NAME_CONTROL_LOG_ENABLED;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.RULES_MANAGER;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.GENERIC;
 
 @Service
 @Slf4j
@@ -57,12 +57,12 @@ public class ConfigSRV implements IConfigSRV {
         if (new Date().getTime() - lastUpdate >= DELTA_MS) {
             synchronized(ConfigSRV.class) {
                 if (new Date().getTime() - lastUpdate >= DELTA_MS) {
-                    refresh(RULES_MANAGER, PROPS_NAME_CONTROL_LOG_ENABLED);
+                    refresh(GENERIC, PROPS_NAME_CONTROL_LOG_ENABLED);
                 }
             }
         }
         return Boolean.parseBoolean(
-                props.get(PROPS_NAME_CONTROL_LOG_ENABLED).getValue()
+            props.get(PROPS_NAME_CONTROL_LOG_ENABLED).getValue()
         );
     }
 
