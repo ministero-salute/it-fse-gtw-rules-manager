@@ -55,7 +55,7 @@ public class ConfigSRV implements IConfigSRV {
     public Boolean isControlLogPersistenceEnable() {
         long lastUpdate = props.get(PROPS_NAME_CONTROL_LOG_ENABLED).getKey();
         if (new Date().getTime() - lastUpdate >= DELTA_MS) {
-            synchronized(ConfigSRV.class) {
+            synchronized(PROPS_NAME_CONTROL_LOG_ENABLED) {
                 if (new Date().getTime() - lastUpdate >= DELTA_MS) {
                     refresh(GENERIC, PROPS_NAME_CONTROL_LOG_ENABLED);
                 }
