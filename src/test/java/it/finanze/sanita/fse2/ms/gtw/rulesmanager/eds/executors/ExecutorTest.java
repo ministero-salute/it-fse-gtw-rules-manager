@@ -21,6 +21,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.ConfigSRV;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
@@ -67,6 +68,8 @@ class ExecutorTest {
     private IExecutorRepo repository;
     @Autowired
     private EDSSchemaDB db;
+    @MockBean
+    private ConfigSRV config;
 
     @BeforeAll
     public void init() { resetDB(); }
@@ -81,6 +84,7 @@ class ExecutorTest {
     void execute() {
         // Mock an executor that simply reset
         doReturn(FAKE_STEPS).when(executor).getSteps();
+        when(config.isControlLogPersistenceEnable()).thenReturn(true);
         assertEquals(OK, executor.execute());
         // Mock a runtime error then call real method after test
         doThrow(new RuntimeException("Test error")).doCallRealMethod().when(executor).startup(any(String[].class));
@@ -94,6 +98,7 @@ class ExecutorTest {
     void recovery() {
         // Mock an executor that simply reset
         doReturn(FAKE_STEPS).when(executor).getRecoverySteps();
+        when(config.isControlLogPersistenceEnable()).thenReturn(true);
         assertEquals(OK, executor.recovery());
         // Mock a runtime error then call real method after test
         doThrow(new RuntimeException("Test error")).doCallRealMethod().when(executor).startup(any(String[].class));
