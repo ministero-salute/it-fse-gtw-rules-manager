@@ -17,27 +17,63 @@ import org.springframework.context.event.EventListener;
 @Slf4j
 public class DockerSetup {
 
+	// Executors
 	@Autowired
-	private EnginesExecutor engineExecutors;
+	private EnginesExecutor engineExecutor;
 	
 	@Autowired
-	private IExecutorRepo executorRepo;
+	private DictionaryExecutor dictionaryExecutor;
+
+	// Data-layer
+	@Autowired
+	private IExecutorRepo repository;
+
+	// Configurations
+	@Autowired
+	private FhirStructuresCFG transforms;
 	
 	@Autowired
-	private FhirStructuresCFG fhirStructuresCFG;
+	private EngineCFG engine;
+
+	@Autowired
+	private DictionaryCFG dictionary;
 	
 	@Autowired
-	private EngineCFG engineCFG;
-	
+	private TerminologyCFG terminology;
+
 	@EventListener(value = ApplicationStartedEvent.class)
-	public void dockerInit() throws EdsDbException {
-		log.info("Docker init engines start");
-		executorRepo.drop(engineCFG.getProduction());
-		log.info("Delete collection engine production");
- 		executorRepo.clone(fhirStructuresCFG.getProduction(), fhirStructuresCFG.getStaging());
-		engineExecutors.execute();
-		executorRepo.drop(fhirStructuresCFG.getStaging());
-		log.info("Delete collection transform-staging");
+	public void init() throws EdsDbException {
+		log.info("[DOCKER] Setup has started");
+		setupEngine();
+		setupDictionary();
+		log.info("[DOCKER] Setup has finished");
 	}
-	
+
+	private void setupEngine() throws EdsDbException {
+		log.info("[DOCKER] Starting docker-routine to initialize engine");
+		repository.drop(engine.getProduction());
+		log.info("[DOCKER] Clean-up previous engines, if they exist");
+		repository.clone(transforms.getProduction(), transforms.getStaging());
+		log.info("[DOCKER] Spawning engine ...");
+		engineExecutor.execute();
+		log.info("[DOCKER] Engine spawned!");
+		repository.drop(transforms.getStaging());
+		repository.drop(engine.getBackup());
+		log.info("[DOCKER] Cleaning-up");
+	}
+
+	private void setupDictionary() throws EdsDbException {
+		log.info("[DOCKER] Starting docker-routine to initialize dictionary");
+		repository.drop(dictionary.getProduction());
+		log.info("[DOCKER] Clean-up previous dictionaries, if they exist");
+		repository.clone(terminology.getProduction(), terminology.getStaging());
+		log.info("[DOCKER] Creating dictionaries ...");
+		dictionaryExecutor.execute();
+		log.info("[DOCKER] Dictionaries created!");
+		repository.drop(terminology.getStaging());
+		repository.drop(dictionary.getBackup());
+		log.info("[DOCKER] Cleaning-up");
+	}
+
+
 }

@@ -14,6 +14,7 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.executors;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,4 +28,6 @@ public final class BridgeEDS {
     private IEDSClient client;
     @Autowired
     private LoggerHelper logger;
+    @Autowired
+    private IConfigSRV config;
 }

@@ -20,6 +20,7 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class ConfigClient implements IConfigClient {
     private RestTemplate client;
 
     @Autowired
-    private ProfileUtility profileUtility;
+    private ProfileUtility profile;
 
     @Override
     public String getGatewayName() {
@@ -54,7 +55,7 @@ public class ConfigClient implements IConfigClient {
             log.debug("Config Client - Calling Config Client to get Gateway Name");
             final String endpoint = routes.whois();
 
-            final boolean isTestEnvironment = profileUtility.isDevOrDockerProfile() || profileUtility.isTestProfile();
+            final boolean isTestEnvironment = profile.isDevOrDockerProfile() || profile.isTestProfile();
 
             // Check if the endpoint is reachable
             if (isTestEnvironment && !isReachable()) {
