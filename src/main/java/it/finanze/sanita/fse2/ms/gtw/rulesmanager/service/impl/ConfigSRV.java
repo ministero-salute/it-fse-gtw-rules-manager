@@ -24,7 +24,6 @@ import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnu
 @Slf4j
 public class ConfigSRV implements IConfigSRV {
 
-    private static final long DELTA_MS = 300_000L;
 
     @Autowired
     private IConfigClient client;
@@ -51,9 +50,9 @@ public class ConfigSRV implements IConfigSRV {
     @Override
     public Boolean isControlLogPersistenceEnable() {
         long lastUpdate = props.get(PROPS_NAME_CONTROL_LOG_ENABLED).getKey();
-        if (new Date().getTime() - lastUpdate >= DELTA_MS) {
+        if (new Date().getTime() - lastUpdate >= getRefreshRate()) {
             synchronized(Locks.CONTROL_LOG_ENABLED) {
-                if (new Date().getTime() - lastUpdate >= DELTA_MS) {
+                if (new Date().getTime() - lastUpdate >= getRefreshRate()) {
                     refresh(PROPS_NAME_CONTROL_LOG_ENABLED);
                 }
             }
@@ -93,6 +92,11 @@ public class ConfigSRV implements IConfigSRV {
             if(opts.isEmpty()) log.info("[GTW-CFG] No props were found");
         }
         integrity();
+    }
+
+    @Override
+    public long getRefreshRate() {
+        return 300_000L;
     }
 
     private static final class Locks {
