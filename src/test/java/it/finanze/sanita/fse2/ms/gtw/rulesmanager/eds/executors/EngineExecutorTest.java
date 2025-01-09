@@ -72,13 +72,16 @@ class EngineExecutorTest {
     }
     
     @Test
-    void cleanBackup() {
+    void cleanBackup() throws EdsDbException {
     	// Call createBackup
     	assertEquals(OK, executor.createBackup());
-    	assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+//    	assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+    	assertTrue(repository.exists(executor.getConfig().getBackup()));
+    	
     	// Call onCleanBackup
     	assertEquals(OK, executor.onCleanBackup());
-    	assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+//    	assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+    	assertFalse(repository.exists(executor.getConfig().getBackup()));
     }
     
     @Test
@@ -92,7 +95,7 @@ class EngineExecutorTest {
         assertDoesNotThrow(() -> {
         	db.setupStaging();
         	assertEquals(OK, executor.onStaging());
-        	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+        	assertTrue(repository.exists(executor.getConfig().getStaging()));
         	assertEquals(OK, executor.onProcessing());
         	List<EngineETY> engines = mongo.findAll(EngineETY.class , executor.getConfig().getStaging());
         	assertEquals(1, engines.size());
@@ -109,12 +112,16 @@ class EngineExecutorTest {
     void recovery() throws EdsDbException {
         // Process staging and create backup
         assertEquals(OK, executor.onStaging());
-        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+        assertTrue(repository.exists(executor.getConfig().getStaging()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+        assertTrue(repository.exists(executor.getConfig().getBackup()));
         // Attempt to restore backup as production
         assertEquals(CB_OK, executor.onRecovery());
-        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
-        assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+        assertFalse(repository.exists(executor.getConfig().getBackup()));
         // Emulate runtime exception
         doThrow(new EdsDbException("Test error")).when(repository).rename(anyString(), anyString());
         assertEquals(CB_KO, executor.onRecovery());

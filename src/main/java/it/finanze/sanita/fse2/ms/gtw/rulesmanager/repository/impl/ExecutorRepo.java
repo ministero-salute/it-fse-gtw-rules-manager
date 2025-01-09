@@ -11,29 +11,34 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.impl;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoException;
-import com.mongodb.MongoNamespace;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.RenameCollectionOptions;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import static com.mongodb.client.model.Accumulators.push;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.match;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_DELETED;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_ID;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.FIELD_LAST_SYNC;
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoException;
+import com.mongodb.MongoNamespace;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.RenameCollectionOptions;
 
-import static com.mongodb.client.model.Accumulators.push;
-import static com.mongodb.client.model.Aggregates.group;
-import static com.mongodb.client.model.Aggregates.match;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.SchemaETY.*;
-import static java.util.Arrays.asList;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 
 @Repository
 public class ExecutorRepo implements IExecutorRepo {
@@ -63,17 +68,34 @@ public class ExecutorRepo implements IExecutorRepo {
         rename(mongo.getCollection(src), target);
     }
 
+//    public boolean exists(String name) throws EdsDbException {
+//        // Working var
+//        boolean exists;
+//        try {
+//            // Verify
+//            exists = mongo.collectionExists(name);
+//        } catch (MongoException e) {
+//            // Catch data-layer runtime exceptions and turn into a checked exception
+//            throw new EdsDbException("Unable to verify collection existence", e);
+//        }
+//        return exists;
+//    }
+    
     public boolean exists(String name) throws EdsDbException {
-        // Working var
-        boolean exists;
         try {
-            // Verify
-            exists = mongo.collectionExists(name);
+            // Get the MongoDatabase instance from MongoTemplate
+            MongoDatabase database = mongo.getDb();
+            
+            // Get the list of collection names in the database
+            List<String> collectionNames = new ArrayList<>();
+            database.listCollectionNames().into(collectionNames);
+
+            // Check if the collection exists
+            return collectionNames.contains(name);
         } catch (MongoException e) {
-            // Catch data-layer runtime exceptions and turn into a checked exception
+            // Catch MongoDB exceptions and throw a custom exception
             throw new EdsDbException("Unable to verify collection existence", e);
         }
-        return exists;
     }
 
     public void drop(String name) throws EdsDbException {
@@ -90,7 +112,8 @@ public class ExecutorRepo implements IExecutorRepo {
         // Working var
         MongoCollection<Document> collection;
         // Verify we do not overwrite an existing collection
-        if(mongo.collectionExists(name)) {
+//        if(mongo.collectionExists(name)) {
+        if(exists(name)) {
             throw new EdsDbException("The collection already exists: " + name);
         }
         try {

@@ -15,6 +15,7 @@ import com.mongodb.client.MongoCollection;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IEDSClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.chunk.ChangeSetChunkDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.impl.MockTermsExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
@@ -230,8 +231,14 @@ class TermsExecutorTest {
     private void resetDB() {
         mongo.dropCollection(executor.getConfig().getProduction());
         mongo.dropCollection(executor.getConfig().getStaging());
-        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+        try {
+        	assertFalse(repository.exists(executor.getConfig().getStaging()));
+        	assertFalse(repository.exists(executor.getConfig().getProduction()));
+        } catch(Exception ex) {
+        	throw new BusinessException(ex);
+        }
+//        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
     }
 
 }
