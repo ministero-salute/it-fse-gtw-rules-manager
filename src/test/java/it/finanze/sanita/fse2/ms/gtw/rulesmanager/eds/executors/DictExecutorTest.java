@@ -12,10 +12,20 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.executors;
 
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_SYSTEMS;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,15 +36,12 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants.Profile.TEST;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_DICTIONARIES;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.impl.EDSTermsHandler.EXPECTED_SYSTEMS;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.CallbackRes.CB_OK;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ActionRes.OK;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSTermsDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockDictionaryExecutor;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.entity.TerminologyETY;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.actions.impl.DerivedActionEDS;
 
 @SpringBootTest
 @ActiveProfiles(TEST)
@@ -45,6 +52,8 @@ class DictExecutorTest {
     private MongoTemplate mongo;
     @Autowired
     private MockDictionaryExecutor executor;
+    @Autowired
+    private IExecutorRepo executorRepo;
     @Autowired
     private EDSTermsDB db;
     
@@ -61,32 +70,48 @@ class DictExecutorTest {
     }
     
     @Test
-    void cleanBackup() {
+    void cleanBackup() throws EdsDbException {
     	// Call createBackup
     	assertEquals(OK, executor.createBackup());
-    	assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+//    	assertTrue(mongo.collectionExists(executor.getConfig().getBackup()));
+    	assertTrue(executorRepo.exists(executor.getConfig().getBackup()));
     	
     	// Call onCleanBackup
     	assertEquals(OK, executor.onCleanBackup());
-    	assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+//    	assertFalse(mongo.collectionExists(executor.getConfig().getBackup()));
+    	assertFalse(executorRepo.exists(executor.getConfig().getBackup()));
     }
     
     @Test
-    void processing() {
-    	assertDoesNotThrow(() -> {
-    		// Setup staging
-        	assertEquals(OK, executor.createStaging());
-        	db.setupStaging();
-        	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
-            // Call processing
-            assertEquals(OK, executor.onProcessing());
-            List<TerminologyETY> terminologies = mongo.findAll(TerminologyETY.class, executor.getConfig().getStaging());
-            assertEquals(EXPECTED_DICTIONARIES, terminologies.size());
-            // If this return false, at least one element has a different system from the one declared
-            assertTrue(
-                terminologies.stream().map(TerminologyETY::getSystem).allMatch(EXPECTED_SYSTEMS::contains)
-            );
-    	});
+    void processing() throws Exception {
+    	// Setup staging
+    	assertEquals(OK, executor.createStaging());
+    	db.setupStaging();
+//    	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+    	assertTrue(executorRepo.exists(executor.getConfig().getStaging()));
+        // Call processing
+        assertEquals(OK, executor.onProcessing());
+        List<TerminologyETY> terminologies = mongo.findAll(TerminologyETY.class, executor.getConfig().getStaging());
+        assertEquals(EXPECTED_DICTIONARIES, terminologies.size());
+        // If this return false, at least one element has a different system from the one declared
+        assertTrue(
+            terminologies.stream().map(TerminologyETY::getSystem).allMatch(EXPECTED_SYSTEMS::contains)
+        );
+//    	assertDoesNotThrow(() -> {
+//    		// Setup staging
+//        	assertEquals(OK, executor.createStaging());
+//        	db.setupStaging();
+////        	assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+//        	assertTrue(executorRepo.exists(executor.getConfig().getStaging()));
+//            // Call processing
+//            assertEquals(OK, executor.onProcessing());
+//            List<TerminologyETY> terminologies = mongo.findAll(TerminologyETY.class, executor.getConfig().getStaging());
+//            assertEquals(EXPECTED_DICTIONARIES, terminologies.size());
+//            // If this return false, at least one element has a different system from the one declared
+//            assertTrue(
+//                terminologies.stream().map(TerminologyETY::getSystem).allMatch(EXPECTED_SYSTEMS::contains)
+//            );
+//    	});
     }
     
     @Test

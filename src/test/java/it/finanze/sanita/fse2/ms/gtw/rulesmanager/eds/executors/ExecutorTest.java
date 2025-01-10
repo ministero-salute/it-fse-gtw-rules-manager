@@ -19,7 +19,9 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.changeset.specs.Schema
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.eds.data.SchemaDTO.Schema;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.db.impl.EDSSchemaDB;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsClientException;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.mock.MockSchemaExecutor;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl.ConfigSRV;
@@ -110,16 +112,18 @@ class ExecutorTest {
     }
 
     @Test
-    void clean() {
+    void clean() throws EdsDbException {
         // Setup production
         setupProduction();
         // Create collection
         mongo.createCollection(executor.getConfig().getStaging());
-        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+        assertTrue(repository.exists(executor.getConfig().getStaging()));
         // Execute
         assertEquals(OK, executor.onClean());
         // Verify
-        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
+        assertFalse(repository.exists(executor.getConfig().getStaging()));
         // No collection exists, call executor without collection
         assertEquals(OK, executor.onClean());
         // Verify production integrity
@@ -177,28 +181,34 @@ class ExecutorTest {
 
     
     @Test
-    void staging() {
+    void staging() throws EdsDbException {
         // Case #1 - Production exists
         // Create collection
         setupProduction();
         // Verify exists
-        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
         // Execute
         assertEquals(OK, executor.onStaging());
         // Now staging and production co-exists
-        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+        assertTrue(repository.exists(executor.getConfig().getStaging()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getProduction()));
+        assertTrue(repository.exists(executor.getConfig().getProduction()));
         // Verify production integrity
         db.verifyIntegrityProduction();
         // Emptying database
         resetDB();
         // Case #2 - Production not exists
-        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getProduction()));
         // Execute
         assertEquals(OK, executor.onStaging());
         // There is only staging
-        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+//        assertTrue(mongo.collectionExists(executor.getConfig().getStaging()));
+        assertTrue(repository.exists(executor.getConfig().getStaging()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+        assertFalse(repository.exists(executor.getConfig().getProduction()));
     }
 
     @Test
@@ -541,8 +551,15 @@ class ExecutorTest {
     private void resetDB() {
         mongo.dropCollection(executor.getConfig().getProduction());
         mongo.dropCollection(executor.getConfig().getStaging());
-        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
-        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
+        try {
+        	assertFalse(repository.exists(executor.getConfig().getStaging()));
+            assertFalse(repository.exists(executor.getConfig().getProduction()));	
+        } catch(Exception ex) {
+        	log.error("Error");
+        	throw new BusinessException(ex);
+        }
+//        assertFalse(mongo.collectionExists(executor.getConfig().getStaging()));
+//        assertFalse(mongo.collectionExists(executor.getConfig().getProduction()));
     }
 
 }
