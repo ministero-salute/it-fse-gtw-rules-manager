@@ -15,31 +15,33 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@ConditionalOnProperty(name = "sasl.mechanism", havingValue = "OAUTHBEARER", matchIfMissing = false)
 public class KafkaHealthIndicator implements HealthIndicator {
 
-	@Autowired
+    @Autowired
     private AdminClient client;
 	
-	@Override
-	public Health health() {
-		Health health = null;
-		try {
-			client.listTopics().listings().get();
-			health = Health.up().build();
-		} catch (InterruptedException e) {
-			log.warn("Interrupted!", e);
-			health = Health.down(e).build();
-			// Restore interrupted state...
-			Thread.currentThread().interrupt();
-		} catch (Exception e) {
-			health = Health.down(e).build();
-		}
-		return health;
-	}
+    @Override
+   	public Health health() {
+   		Health health = null;
+   		try {
+   			client.listTopics().listings().get();
+   			health = Health.up().build();
+   		} catch (InterruptedException e) {
+   			log.warn("Interrupted!", e);
+   			health = Health.down(e).build();
+   			// Restore interrupted state...
+   			Thread.currentThread().interrupt();
+   		} catch (Exception e) {
+   			health = Health.down(e).build();
+   		}
+   		return health;
+   	}
 }
