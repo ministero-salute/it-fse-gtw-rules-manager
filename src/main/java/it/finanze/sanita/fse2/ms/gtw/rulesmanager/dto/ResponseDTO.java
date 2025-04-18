@@ -11,8 +11,7 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto;
 
-import javax.validation.constraints.Size;
-
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 

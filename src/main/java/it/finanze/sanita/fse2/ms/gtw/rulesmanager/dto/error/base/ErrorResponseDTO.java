@@ -11,10 +11,11 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.base;
 
+import org.springframework.http.HttpStatus;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
 import lombok.Data;
-import org.apache.http.HttpStatus;
 
 /**
  * Error response
@@ -65,11 +66,7 @@ public class ErrorResponseDTO {
     /**
      * HTTP status
      */
-    @Schema(
-        description = "Stato http",
-        minimum = HttpStatus.SC_CONTINUE + "",
-        maximum = HttpStatus.SC_INSUFFICIENT_STORAGE + ""
-    )
+    @Schema(description = "Stato HTTP", minimum = "100", maximum = "507")
     private Integer status;
 
     /**

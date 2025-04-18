@@ -11,12 +11,6 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.controller.handler;
 
-import brave.Tracer;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.ErrorBuilderDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.base.ErrorResponseDTO;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsSchedulerRunningException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,6 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import io.micrometer.tracing.Tracer;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.LogTraceInfoDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.ErrorBuilderDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.error.base.ErrorResponseDTO;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsSchedulerRunningException;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
@@ -48,17 +49,14 @@ public class ExceptionCTL extends ResponseEntityExceptionHandler {
      * Generate a new {@link LogTraceInfoDTO} instance
      * @return The new instance
      */
-    private LogTraceInfoDTO getLogTraceInfo() {
-        // Create instance
-        LogTraceInfoDTO out = new LogTraceInfoDTO(null, null);
-        // Verify if context is available
-        if (tracer.currentSpan() != null) {
-            out = new LogTraceInfoDTO(
-                tracer.currentSpan().context().spanIdString(),
-                tracer.currentSpan().context().traceIdString());
-        }
-        // Return the log trace
-        return out;
-    }
+    protected LogTraceInfoDTO getLogTraceInfo() {
+		LogTraceInfoDTO out = new LogTraceInfoDTO(null, null);
+		if (tracer.currentSpan() != null) {
+			out = new LogTraceInfoDTO(
+					tracer.currentSpan().context().spanId(), 
+					tracer.currentSpan().context().traceId());
+		}
+		return out;
+	}
 
 }

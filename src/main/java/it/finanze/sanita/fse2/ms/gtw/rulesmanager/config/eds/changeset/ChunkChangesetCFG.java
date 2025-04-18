@@ -11,11 +11,11 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset;
 
-import lombok.Getter;
-import org.apache.http.client.utils.URIBuilder;
-
 import java.net.URI;
-import java.net.URISyntaxException;
+
+import org.springframework.web.util.UriComponentsBuilder;
+
+import lombok.Getter;
 
 @Getter
 public abstract class ChunkChangesetCFG extends ChangesetCFG {
@@ -29,12 +29,21 @@ public abstract class ChunkChangesetCFG extends ChangesetCFG {
         this.chunkDelete = chunkDelete;
     }
 
-    public URI getChunkIns(String id, int idx) throws URISyntaxException {
-        return new URI(chunkInsert + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+//    public URI getChunkIns(String id, int idx) throws URISyntaxException {
+//        return new URI(chunkInsert + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+//    }
+    
+    public URI getChunkIns(String id, int idx) {
+        return UriComponentsBuilder.fromUriString(chunkInsert).pathSegment(id, String.valueOf(idx)).build().toUri();
     }
+    
 
-    public URI getChunkDel(String id, int idx) throws URISyntaxException {
-        return new URI(chunkDelete + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+//    public URI getChunkDel(String id, int idx) throws URISyntaxException {
+//        return new URI(chunkDelete + new URIBuilder().setPathSegments(id, Integer.toString(idx)).build());
+//    }
+    
+    public URI getChunkDel(String id, int idx) {
+        return UriComponentsBuilder.fromUriString(chunkDelete).pathSegment(id, String.valueOf(idx)).build().toUri();
     }
 
 }

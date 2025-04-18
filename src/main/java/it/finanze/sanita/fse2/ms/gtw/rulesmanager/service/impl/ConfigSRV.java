@@ -1,24 +1,25 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.impl;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.PROPS_NAME_CONTROL_LOG_ENABLED;
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.RULES_MANAGER;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.dto.ConfigItemDTO.ConfigDataItemDTO;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.base.ClientRoutes.Config.PROPS_NAME_CONTROL_LOG_ENABLED;
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.RULES_MANAGER;
 
 @Service
 @Slf4j

@@ -11,8 +11,7 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset;
 
-import lombok.Getter;
-import org.apache.http.client.utils.URIBuilder;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -24,7 +23,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
+import lombok.Getter;
 
 @Getter
 public abstract class ChangesetCFG {
@@ -76,11 +78,23 @@ public abstract class ChangesetCFG {
     }
 
     public URL getStatusURL() throws MalformedURLException {
-        return new URL(statusURL);
+    	URL url = null;
+    	try {
+    		url = new URI(statusURL).toURL();
+    	} catch (Exception e) {
+    		throw new BusinessException(e);
+		}
+        return url;
     }
 
     public URL getDataURL() throws MalformedURLException {
-        return new URL(dataURL);
+    	URL url = null;
+    	try {
+    		url = new URI(dataURL).toURL();
+    	} catch (Exception e) {
+    		throw new BusinessException(e);
+		}
+        return url;
     }
 
     public URI getStatusURI() throws URISyntaxException, MalformedURLException {
@@ -109,19 +123,33 @@ public abstract class ChangesetCFG {
         return res;
     }
 
+//    public URI getStatusReq(Date lastUpdate) throws MalformedURLException, URISyntaxException {
+//        // Create URI
+//        URI uri = getStatusURI();
+//        // Verify if timeframe is given or if it's a new copy
+//        if(lastUpdate != null) {
+//            // Return encoded
+//            uri = new URIBuilder(uri)
+//                .addParameter(
+//                    LAST_UPDATE_FIELD, getLastUpdateFormatted(lastUpdate)
+//                ).build();
+//        }
+//        return uri;
+//    }
+    
     public URI getStatusReq(Date lastUpdate) throws MalformedURLException, URISyntaxException {
         // Create URI
         URI uri = getStatusURI();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri);
         // Verify if timeframe is given or if it's a new copy
-        if(lastUpdate != null) {
+        if (lastUpdate != null) {
             // Return encoded
-            uri = new URIBuilder(uri)
-                .addParameter(
-                    LAST_UPDATE_FIELD, getLastUpdateFormatted(lastUpdate)
-                ).build();
+            builder.queryParam(LAST_UPDATE_FIELD, getLastUpdateFormatted(lastUpdate));
+            uri = builder.build().toUri();
         }
         return uri;
     }
+    
 
     public URI getDataReq(String id) throws MalformedURLException, URISyntaxException {
         return getDataURI().resolve(id);
