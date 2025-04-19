@@ -13,11 +13,13 @@ package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
- * 
- *
- *         Constants application.
+ * Constants application.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Constants {
 
 	
@@ -33,6 +35,7 @@ public final class Constants {
 	/**
 	 * Path scan.
 	 */
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	public static final class ComponentScan {
 
 		/**
@@ -69,10 +72,6 @@ public final class Constants {
 		
 		public static final String SCHEDULER_QUERIES = "it.finanze.sanita.fse2.ms.gtw.rulesmanager.scheduler.entity";
 
-
-		private ComponentScan() {
-			// This method is intentionally left blank.
-		}
 
 	}
 	
@@ -134,12 +133,11 @@ public final class Constants {
 		}
 
 	}
-
-	/**
-	 * Constants.
-	 */
-	private Constants() {
-
+	
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	public static final class Properties {
+		public static final String MS_NAME = "gtw-rules-manager";
+		 
 	}
 
 	public static final class Logs {
