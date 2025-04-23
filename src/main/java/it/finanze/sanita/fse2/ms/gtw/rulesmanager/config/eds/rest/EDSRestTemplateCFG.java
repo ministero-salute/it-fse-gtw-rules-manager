@@ -11,58 +11,34 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.rest;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.web.client.RestTemplate;
+
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.GovwayCfg;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.StringUtility;
 
 @Configuration
 public class EDSRestTemplateCFG {
 
-//    @Autowired
-//    private EDSRestPropertiesCFG config;
+	@Autowired
+	private GovwayCfg govwayCfg;
 
-    @ConditionalOnProperty(name="eds.rest.secured", havingValue="false")
-    @Bean
-    public RestTemplate createRestTemplateForDev() {
-        return new RestTemplate();
-    }
+	@Bean
+	public RestTemplate restTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
 
-//    @SneakyThrows
-//    @Bean
-//    @ConditionalOnProperty(name="eds.rest.secured", havingValue="true")
-//    public RestTemplate createRestTemplateForProd() {
-//
-//        RestTemplate restTemplate;
-//
-//        try (FileInputStream fis = new FileInputStream(config.getKspath())) {
-//
-//            KeyStore clientStore = KeyStore.getInstance("JKS");
-//            clientStore.load(fis, config.getKspwd().toCharArray());
-//
-//            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
-//            // CA and certificate
-//            sslContextBuilder.loadKeyMaterial(clientStore, config.getCertificatePwd().toCharArray());
-//            // Gateway certificate
-//            sslContextBuilder.loadTrustMaterial(new File(
-//                config.getTruststorePath()), config.getTruststorePwd().toCharArray()
-//            );
-//            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
-//                sslContextBuilder.build()
-//            );
-//
-//            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-//            clientBuilder.disableCookieManagement();
-//
-//            CloseableHttpClient httpClient = clientBuilder.setSSLSocketFactory(sslConnectionSocketFactory).build();
-//
-//            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-//            requestFactory.setConnectTimeout(config.getConnectionTimeout());
-//            requestFactory.setReadTimeout(config.getReadTimeout());
-//
-//            restTemplate = new RestTemplate(requestFactory);
-//        }
-//
-//        return restTemplate;
-//    }
+		if(!StringUtility.isNullOrEmpty(govwayCfg.getGovwayUser()) && !StringUtility.isNullOrEmpty(govwayCfg.getGovwayPass())) {
+			ClientHttpRequestInterceptor interceptor = new BasicAuthenticationInterceptor(govwayCfg.getGovwayUser(), govwayCfg.getGovwayPass());
+			restTemplate.setInterceptors(Arrays.asList(interceptor));			
+		}
+
+		return restTemplate;
+	}
+
 }

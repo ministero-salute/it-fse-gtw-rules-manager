@@ -11,6 +11,14 @@
  */
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.impl;
 
+import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.GENERIC;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.routes.ConfigClientRoutes;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.Constants;
@@ -20,14 +28,6 @@ import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.BusinessException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.utility.ProfileUtility;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
-
-import static it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ConfigItemTypeEnum.GENERIC;
 
 /**
  * Implementation of gtw-config Client.
