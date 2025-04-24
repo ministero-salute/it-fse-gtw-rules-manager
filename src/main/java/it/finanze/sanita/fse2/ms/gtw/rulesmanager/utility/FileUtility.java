@@ -49,24 +49,6 @@ public final class FileUtility {
 		} 
 	}
 
-	/**
-	 * Metodo per il recupero del contenuto di un file da file system.
-	 *
-	 * @param filename	nome del file
-	 * @return			contenuto del file
-	 */
-	public static byte[] getFileFromFS(final String filename) {
-		byte[] b = null;
-		try {
-			File f = new File(filename);
-			InputStream is = new FileInputStream(f);
-			b = getByteFromInputStream(is);
-			is.close();
-		} catch (Exception e) {
-			log.error("FILE UTILS getFileFromFS():Error retrieving the contents of a file from the file system ", e);
-		}
-		return b;
-	}
 
 	/**
 	 * Metodo per il recupero del contenuto di un file dalla folder interna "/src/main/resources".

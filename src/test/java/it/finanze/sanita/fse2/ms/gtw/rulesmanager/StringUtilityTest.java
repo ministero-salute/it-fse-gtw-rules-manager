@@ -126,29 +126,6 @@ class StringUtilityTest {
 		
 		assertEquals(String.class, uuid.getClass()); 
 	} 
-	
-    @Test
-    void fileUtilityTest() {
-    	byte[] bytes = "\u00e0\u004f\u00d0\u0020\u00ea\u003a\u0069\u0010\u00a2\u00d8\u0008\u0000\u002b\u0030\u0030\u009d".getBytes();    
-    	String fileName = "string";
-    	String testFile= System.getProperty("user.dir") + "/src/test/resources/Files/schema/CDA.XSD"; 
-    	byte[] bytesReturn = FileUtility.getFileFromFS(fileName);
-    	byte[] bytesReturnTestFile = FileUtility.getFileFromFS(testFile); 
-
-
-    	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,fileName));
-    	assertDoesNotThrow(()->FileUtility.saveToFile(bytes,null));
-    	assertDoesNotThrow(()->FileUtility.saveToFile(bytesReturn,null)); 
-    	
-    	assertNotNull(bytesReturnTestFile); 
-    	
-
-		try {
-			Files.deleteIfExists(Paths.get(fileName));
-		} catch (IOException e) {
-			log.warn("Unable to delete {} file", fileName);
-		}
-	} 
     
 
     @Test
