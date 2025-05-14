@@ -18,12 +18,10 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.config.eds.changeset.ChangesetCFG;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.eds.base.entities.AbstractEntityHandler;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 
 public abstract class AbstractSchemaDB<T> {
 
