@@ -62,6 +62,7 @@
 			<producerConfig>bootstrap.servers=${kafka.bootstrap-servers}</producerConfig>
 			<producerConfig>metadata.fetch.timeout.ms=99999999999</producerConfig>
 			<producerConfig>client.id=${kafka.producer.client-id}</producerConfig>
+			<producerConfig>sasl.login.callback.handler.class=${kafka.properties.sasl.client.callback.handler.class}</producerConfig>
 			<springProfile name="default">
 				<producerConfig>security.protocol=${kafka.properties.security.protocol}</producerConfig>
 				<producerConfig>sasl.mechanism=${kafka.properties.sasl.mechanism}</producerConfig>
