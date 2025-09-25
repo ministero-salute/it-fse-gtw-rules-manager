@@ -19,15 +19,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClients;
 
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.mongo.MongoLockProvider;
@@ -40,44 +35,18 @@ import net.javacrumbs.shedlock.provider.mongo.MongoLockProvider;
 public class MongoDatabaseCFG {
 
 	@Autowired
-	private MongoPropertiesCFG props;
+	private MongoDatabaseFactory factory;
 
-
-    /**
-     * Creates a new factory instance with the given connection string (properties.yml)
-     * @return The new {@link SimpleMongoClientDatabaseFactory} instance
-     */
-    @Bean
-    public MongoDatabaseFactory createFactory(MongoPropertiesCFG props) {
-    	  ConnectionString connectionString = new ConnectionString(props.getUri());
-          MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-              .applyConnectionString(connectionString)
-              .build();
-          return new SimpleMongoClientDatabaseFactory(MongoClients.create(mongoClientSettings), props.getSchemaName());
-    }
-
-    /**
-     * Creates a new template instance used to perform operations on the schema
-     * @return The new {@link MongoTemplate} instance
-     */
     @Bean
     @Primary
-    public MongoTemplate createTemplate(ApplicationContext appContext) {
-        // Create new connection instance
-        MongoDatabaseFactory factory = createFactory(props);
-        // Assign application context to mongo
+    public MongoTemplate mongoTemplate(final ApplicationContext appContext) {
         final MongoMappingContext mongoMappingContext = new MongoMappingContext();
         mongoMappingContext.setApplicationContext(appContext);
-        // Apply default mapper
-        MappingMongoConverter converter = new MappingMongoConverter(
-            new DefaultDbRefResolver(factory),
-                mongoMappingContext
-        );
-        // Set the default type mapper (removes custom "_class" column)
+        MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(factory), mongoMappingContext);
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        // Return the new instance
         return new MongoTemplate(factory, converter);
     }
+ 
 
     @Bean
     public LockProvider lockProvider(MongoTemplate template) {
