@@ -61,14 +61,14 @@ public class InvokeEDSClientScheduler {
 	private volatile boolean running;
 
 
-	@Async("single-thread-exec")
-	@EventListener(ApplicationStartedEvent.class)
-	public void initialize() {
-		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
-			log.debug("[EDS] Executing post construct");
-			action();
-		}
-	}
+//	@Async("single-thread-exec")
+//	@EventListener(ApplicationStartedEvent.class)
+//	public void initialize() {
+//		if(!profiles.isTestProfile() && !profiles.isDevOrDockerProfile()) {
+//			log.debug("[EDS] Executing post construct");
+//			action();
+//		}
+//	}
 
 	@Async("single-thread-exec")
 	public void asyncAction() {
