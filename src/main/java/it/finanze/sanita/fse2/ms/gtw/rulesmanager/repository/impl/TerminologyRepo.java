@@ -63,7 +63,10 @@ public class TerminologyRepo implements ITerminologyRepo {
 				TerminologyMapDTO.FIELD_RELEASE_DATE
 			);
 			// Create aggregation definition
-			Aggregation agg = Aggregation.newAggregation(group, project);
+//			Aggregation agg = Aggregation.newAggregation(group, project);
+			Aggregation agg = Aggregation.newAggregation(group, project).
+					withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
+			
 			// Execute
 			res = mongo.aggregate(agg, collection, TerminologyMapDTO.class).getMappedResults();
 		} catch(MongoException ex) {
