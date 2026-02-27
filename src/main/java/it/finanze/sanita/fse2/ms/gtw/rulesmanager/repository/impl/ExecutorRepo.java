@@ -33,14 +33,17 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import com.mongodb.MongoNamespace;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.RenameCollectionOptions;
 
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.exceptions.eds.EdsDbException;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.repository.IExecutorRepo;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
+@Slf4j
 public class ExecutorRepo implements IExecutorRepo {
 
     @Autowired
@@ -68,18 +71,6 @@ public class ExecutorRepo implements IExecutorRepo {
         rename(mongo.getCollection(src), target);
     }
 
-//    public boolean exists(String name) throws EdsDbException {
-//        // Working var
-//        boolean exists;
-//        try {
-//            // Verify
-//            exists = mongo.collectionExists(name);
-//        } catch (MongoException e) {
-//            // Catch data-layer runtime exceptions and turn into a checked exception
-//            throw new EdsDbException("Unable to verify collection existence", e);
-//        }
-//        return exists;
-//    }
     
     public boolean exists(String name) throws EdsDbException {
         try {
@@ -112,7 +103,6 @@ public class ExecutorRepo implements IExecutorRepo {
         // Working var
         MongoCollection<Document> collection;
         // Verify we do not overwrite an existing collection
-//        if(mongo.collectionExists(name)) {
         if(exists(name)) {
             throw new EdsDbException("The collection already exists: " + name);
         }
@@ -140,16 +130,38 @@ public class ExecutorRepo implements IExecutorRepo {
         MongoCollection<Document> src = mongo.getCollection(source);
         MongoCollection<Document> dst = mongo.createCollection(dest);
         // Get iterator
-        List<Document> docs = src.find().into(new ArrayList<>());
-        // Note: We need to check docs.size() because insertMany() does not allow empty lists
-        if(!docs.isEmpty()) {
-            try {
-                dst.insertMany(docs);
-            } catch (MongoException e) {
-                // Catch data-layer runtime exceptions and turn into a checked exception
-                throw new EdsDbException("Unable to clone collection", e);
+//        List<Document> docs = src.find().into(new ArrayList<>());
+//        // Note: We need to check docs.size() because insertMany() does not allow empty lists
+//        if(!docs.isEmpty()) {
+//            try {
+//                dst.insertMany(docs);
+//            } catch (MongoException e) {
+//                // Catch data-layer runtime exceptions and turn into a checked exception
+//                throw new EdsDbException("Unable to clone collection", e);
+//            }
+//        }
+        log.info("Starting - Clone in batch");
+        final int BATCH_SIZE = 1000;
+        List<Document> batch = new ArrayList<>(BATCH_SIZE);
+
+        // Iterate with a cursor instead of loading everything into memory
+        try (MongoCursor<Document> cursor = src.find().batchSize(BATCH_SIZE).cursor()) {
+            while (cursor.hasNext()) {
+                batch.add(cursor.next());
+                if (batch.size() == BATCH_SIZE) {
+                    dst.insertMany(batch);
+                    batch.clear();
+                }
             }
+            // Insert remaining documents
+            if (!batch.isEmpty()) {
+                dst.insertMany(batch);
+            }
+        } catch (MongoException e) {
+            throw new EdsDbException("Unable to clone collection", e);
         }
+        log.info("End - Clone in batch");
+        
         // Return the new copied collection
         return dst;
     }
