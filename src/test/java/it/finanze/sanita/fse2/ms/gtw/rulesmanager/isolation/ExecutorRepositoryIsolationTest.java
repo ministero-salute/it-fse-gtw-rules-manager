@@ -32,11 +32,13 @@ class ExecutorRepositoryIsolationTest {
     @MockitoBean(name="destination") MongoCollection<Document> destination;
     ListCollectionNamesIterable names;
     FindIterable<Document> found;
+    MongoCursor<Document> cursor;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     void defaults() {
         names = mock(ListCollectionNamesIterable.class); found = mock(FindIterable.class);
+        cursor = mock(MongoCursor.class);
         when(mongo.getDb()).thenReturn(database);
         when(database.getName()).thenReturn("isolation");
         when(database.listCollectionNames()).thenReturn(names);
@@ -45,7 +47,8 @@ class ExecutorRepositoryIsolationTest {
         when(mongo.createCollection("dest")).thenReturn(destination);
         when(source.find()).thenReturn(found);
         when(found.sort(any())).thenReturn(found);
-        when(found.into(any())).thenAnswer(call -> call.getArgument(0));
+        when(found.batchSize(anyInt())).thenReturn(found);
+        when(found.cursor()).thenReturn(cursor);
     }
 
     @Test
@@ -65,12 +68,39 @@ class ExecutorRepositoryIsolationTest {
     void cloneCopiesDocumentsButNeverCallsInsertManyForEmptySource() throws Exception {
         assertSame(destination, repo.clone("source", "dest"));
         verify(destination, never()).insertMany(anyList());
+        verify(cursor).close();
         Document doc = new Document("field", "value");
-        when(found.into(any())).thenAnswer(call -> { Collection<Document> out = call.getArgument(0); out.add(doc); return out; });
+        when(cursor.hasNext()).thenReturn(true, false);
+        when(cursor.next()).thenReturn(doc);
         assertSame(destination, repo.clone("source", "dest"));
         verify(destination).insertMany(List.of(doc));
+        verify(cursor, times(2)).close();
         assertThrows(EdsDbException.class, () -> repo.clone("missing", "dest"));
         assertThrows(EdsDbException.class, () -> repo.clone("source", "source"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints={1000,1001,2000})
+    void cloneCopiesFullBatchesAndRemainingDocuments(int count) throws Exception {
+        List<Document> documents = new ArrayList<>();
+        for (int i = 0; i < count; i++) documents.add(new Document("index", i));
+        Iterator<Document> iterator = documents.iterator();
+        when(cursor.hasNext()).thenAnswer(call -> iterator.hasNext());
+        when(cursor.next()).thenAnswer(call -> iterator.next());
+        List<List<Document>> batches = new ArrayList<>();
+        when(destination.insertMany(anyList())).thenAnswer(call -> {
+            batches.add(new ArrayList<>(call.getArgument(0)));
+            return null;
+        });
+
+        assertSame(destination, repo.clone("source", "dest"));
+
+        assertEquals((count + 999) / 1000, batches.size());
+        for (int i = 0; i < batches.size(); i++) {
+            assertEquals(documents.subList(i * 1000, Math.min((i + 1) * 1000, count)), batches.get(i));
+        }
+        verify(found).batchSize(1000);
+        verify(cursor).close();
     }
 
     @Test
@@ -119,7 +149,8 @@ class ExecutorRepositoryIsolationTest {
             case "create" -> { when(mongo.createCollection("dest")).thenThrow(cause); action = () -> repo.create("dest"); }
             case "drop" -> { doThrow(cause).when(mongo).dropCollection("source"); action = () -> repo.drop("source"); }
             case "clone" -> {
-                when(found.into(any())).thenAnswer(call -> { Collection<Document> out = call.getArgument(0); out.add(new Document()); return out; });
+                when(cursor.hasNext()).thenReturn(true, false);
+                when(cursor.next()).thenReturn(new Document());
                 when(destination.insertMany(anyList())).thenThrow(cause); action = () -> repo.clone("source", "dest"); }
             case "rename" -> { doThrow(cause).when(source).renameCollection(any(MongoNamespace.class), any(RenameCollectionOptions.class)); action = () -> repo.rename(source, "dest"); }
             case "lastSync" -> { when(found.first()).thenThrow(cause); action = () -> repo.getLastSync("source"); }
@@ -129,5 +160,6 @@ class ExecutorRepositoryIsolationTest {
             default -> { when(source.aggregate(anyList())).thenThrow(cause); action = () -> repo.getActiveDocumentsId("source"); }
         }
         assertSame(cause, assertThrows(EdsDbException.class, action).getCause());
+        if (operation.equals("clone")) verify(cursor).close();
     }
 }

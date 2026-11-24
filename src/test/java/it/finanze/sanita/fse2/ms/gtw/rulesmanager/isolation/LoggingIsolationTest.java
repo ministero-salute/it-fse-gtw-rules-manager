@@ -1,14 +1,36 @@
 package it.finanze.sanita.fse2.ms.gtw.rulesmanager.isolation;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.*;
-import org.apache.kafka.clients.producer.*;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -16,16 +38,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import ch.qos.logback.classic.*;
-import ch.qos.logback.classic.spi.*;
-import ch.qos.logback.core.*;
+
+import com.google.gson.JsonParser;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.Encoder;
 import ch.qos.logback.core.read.ListAppender;
-import com.google.gson.JsonParser;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.client.IConfigClient;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
-import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.*;
 import it.finanze.sanita.fse2.ms.gtw.rulesmanager.enums.ResultLogEnum;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.AsynchronousDeliveryStrategy;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.BlockingDeliveryStrategy;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.DeliveryStrategy;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.FailedDeliveryCallback;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.HostNameKeyingStrategy;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.KafkaAppender;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.LoggerHelper;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.logging.NoKeyKeyingStrategy;
+import it.finanze.sanita.fse2.ms.gtw.rulesmanager.service.IConfigSRV;
 
 @Tag("ISOLATION")
 @SpringJUnitConfig(LoggerHelper.class)
